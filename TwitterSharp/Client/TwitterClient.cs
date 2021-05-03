@@ -16,9 +16,15 @@ namespace TwitterSharp.Client
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
         }
 
-        public async Task<Tweet[]> GetTweetsAsync(params string[] ids)
+        public async Task<Tweet[]> GetTweetsByIdsAsync(params string[] ids)
         {
             var str = await _httpClient.GetStringAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x))));
+            return JsonSerializer.Deserialize<Answer<Tweet[]>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data;
+        }
+
+        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId)
+        {
+            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets");
             return JsonSerializer.Deserialize<Answer<Tweet[]>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data;
         }
 
