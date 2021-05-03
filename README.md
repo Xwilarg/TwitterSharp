@@ -29,6 +29,6 @@ var client = new TwitterSharp.Client.TwitterClient(bearerToken);
 var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577"); // You can get the id using GetUsersAsync
 for (int i = 0; i < answer.Length; i++)
 {
-    Console.WriteLine($"Twitter n°{i}:\n{answer[i].Text}");
+    Console.WriteLine($"Tweet n°{i}:\n{answer[i].Text}\n\n");
 }
 ```
