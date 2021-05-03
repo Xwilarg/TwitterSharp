@@ -19,14 +19,15 @@ Console.WriteLine(answer[0].Text); // たのしみ！！\uD83D\uDC93 https://t.c
 ### Get a tweet from its username
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
-var answer = await client.GetUsersAsync("theindra5"); // 1022468464513089536
-Console.WriteLine(answer[0].Id); // TheIndra
+var answer = await client.GetUsersAsync("theindra5");
+Console.WriteLine(answer[0].Id); // 1022468464513089536
 ```
 
 ### Get a tweet from an user id
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
-var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577"); // You can get the id using GetUsersAsync
+// You can get the id using GetUsersAsync
+var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577");
 for (int i = 0; i < answer.Length; i++)
 {
     Console.WriteLine($"Tweet n°{i}:\n{answer[i].Text}\n\n");
