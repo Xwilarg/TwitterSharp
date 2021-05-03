@@ -24,6 +24,6 @@ namespace TwitterSharp.Client
 
         private const string _baseUrl = "https://api.twitter.com/2/";
 
-        private HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
     }
 }
