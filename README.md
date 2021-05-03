@@ -12,6 +12,13 @@ To begin with, please go to the [Twitter Developper Portail](https://developer.t
 ### Get a tweet from its ID
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
-var answer = await client.GetTweetByIdAsync("1389189291582967809");
-Console.WriteLine(answer[0].Text);
+var answer = await client.GetTweets("1389189291582967809");
+Console.WriteLine(answer[0].Text); // たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN
+```
+
+### Get a tweet from its username
+```cs
+var client = new TwitterSharp.Client.TwitterClient(bearerToken);
+var answer = await client.GetUsers("1389189291582967809");
+Console.WriteLine(answer[0].Name); // TheIndra
 ```
