@@ -7,7 +7,7 @@ C# wrapper around Twitter API V2
 
 ## Examples (WIP)
 
-To begin with, please go to the [Twitter Developper Portail](https://developer.twitter.com/) and create a new application
+To begin with, please go to the [Twitter Developper Portal](https://developer.twitter.com/) and create a new application
 
 ### Get a tweet from its ID
 ```cs
@@ -16,7 +16,7 @@ var answer = await client.GetTweetsByIdsAsync("1389189291582967809");
 Console.WriteLine(answer[0].Text); // たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN
 ```
 
-### Get a tweet from its username
+### Get an user from its username
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
 var answer = await client.GetUsersAsync("theindra5");
