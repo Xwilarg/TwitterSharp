@@ -23,7 +23,7 @@ var answer = await client.GetUsersAsync("theindra5");
 Console.WriteLine(answer[0].Id); // 1022468464513089536
 ```
 
-### Get a tweet from an user id
+### Get latest tweets from an user id
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
 // You can get the id using GetUsersAsync
@@ -32,4 +32,27 @@ for (int i = 0; i < answer.Length; i++)
 {
     Console.WriteLine($"Tweet n°{i}:\n{answer[i].Text}\n\n");
 }
+```
+
+### Follow users and get all new tweets
+```cs
+var client = new TwitterSharp.Client.TwitterClient(bearerToken);
+
+// Subscribe to 5 Twitter accounts
+var request = new TwitterSharp.Request.StreamRequest(
+    "moricalliope OR takanashikiara OR ninomaeinanis OR gawrgura OR watsonameliaEN"
+);
+await client.AddTweetStreamAsync(request); // Add them to the stream
+
+// We display all the subscriptions we have
+var subs = await client.GetInfoTweetStreamAsync();
+Console.WriteLine("Subscriptions: " + string.Join("\n", subs.Select(x => x.Value)));
+
+Task.Run(async () => // NextTweetStreamAsync will continue to run in background
+{
+    await client.NextTweetStreamAsync((tweet) => // Take in parameter a callback called for each new tweet
+    {
+        Console.WriteLine(tweet.Text);
+    });
+});
 ```

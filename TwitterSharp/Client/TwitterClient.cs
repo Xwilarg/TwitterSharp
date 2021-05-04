@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -41,10 +42,18 @@ namespace TwitterSharp.Client
             return JsonSerializer.Deserialize<Answer<StreamInfo[]>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data ?? Array.Empty<StreamInfo>();
         }
 
-        public async Task<Tweet> NextTweetStreamAsync()
+        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet)
         {
-            var str = await _httpClient.GetStringAsync(_baseUrl + "tweets/search/stream");
-            return JsonSerializer.Deserialize<Answer<Tweet>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data;
+            var stream = await _httpClient.GetStreamAsync(_baseUrl + "tweets/search/stream");
+            using StreamReader reader = new(stream);
+            while (!reader.EndOfStream)
+            {
+                var str = reader.ReadLine();
+                if (string.IsNullOrWhiteSpace(str))
+                    continue;
+                var result = JsonSerializer.Deserialize<Answer<Tweet>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data;
+                onNextTweet(result);
+            }
         }
 
         public async Task<StreamInfo[]> AddTweetStreamAsync(params StreamRequest[] request)
