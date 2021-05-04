@@ -21,17 +21,37 @@ namespace TwitterSharp.Client
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
         }
 
+        private T[] ParseArrayData<T>(string json)
+        {
+            var answer = JsonSerializer.Deserialize<Answer<T[]>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (answer.Detail != null)
+            {
+                throw new TwitterException(answer.Detail);
+            }
+            return answer.Data ?? Array.Empty<T>();
+        }
+
+        private Answer<T> ParseData<T>(string json)
+        {
+            var answer = JsonSerializer.Deserialize<Answer<T>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (answer.Detail != null)
+            {
+                throw new TwitterException(answer.Detail);
+            }
+            return answer;
+        }
+
         #region TweetSearch
         public async Task<Tweet[]> GetTweetsByIdsAsync(params string[] ids)
         {
             var str = await _httpClient.GetStringAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x))));
-            return JsonSerializer.Deserialize<Answer<Tweet[]>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data ?? Array.Empty<Tweet>();
+            return ParseArrayData<Tweet>(str);
         }
 
         public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId)
         {
             var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets");
-            return JsonSerializer.Deserialize<Answer<Tweet[]>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data ?? Array.Empty<Tweet>();
+            return ParseArrayData<Tweet>(str);
         }
         #endregion TweetSearch
 
@@ -39,7 +59,7 @@ namespace TwitterSharp.Client
         public async Task<StreamInfo[]> GetInfoTweetStreamAsync()
         {
             var str = await _httpClient.GetStringAsync(_baseUrl + "tweets/search/stream/rules");
-            return JsonSerializer.Deserialize<Answer<StreamInfo[]>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data ?? Array.Empty<StreamInfo>();
+            return ParseArrayData<StreamInfo>(str);
         }
 
         public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet)
@@ -51,7 +71,7 @@ namespace TwitterSharp.Client
                 var str = reader.ReadLine();
                 if (string.IsNullOrWhiteSpace(str))
                     continue;
-                var result = JsonSerializer.Deserialize<Answer<Tweet>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data;
+                var result = ParseData<Tweet>(str).Data;
                 onNextTweet(result);
             }
         }
@@ -60,14 +80,14 @@ namespace TwitterSharp.Client
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }), Encoding.UTF8, "application/json");
             var str = await (await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules", content)).Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Answer<StreamInfo[]>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data ?? Array.Empty<StreamInfo>();
+            return ParseArrayData<StreamInfo>(str);
         }
 
         public async Task<int> DeleteTweetStreamAsync(params string[] ids)
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestDelete { Delete = new StreamRequestDeleteIds { Ids = ids } }), Encoding.UTF8, "application/json");
             var str = await (await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules", content)).Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Answer<object>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Meta.Summary.Deleted;
+            return ParseData<object>(str).Meta.Summary.Deleted;
         }
         #endregion TweetStream
 
@@ -75,7 +95,7 @@ namespace TwitterSharp.Client
         public async Task<User[]> GetUsersAsync(params string[] usernames)
         {
             var str = await _httpClient.GetStringAsync(_baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.HtmlEncode(x))));
-            return JsonSerializer.Deserialize<Answer<User[]>>(str, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Data ?? Array.Empty<User>();
+            return ParseArrayData<User>(str);
         }
         #endregion UserSearch
 

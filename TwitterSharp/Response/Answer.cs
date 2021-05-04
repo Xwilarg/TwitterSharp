@@ -4,6 +4,9 @@
     {
         public T Data { init; get; }
         public Meta Meta { init; get; }
+
+        // Error Handling
+        public string Detail { init; get; }
     }
 
     internal struct Meta
