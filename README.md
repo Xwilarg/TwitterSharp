@@ -48,9 +48,11 @@ await client.AddTweetStreamAsync(request); // Add them to the stream
 var subs = await client.GetInfoTweetStreamAsync();
 Console.WriteLine("Subscriptions: " + string.Join("\n", subs.Select(x => x.Value)));
 
-Task.Run(async () => // NextTweetStreamAsync will continue to run in background
+// NextTweetStreamAsync will continue to run in background
+Task.Run(async () =>
 {
-    await client.NextTweetStreamAsync((tweet) => // Take in parameter a callback called for each new tweet
+    // Take in parameter a callback called for each new tweet
+    await client.NextTweetStreamAsync((tweet) =>
     {
         Console.WriteLine(tweet.Text);
     });
