@@ -21,7 +21,7 @@ namespace TwitterSharp.Client
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
         }
 
-        private T[] ParseArrayData<T>(string json)
+        private static T[] ParseArrayData<T>(string json)
         {
             var answer = JsonSerializer.Deserialize<Answer<T[]>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             if (answer.Detail != null)
@@ -31,7 +31,7 @@ namespace TwitterSharp.Client
             return answer.Data ?? Array.Empty<T>();
         }
 
-        private Answer<T> ParseData<T>(string json)
+        private static Answer<T> ParseData<T>(string json)
         {
             var answer = JsonSerializer.Deserialize<Answer<T>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             if (answer.Detail != null)
