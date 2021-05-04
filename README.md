@@ -7,7 +7,7 @@ C# wrapper around Twitter API V2
 
 ## Examples (WIP)
 
-To begin with, please go to the [Twitter Developper Portail](https://developer.twitter.com/) and create a new application
+To begin with, please go to the [Twitter Developer Portail](https://developer.twitter.com/) and create a new application
 
 ### Get a tweet from its ID
 ```cs
