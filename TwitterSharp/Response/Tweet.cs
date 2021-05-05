@@ -2,12 +2,6 @@
 
 namespace TwitterSharp.Response
 {
-    internal class TweetInternal
-    {
-        public string Id { init; get; }
-        public string Text { init; get; }
-    }
-
     public class Tweet : IEquatable<Tweet>
     {
         public string Id { init; get; }

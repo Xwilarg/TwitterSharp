@@ -39,16 +39,6 @@ namespace TwitterSharp.Client
             return answer.Data ?? Array.Empty<T>();
         }
 
-        private Answer<T, U> ParseDataWithIncludes<T, U>(string json)
-        {
-            var answer = JsonSerializer.Deserialize<Answer<T, U>>(json, _jsonOptions);
-            if (answer.Detail != null)
-            {
-                throw new TwitterException(answer.Detail);
-            }
-            return answer;
-        }
-
         private Answer<T> ParseData<T>(string json)
         {
             var answer = JsonSerializer.Deserialize<Answer<T>>(json, _jsonOptions);
@@ -94,13 +84,7 @@ namespace TwitterSharp.Client
                 var str = reader.ReadLine();
                 if (string.IsNullOrWhiteSpace(str))
                     continue;
-                var result = ParseDataWithIncludes<TweetInternal, UserContainer>(str);
-                onNextTweet(new Tweet
-                {
-                    Id = result.Data.Id,
-                    Text = result.Data.Text,
-                    Author = result.Includes.Users[0]
-                });
+                onNextTweet(ParseData<Tweet>(str).Data);
             }
         }
 

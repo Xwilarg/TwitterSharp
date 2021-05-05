@@ -2,16 +2,6 @@
 
 namespace TwitterSharp.Client
 {
-    internal class Answer<T, U>
-    {
-        public T Data { init; get; }
-        public U Includes { init; get; }
-        public Meta Meta { init; get; }
-
-        // Error Handling
-        public string Detail { init; get; }
-    }
-
     internal class Answer<T>
     {
         public T Data { init; get; }
@@ -24,11 +14,6 @@ namespace TwitterSharp.Client
     internal class Meta
     {
         public Summary Summary { init; get; }
-    }
-
-    internal class UserContainer
-    {
-        public User[] Users { init; get; }
     }
 
     internal class Summary
