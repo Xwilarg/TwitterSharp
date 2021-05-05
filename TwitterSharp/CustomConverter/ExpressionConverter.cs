@@ -9,7 +9,7 @@ namespace TwitterSharp.CustomConverter
     {
         public override Expression Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            throw new NotImplementedException("TODO");
+            return new(reader.GetString(), "");
         }
 
         public override void Write(Utf8JsonWriter writer, Expression value, JsonSerializerOptions options)
