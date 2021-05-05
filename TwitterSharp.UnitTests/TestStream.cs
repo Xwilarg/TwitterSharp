@@ -21,7 +21,7 @@ namespace TwitterSharp.UnitTests
 
             var objectiveCount = res.Length + 1;
 
-            if (elem.Id != null)
+            if (elem != null)
             {
                 await client.DeleteTweetStreamAsync(elem.Id);
                 objectiveCount--;
@@ -50,7 +50,7 @@ namespace TwitterSharp.UnitTests
 
             Assert.IsTrue(res.Length == objectiveCount);
             elem = res.FirstOrDefault(x => x.Tag == "TwitterSharp UnitTest");
-            Assert.IsNull(elem.Id);
+            Assert.IsNull(elem);
         }
     }
 }
