@@ -40,13 +40,19 @@ var client = new TwitterSharp.Client.TwitterClient(bearerToken);
 
 // Subscribe to 5 Twitter accounts
 var request = new TwitterSharp.Request.StreamRequest(
-    "moricalliope OR takanashikiara OR ninomaeinanis OR gawrgura OR watsonameliaEN"
+    Expression.Author("moricalliope")
+        .Or(
+            Expression.Author("takanashikiara"),
+            Expression.Author("ninomaeinanis"),
+            Expression.Author("gawrgura"),
+            Expression.Author("watsonameliaEN")
+        )
 );
 await client.AddTweetStreamAsync(request); // Add them to the stream
 
 // We display all the subscriptions we have
 var subs = await client.GetInfoTweetStreamAsync();
-Console.WriteLine("Subscriptions: " + string.Join("\n", subs.Select(x => x.Value)));
+Console.WriteLine("Subscriptions: " + string.Join("\n", subs.Select(x => x.Value.ToString())));
 
 // NextTweetStreamAsync will continue to run in background
 Task.Run(async () =>

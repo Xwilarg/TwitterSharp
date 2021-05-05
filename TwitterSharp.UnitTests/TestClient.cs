@@ -6,7 +6,7 @@ using TwitterSharp.Client;
 namespace TwitterSharp.UnitTests
 {
     [TestClass]
-    public class UnitTest
+    public class TestClient
     {
         [TestMethod]
         public async Task GetTweetByIdsAsync()

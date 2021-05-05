@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
+using TwitterSharp.CustomConverter;
 using TwitterSharp.Request;
 using TwitterSharp.Request.Internal;
 using TwitterSharp.Response;
@@ -19,11 +20,17 @@ namespace TwitterSharp.Client
         {
             _httpClient = new();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            };
+            _jsonOptions.Converters.Add(new ExpressionConverter());
         }
 
-        private static T[] ParseArrayData<T>(string json)
+        private T[] ParseArrayData<T>(string json)
         {
-            var answer = JsonSerializer.Deserialize<Answer<T[]>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var answer = JsonSerializer.Deserialize<Answer<T[]>>(json, _jsonOptions);
             if (answer.Detail != null)
             {
                 throw new TwitterException(answer.Detail);
@@ -31,9 +38,9 @@ namespace TwitterSharp.Client
             return answer.Data ?? Array.Empty<T>();
         }
 
-        private static Answer<T> ParseData<T>(string json)
+        private Answer<T> ParseData<T>(string json)
         {
-            var answer = JsonSerializer.Deserialize<Answer<T>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var answer = JsonSerializer.Deserialize<Answer<T>>(json, _jsonOptions);
             if (answer.Detail != null)
             {
                 throw new TwitterException(answer.Detail);
@@ -102,5 +109,6 @@ namespace TwitterSharp.Client
         private const string _baseUrl = "https://api.twitter.com/2/";
 
         private readonly HttpClient _httpClient;
+        private readonly JsonSerializerOptions _jsonOptions;
     }
 }
