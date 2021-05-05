@@ -4,14 +4,14 @@ namespace TwitterSharp.Response
 {
     internal struct TweetInternal
     {
-        public string Id { internal init; get; }
-        public string Text { internal init; get; }
+        public string Id { init; get; }
+        public string Text { init; get; }
     }
 
     public struct Tweet : IEquatable<Tweet>
     {
-        public string Id { internal init; get; }
-        public string Text { internal init;  get; }
+        public string Id { init; get; }
+        public string Text { init; get; }
 
         public User Author { internal init; get; }
 

@@ -5,11 +5,11 @@ namespace TwitterSharp.Response
 {
     public struct StreamInfo : IEquatable<StreamInfo>
     {
-        public string Id { internal init; get; }
+        public string Id { init; get; }
 
         // TODO: I want to better handle this but there is too much parsing: https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query
         public Expression Value { init; get; }
-        public string Tag { internal init; get; }
+        public string Tag { init; get; }
 
         public override bool Equals(object obj)
             => obj is StreamInfo t && t.Id == Id;
