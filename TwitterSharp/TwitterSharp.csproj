@@ -2,6 +2,22 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0-alpha</Version>
+    <Authors>Xwilarg</Authors>
+    <Description>C# wrapper around Twitter API V2</Description>
+    <Copyright>MIT</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/Xwilarg/TwitterSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Xwilarg/TwitterSharp</RepositoryUrl>
+    <PackageTags>twitter-api twitter-api-v2</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
