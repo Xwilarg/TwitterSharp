@@ -21,13 +21,13 @@ namespace TwitterSharp.Rule
         /// Tweet match one of the expression given in parameter
         /// </summary>
         public Expression Or(params Expression[] others)
-            => new(_internal + " OR " + string.Join(" OR ", others.Select(x => x.ToString())), "");
+            => new("(" + _internal + " OR " + string.Join(" OR ", others.Select(x => x.ToString())) + ")", "");
 
         /// <summary>
         /// Tweet match all the expressions given in parameter
         /// </summary>
         public Expression And(params Expression[] others)
-            => new(_internal + " AND " + string.Join(" AND ", others.Select(x => x.ToString())), "");
+            => new("(" + _internal + " AND " + string.Join(" AND ", others.Select(x => x.ToString())) + ")", "");
 
         /// <summary>
         /// Tweet match the negation of the current expression
