@@ -16,18 +16,18 @@ namespace TwitterSharp.Response
         public User Author { internal init; get; }
 
         public override bool Equals(object obj)
-            => obj is Tweet t && t.Id == Id;
+            => obj is Tweet t && t?.Id == Id;
 
         public bool Equals(Tweet other)
-            => other.Id == Id;
+            => other?.Id == Id;
 
         public override int GetHashCode()
             => Id.GetHashCode();
 
         public static bool operator ==(Tweet left, Tweet right)
-            => left.Id == right.Id;
+            => left?.Id == right?.Id;
 
         public static bool operator !=(Tweet left, Tweet right)
-            => left.Id != right.Id;
+            => left?.Id != right?.Id;
     }
 }

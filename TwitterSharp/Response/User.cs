@@ -28,18 +28,18 @@ namespace TwitterSharp.Response
         public bool? IsVerified { init; get; }
 
         public override bool Equals(object obj)
-            => obj is User t && t.Id == Id;
+            => obj is User t && t?.Id == Id;
 
         public bool Equals(User other)
-            => other.Id == Id;
+            => other?.Id == Id;
 
         public override int GetHashCode()
             => Id.GetHashCode();
 
         public static bool operator ==(User left, User right)
-            => left.Id == right.Id;
+            => left?.Id == right?.Id;
 
         public static bool operator !=(User left, User right)
-            => left.Id != right.Id;
+            => left?.Id != right?.Id;
     }
 }
