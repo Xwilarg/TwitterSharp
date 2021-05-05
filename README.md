@@ -40,7 +40,7 @@ var client = new TwitterSharp.Client.TwitterClient(bearerToken);
 
 // Subscribe to 5 Twitter accounts
 var request = new TwitterSharp.Request.StreamRequest(
-    Expression.Author("moricalliope")
+    Expression.Author("moricalliope") // using TwitterSharp.Rule;
         .Or(
             Expression.Author("takanashikiara"),
             Expression.Author("ninomaeinanis"),
@@ -58,9 +58,10 @@ Console.WriteLine("Subscriptions: " + string.Join("\n", subs.Select(x => x.Value
 Task.Run(async () =>
 {
     // Take in parameter a callback called for each new tweet
+    // Since we want to get the basic info of the tweet author, we add an empty array of UserOption
     await client.NextTweetStreamAsync((tweet) =>
     {
-        Console.WriteLine(tweet.Text);
-    });
+        Console.WriteLine($"From {tweet.Author.Name}: {tweet.Text}");
+    }, Array.Empty<UserOption>());
 });
 ```

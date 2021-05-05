@@ -3,7 +3,7 @@ using TwitterSharp.Rule;
 
 namespace TwitterSharp.Response
 {
-    public struct StreamInfo : IEquatable<StreamInfo>
+    public class StreamInfo : IEquatable<StreamInfo>
     {
         public string Id { init; get; }
 

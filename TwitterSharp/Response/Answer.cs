@@ -2,7 +2,7 @@
 
 namespace TwitterSharp.Client
 {
-    internal struct Answer<T, U>
+    internal class Answer<T, U>
     {
         public T Data { init; get; }
         public U Includes { init; get; }
@@ -12,7 +12,7 @@ namespace TwitterSharp.Client
         public string Detail { init; get; }
     }
 
-    internal struct Answer<T>
+    internal class Answer<T>
     {
         public T Data { init; get; }
         public Meta Meta { init; get; }
@@ -21,17 +21,17 @@ namespace TwitterSharp.Client
         public string Detail { init; get; }
     }
 
-    internal struct Meta
+    internal class Meta
     {
         public Summary Summary { init; get; }
     }
 
-    internal struct UserContainer
+    internal class UserContainer
     {
         public User[] Users { init; get; }
     }
 
-    internal struct Summary
+    internal class Summary
     {
         public int Deleted { init; get; }
     }

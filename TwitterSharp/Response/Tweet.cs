@@ -2,13 +2,13 @@
 
 namespace TwitterSharp.Response
 {
-    internal struct TweetInternal
+    internal class TweetInternal
     {
         public string Id { init; get; }
         public string Text { init; get; }
     }
 
-    public struct Tweet : IEquatable<Tweet>
+    public class Tweet : IEquatable<Tweet>
     {
         public string Id { init; get; }
         public string Text { init; get; }

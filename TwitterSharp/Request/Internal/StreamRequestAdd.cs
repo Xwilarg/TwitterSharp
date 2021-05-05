@@ -2,7 +2,7 @@
 
 namespace TwitterSharp.Request.Internal
 {
-    internal struct StreamRequestAdd
+    internal class StreamRequestAdd
     {
         [JsonPropertyName("add")]
         public StreamRequest[] Add { init; get; }

@@ -3,7 +3,7 @@ using TwitterSharp.Rule;
 
 namespace TwitterSharp.Request
 {
-    public struct StreamRequest
+    public class StreamRequest
     {
         public StreamRequest(Expression value, string tag = "")
         {

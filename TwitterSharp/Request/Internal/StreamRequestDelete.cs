@@ -2,13 +2,13 @@
 
 namespace TwitterSharp.Request.Internal
 {
-    internal struct StreamRequestDelete
+    internal class StreamRequestDelete
     {
         [JsonPropertyName("delete")]
         public StreamRequestDeleteIds Delete { init; get; }
     }
 
-    internal struct StreamRequestDeleteIds
+    internal class StreamRequestDeleteIds
     {
         [JsonPropertyName("ids")]
         public string[] Ids { init; get; }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace TwitterSharp.Response
 {
-    public struct User : IEquatable<User>
+    public class User : IEquatable<User>
     {
         public string Id { init; get; }
         public string Name { init; get; }

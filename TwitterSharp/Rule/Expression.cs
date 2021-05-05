@@ -3,7 +3,7 @@
 namespace TwitterSharp.Rule
 {
     // https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
-    public struct Expression
+    public class Expression
     {
         internal Expression(string prefix, string userInput)
         {

@@ -81,8 +81,13 @@ namespace TwitterSharp.Client
         }
 
         public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet)
+            => await NextTweetStreamAsync(onNextTweet, null);
+
+        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, UserOption[] options)
         {
-            var stream = await _httpClient.GetStreamAsync(_baseUrl + "tweets/search/stream");
+            var stream = await _httpClient.GetStreamAsync(_baseUrl + "tweets/search/stream"
+                    + (options == null ? "" : "?expansions=author_id&user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant())))
+                );
             using StreamReader reader = new(stream);
             while (!reader.EndOfStream)
             {
@@ -100,14 +105,9 @@ namespace TwitterSharp.Client
         }
 
         public async Task<StreamInfo[]> AddTweetStreamAsync(params StreamRequest[] request)
-            => await AddTweetStreamAsync(request, null);
-
-        public async Task<StreamInfo[]> AddTweetStreamAsync(StreamRequest[] request, UserOption[] options)
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }, _jsonOptions), Encoding.UTF8, "application/json");
-            var str = await (await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules"
-                    + (options == null ? "" : "?expansions=author_id&user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant())))
-                , content)).Content.ReadAsStringAsync();
+            var str = await (await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules", content)).Content.ReadAsStringAsync();
             return ParseArrayData<StreamInfo>(str);
         }
 
