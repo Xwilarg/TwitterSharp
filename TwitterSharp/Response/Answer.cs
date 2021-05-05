@@ -28,7 +28,7 @@ namespace TwitterSharp.Client
 
     internal struct UserContainer
     {
-        public User[] Users;
+        public User[] Users { init; get; }
     }
 
     internal struct Summary
