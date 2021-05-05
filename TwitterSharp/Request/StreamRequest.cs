@@ -12,8 +12,8 @@ namespace TwitterSharp.Request
         }
 
         [JsonPropertyName("value")]
-        public Expression Value { init; get; }
+        public Expression Value { private init; get; }
         [JsonPropertyName("tag")]
-        public string Tag { init; get; }
+        public string Tag { private init; get; }
     }
 }

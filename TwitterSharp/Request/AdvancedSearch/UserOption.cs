@@ -1,7 +1,7 @@
 ﻿namespace TwitterSharp.Request.AdvancedSearch
 {
     // https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/user
-    public enum UserSearch
+    public enum UserOption
     {
         /// <summary>
         /// UTC Datetime that the user account was created

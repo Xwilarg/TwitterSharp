@@ -4,8 +4,10 @@ namespace TwitterSharp.Response
 {
     public struct Tweet : IEquatable<Tweet>
     {
-        public string Id { init; get; }
-        public string Text { init;  get; }
+        public string Id { internal init; get; }
+        public string Text { internal init;  get; }
+
+        public User Author { internal init; get; }
 
         public override bool Equals(object obj)
             => obj is Tweet t && t.Id == Id;

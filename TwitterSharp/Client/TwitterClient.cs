@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using TwitterSharp.CustomConverter;
 using TwitterSharp.Request;
+using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Internal;
 using TwitterSharp.Response;
 
@@ -36,6 +37,16 @@ namespace TwitterSharp.Client
                 throw new TwitterException(answer.Detail);
             }
             return answer.Data ?? Array.Empty<T>();
+        }
+
+        private Answer<T, U> ParseDataWithIncludes<T, U>(string json)
+        {
+            var answer = JsonSerializer.Deserialize<Answer<T, U>>(json, _jsonOptions);
+            if (answer.Detail != null)
+            {
+                throw new TwitterException(answer.Detail);
+            }
+            return answer;
         }
 
         private Answer<T> ParseData<T>(string json)
@@ -78,15 +89,25 @@ namespace TwitterSharp.Client
                 var str = reader.ReadLine();
                 if (string.IsNullOrWhiteSpace(str))
                     continue;
-                var result = ParseData<Tweet>(str).Data;
-                onNextTweet(result);
+                var result = ParseDataWithIncludes<TweetInternal, UserContainer>(str);
+                onNextTweet(new Tweet
+                {
+                    Id = result.Data.Id,
+                    Text = result.Data.Text,
+                    Author = result.Includes.Users[0]
+                });
             }
         }
 
         public async Task<StreamInfo[]> AddTweetStreamAsync(params StreamRequest[] request)
+            => await AddTweetStreamAsync(request, null);
+
+        public async Task<StreamInfo[]> AddTweetStreamAsync(StreamRequest[] request, UserOption[] options)
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }), Encoding.UTF8, "application/json");
-            var str = await (await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules", content)).Content.ReadAsStringAsync();
+            var str = await (await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules"
+                    + (options == null ? "" : "?expansions=author_id&user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant())))
+                , content)).Content.ReadAsStringAsync();
             return ParseArrayData<StreamInfo>(str);
         }
 
@@ -100,8 +121,14 @@ namespace TwitterSharp.Client
 
         #region UserSearch
         public async Task<User[]> GetUsersAsync(params string[] usernames)
+            => await GetUsersAsync(usernames, null);
+
+        public async Task<User[]> GetUsersAsync(string[] usernames, UserOption[] options)
         {
-            var str = await _httpClient.GetStringAsync(_baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.HtmlEncode(x))));
+            var str = await _httpClient.GetStringAsync(
+                _baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.HtmlEncode(x)))
+                    + (options == null ? "" : "&user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant())))
+                );
             return ParseArrayData<User>(str);
         }
         #endregion UserSearch
