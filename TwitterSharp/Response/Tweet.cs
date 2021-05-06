@@ -8,6 +8,7 @@ namespace TwitterSharp.Response
     {
         public string Id { init; get; }
         public string Text { init; get; }
+        [JsonPropertyName("author_id")]
         public string AuthorId { init; get; }
 
         [JsonIgnore]

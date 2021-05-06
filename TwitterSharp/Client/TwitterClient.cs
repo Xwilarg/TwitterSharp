@@ -46,7 +46,7 @@ namespace TwitterSharp.Client
         private static readonly Type _authorInterface = typeof(IHaveAuthor);
         private static void InternalIncludesParse<T>(Answer<T> answer)
         {
-            if (_authorInterface.IsAssignableFrom(typeof(T)))
+            if (answer.Includes != null && _authorInterface.IsAssignableFrom(typeof(T)))
             {
                 var data = answer.Data;
                 IncludesParseUser((IHaveAuthor)data, answer.Includes);
@@ -55,7 +55,7 @@ namespace TwitterSharp.Client
         }
         private static void InternalIncludesParse<T>(Answer<T[]> answer)
         {
-            if (_authorInterface.IsAssignableFrom(typeof(T)))
+            if (answer.Includes != null && _authorInterface.IsAssignableFrom(typeof(T)))
             {
                 var data = answer.Data;
                 IncludesParseUser(data.Cast<IHaveAuthor>().ToArray(), answer.Includes);

@@ -75,7 +75,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetsFromUserIdWithAuthorAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577");
+            var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577", Array.Empty<UserOption>());
             Assert.IsTrue(answer.Length == 10);
             foreach (var t in answer)
             {
