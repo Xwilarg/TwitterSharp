@@ -13,7 +13,10 @@
         /// </summary>
         Description,
 
-        // Entities // Not implemented yet
+        /// <summary>
+        /// Entities in the description
+        /// </summary>
+        Entities,
 
         /// <summary>
         /// Location specified on user's profile

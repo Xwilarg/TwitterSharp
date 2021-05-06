@@ -22,6 +22,7 @@ namespace TwitterSharp.Response
         [JsonPropertyName("protected")]
         public bool? IsProtected { init; get; }
         public string Url { init; get; }
+        public Entities Entities { init; get; }
         [JsonPropertyName("public_metrics")]
         public PublicMetrics PublicMetrics { init; get; }
         [JsonPropertyName("verified")]

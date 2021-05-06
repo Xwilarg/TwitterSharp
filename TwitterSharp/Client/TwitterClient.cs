@@ -27,6 +27,7 @@ namespace TwitterSharp.Client
             {
                 PropertyNameCaseInsensitive = true,
             };
+            _jsonOptions.Converters.Add(new EntitiesConverter());
             _jsonOptions.Converters.Add(new ExpressionConverter());
         }
 
