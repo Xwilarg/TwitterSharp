@@ -29,6 +29,24 @@ namespace TwitterSharp.Client
             _jsonOptions.Converters.Add(new ExpressionConverter());
         }
 
+        private static void InteralIncludesParse<T>(Answer<T> answer)
+            where T : Tweet
+        {
+            answer.Data.Author = answer.Includes.Users.FirstOrDefault();
+        }
+
+        private static void InteralIncludesParse<T>(Answer<T[]> answer)
+            where T : Tweet
+        {
+            for (int i = 0; i < answer.Data.Length; i++)
+            {
+                answer.Data[i].Author = answer.Includes.Users.Where(x => x.Id == answer.Data[i].AuthorId).FirstOrDefault();
+            }
+        }
+
+        private static void InternalIncludesParse<T>(Answer<T> answer)
+        { }
+
         private T[] ParseArrayData<T>(string json)
         {
             var answer = JsonSerializer.Deserialize<Answer<T[]>>(json, _jsonOptions);
@@ -36,7 +54,12 @@ namespace TwitterSharp.Client
             {
                 throw new TwitterException(answer.Detail);
             }
-            return answer.Data ?? Array.Empty<T>();
+            if (answer.Data == null)
+            {
+                return Array.Empty<T>();
+            }
+            InternalIncludesParse(answer);
+            return answer.Data;
         }
 
         private Answer<T> ParseData<T>(string json)
@@ -46,19 +69,30 @@ namespace TwitterSharp.Client
             {
                 throw new TwitterException(answer.Detail);
             }
+            InternalIncludesParse(answer);
             return answer;
         }
 
         #region TweetSearch
         public async Task<Tweet[]> GetTweetsByIdsAsync(params string[] ids)
+            => await GetTweetsByIdsAsync(ids, null);
+
+        public async Task<Tweet[]> GetTweetsByIdsAsync(string[] ids, UserOption[] options)
         {
-            var str = await _httpClient.GetStringAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x))));
+            var str = await _httpClient.GetStringAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x)))
+                    + (options == null ? "" : "&expansions=author_id&user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant())))
+                );
             return ParseArrayData<Tweet>(str);
         }
 
         public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId)
+            => await GetTweetsFromUserIdAsync(userId, null);
+
+        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, UserOption[] options)
         {
-            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets");
+            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets"
+                    + (options == null ? "" : "?expansions=author_id&user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant())))
+                );
             return ParseArrayData<Tweet>(str);
         }
         #endregion TweetSearch

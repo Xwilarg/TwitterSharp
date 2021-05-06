@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace TwitterSharp.Response
 {
@@ -6,8 +7,10 @@ namespace TwitterSharp.Response
     {
         public string Id { init; get; }
         public string Text { init; get; }
+        public string AuthorId { init; get; }
 
-        public User Author { internal init; get; }
+        [JsonIgnore]
+        public User Author { internal set; get; }
 
         public override bool Equals(object obj)
             => obj is Tweet t && t?.Id == Id;
