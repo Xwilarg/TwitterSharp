@@ -30,27 +30,37 @@ namespace TwitterSharp.Client
             _jsonOptions.Converters.Add(new ExpressionConverter());
         }
 
-        private static void IncludesParseUser(Answer<IHaveAuthor> answer)
+        private static void IncludesParseUser(IHaveAuthor data, Includes includes)
         {
-            answer.Data.Author = answer.Includes.Users.FirstOrDefault();
+            data.Author = includes.Users.FirstOrDefault();
         }
 
-        private static void IncludesParseUserArray<T>(Answer<IHaveAuthor[]> answer)
+        private static void IncludesParseUser(IHaveAuthor[] data, Includes includes)
         {
-            for (int i = 0; i < answer.Data.Length; i++)
+            for (int i = 0; i < data.Length; i++)
             {
-                answer.Data[i].Author = answer.Includes.Users.Where(x => x.Id == answer.Data[i].AuthorId).FirstOrDefault();
+                data[i].Author = includes.Users.Where(x => x.Id == data[i].AuthorId).FirstOrDefault();
             }
         }
 
         private static readonly Type _authorInterface = typeof(IHaveAuthor);
         private static void InternalIncludesParse<T>(Answer<T> answer)
         {
-            if (typeof(T).IsSubclassOf(_authorInterface)) IncludesParseUser((Answer<IHaveAuthor>)answer);
+            if (typeof(T).IsSubclassOf(_authorInterface))
+            {
+                var data = answer.Data;
+                IncludesParseUser((IHaveAuthor)data, answer.Includes);
+                answer.Data = data;
+            }
         }
         private static void InternalIncludesParse<T>(Answer<T[]> answer)
         {
-            if (typeof(T).IsSubclassOf(_authorInterface)) IncludesParseUser((Answer<IHaveAuthor[]>)answer);
+            if (typeof(T).IsSubclassOf(_authorInterface))
+            {
+                var data = answer.Data;
+                IncludesParseUser(data.Cast<IHaveAuthor>().ToArray(), answer.Includes);
+                answer.Data = data;
+            }
         }
 
         private T[] ParseArrayData<T>(string json)
