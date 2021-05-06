@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
 using TwitterSharp.CustomConverter;
+using TwitterSharp.Model;
 using TwitterSharp.Request;
 using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Internal;
@@ -29,14 +30,12 @@ namespace TwitterSharp.Client
             _jsonOptions.Converters.Add(new ExpressionConverter());
         }
 
-        private static void InteralIncludesParse<T>(Answer<T> answer)
-            where T : Tweet
+        private static void IncludesParseUser(Answer<IHaveAuthor> answer)
         {
             answer.Data.Author = answer.Includes.Users.FirstOrDefault();
         }
 
-        private static void InteralIncludesParse<T>(Answer<T[]> answer)
-            where T : Tweet
+        private static void IncludesParseUserArray<T>(Answer<IHaveAuthor[]> answer)
         {
             for (int i = 0; i < answer.Data.Length; i++)
             {
@@ -44,8 +43,15 @@ namespace TwitterSharp.Client
             }
         }
 
+        private static readonly Type _authorInterface = typeof(IHaveAuthor);
         private static void InternalIncludesParse<T>(Answer<T> answer)
-        { }
+        {
+            if (typeof(T).IsSubclassOf(_authorInterface)) IncludesParseUser((Answer<IHaveAuthor>)answer);
+        }
+        private static void InternalIncludesParse<T>(Answer<T[]> answer)
+        {
+            if (typeof(T).IsSubclassOf(_authorInterface)) IncludesParseUser((Answer<IHaveAuthor[]>)answer);
+        }
 
         private T[] ParseArrayData<T>(string json)
         {

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using TwitterSharp.Model;
 
 namespace TwitterSharp.Response
 {
-    public class Tweet : IEquatable<Tweet>
+    public class Tweet : IEquatable<Tweet>, IHaveAuthor
     {
         public string Id { init; get; }
         public string Text { init; get; }
@@ -11,6 +12,16 @@ namespace TwitterSharp.Response
 
         [JsonIgnore]
         public User Author { internal set; get; }
+
+        // Interface
+
+        [JsonIgnore]
+        User IHaveAuthor.Author { set => Author = value; }
+
+        [JsonIgnore]
+        string IHaveAuthor.AuthorId => AuthorId;
+
+        // Comparison
 
         public override bool Equals(object obj)
             => obj is Tweet t && t?.Id == Id;
