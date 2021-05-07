@@ -12,10 +12,22 @@ The package is available as a pre-release on [https://www.nuget.org/packages/Twi
 Install-Package TwitterSharp -Version 0.1.0-alpha
 ```
 
+## How does it works?
+
+To begin with, please go to the [Twitter Developer Portal](https://developer.twitter.com/) and create a new application\
+Then you must instantiate a new client:
+```cs
+var client = new TwitterSharp.Client.TwitterClient(bearerToken);
+```
+From there you can access various methods to access tweets and users, however please make note that a basic request only includes:
+ - For tweets: its ID and content
+ - For users: its ID, name and username
+
+To solve that, most function take an array of UserOption or TweetOption, make sure to add what you need there!
+
+Need more help? You can use the examples below, if you're still lost feel free to open an issue or a discussion!
+
 ## Examples
-
-To begin with, please go to the [Twitter Developer Portal](https://developer.twitter.com/) and create a new application
-
 ### Get a tweet from its ID
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
