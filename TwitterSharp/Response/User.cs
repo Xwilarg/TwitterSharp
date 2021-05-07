@@ -18,7 +18,7 @@ namespace TwitterSharp.Response
         public bool? IsProtected { init; get; }
         public string Url { init; get; }
         public Entities Entities { init; get; }
-        public PublicMetrics PublicMetrics { init; get; }
+        public UserPublicMetrics PublicMetrics { init; get; }
         public bool? IsVerified { init; get; }
 
         public override bool Equals(object obj)

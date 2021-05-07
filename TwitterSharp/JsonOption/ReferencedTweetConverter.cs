@@ -9,8 +9,9 @@ namespace TwitterSharp.JsonOption
     {
         public override ReferencedTweet Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
+            var json = JsonSerializer.Deserialize<JsonElement>(ref reader, options);
             var t = new ReferencedTweet();
-            switch (reader.GetString())
+            switch (json.GetProperty("type").GetString())
             {
                 case "replied_to":
                     t.Type = ReferenceType.RepliedTo;
@@ -23,7 +24,7 @@ namespace TwitterSharp.JsonOption
                 default:
                     throw new InvalidOperationException("Invalid type");
             }
-            t.Id = reader.GetString();
+            t.Id = json.GetProperty("id").GetString();
             return t;
         }
 

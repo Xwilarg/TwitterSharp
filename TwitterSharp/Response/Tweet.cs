@@ -15,10 +15,10 @@ namespace TwitterSharp.Response
         public string InReplyToUserId { init; get; }
         public string Lang { init; get; }
         public bool? PossiblySensitive { init; get; }
-        public PublicMetrics PublicMetrics { init; get; }
+        public TweetPublicMetrics PublicMetrics { init; get; }
         public string Source { init; get; }
         public ReferencedTweet[] ReferencedTweets { init; get; }
-        public ReplySettings ReplySettings { init; get; }
+        public ReplySettings? ReplySettings { init; get; }
 
         [JsonIgnore]
         public User Author { internal set; get; }

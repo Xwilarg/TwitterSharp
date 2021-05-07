@@ -1,6 +1,6 @@
 ﻿namespace TwitterSharp.Response
 {
-    public class PublicMetrics
+    public class UserPublicMetrics
     {
         public int FollowersCount { init; get; }
         public int FollowingCount { init; get; }
