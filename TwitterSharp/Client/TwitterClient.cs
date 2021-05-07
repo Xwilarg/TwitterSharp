@@ -181,7 +181,9 @@ namespace TwitterSharp.Client
             {
                 var str = reader.ReadLine();
                 if (string.IsNullOrWhiteSpace(str))
+                {
                     continue;
+                }
                 onNextTweet(ParseData<Tweet>(str).Data);
             }
         }
