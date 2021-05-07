@@ -8,19 +8,13 @@ namespace TwitterSharp.Response
     {
         public string Id { init; get; }
         public string Text { init; get; }
-        [JsonPropertyName("author_id")]
         public string AuthorId { init; get; }
-        [JsonPropertyName("conversation_id")]
         public string ConversationId { init; get; }
-        [JsonPropertyName("created_at")]
         public DateTime? CreatedAt { init; get; }
         public Entities Entities { init; get; }
-        [JsonPropertyName("in_reply_to_user_id")]
         public string InReplyToUserId { init; get; }
         public string Lang { init; get; }
-        [JsonPropertyName("possibly_sensitive")]
         public bool? PossiblySensitive { init; get; }
-        [JsonPropertyName("public_metrics")]
         public PublicMetrics PublicMetrics { init; get; }
         public string Source;
 

@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using TwitterSharp.Rule;
 
-namespace TwitterSharp.CustomConverter
+namespace TwitterSharp.JsonOption
 {
     public class ExpressionConverter : JsonConverter<Expression>
     {

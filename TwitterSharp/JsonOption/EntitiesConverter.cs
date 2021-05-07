@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Buffers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TwitterSharp.Response;
 using TwitterSharp.Response.Entity;
 
-namespace TwitterSharp.CustomConverter
+namespace TwitterSharp.JsonOption
 {
     public class EntitiesConverter : JsonConverter<Entities>
     {

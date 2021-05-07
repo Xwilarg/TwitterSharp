@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
-using TwitterSharp.CustomConverter;
+using TwitterSharp.JsonOption;
 using TwitterSharp.Model;
 using TwitterSharp.Request;
 using TwitterSharp.Request.AdvancedSearch;
@@ -25,7 +25,7 @@ namespace TwitterSharp.Client
 
             _jsonOptions = new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = new SnakeCaseNamingPolicy()
             };
             _jsonOptions.Converters.Add(new EntitiesConverter());
             _jsonOptions.Converters.Add(new ExpressionConverter());
