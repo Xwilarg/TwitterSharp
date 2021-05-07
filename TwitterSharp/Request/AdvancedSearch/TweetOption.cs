@@ -10,7 +10,6 @@
         // non_public_metrics
         // organic_metrics
         // promoted_metrics
-        // source
 
         Conversation_Id,
         Created_At,

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -30,6 +29,8 @@ namespace TwitterSharp.Client
             };
             _jsonOptions.Converters.Add(new EntitiesConverter());
             _jsonOptions.Converters.Add(new ExpressionConverter());
+            _jsonOptions.Converters.Add(new ReferencedTweetConverter());
+            _jsonOptions.Converters.Add(new ReplySettingsConverter());
         }
 
         #region AdvancedParsing

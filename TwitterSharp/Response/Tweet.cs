@@ -16,7 +16,9 @@ namespace TwitterSharp.Response
         public string Lang { init; get; }
         public bool? PossiblySensitive { init; get; }
         public PublicMetrics PublicMetrics { init; get; }
-        public string Source { internal set; get; }
+        public string Source { init; get; }
+        public ReferencedTweet[] ReferencedTweets { init; get; }
+        public ReplySettings ReplySettings { init; get; }
 
         [JsonIgnore]
         public User Author { internal set; get; }
