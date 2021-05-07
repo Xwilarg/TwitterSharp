@@ -34,14 +34,14 @@ namespace TwitterSharp.Client
         #region AdvancedParsing
         private static void IncludesParseUser(IHaveAuthor data, Includes includes)
         {
-            data.Author = includes.Users.FirstOrDefault();
+            data.SetAuthor(includes.Users.FirstOrDefault());
         }
 
         private static void IncludesParseUser(IHaveAuthor[] data, Includes includes)
         {
             for (int i = 0; i < data.Length; i++)
             {
-                data[i].Author = includes.Users.Where(x => x.Id == data[i].AuthorId).FirstOrDefault();
+                data[i].SetAuthor(includes.Users.Where(x => x.Id == data[i].AuthorId).FirstOrDefault());
             }
         }
 

@@ -5,10 +5,16 @@ namespace TwitterSharp.Request
 {
     public class StreamRequest
     {
-        public StreamRequest(Expression value, string tag = "")
+        public StreamRequest(Expression value, string tag)
         {
             Value = value;
             Tag = tag;
+        }
+
+        public StreamRequest(Expression value)
+        {
+            Value = value;
+            Tag = "";
         }
 
         [JsonPropertyName("value")]

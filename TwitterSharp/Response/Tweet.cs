@@ -16,16 +16,14 @@ namespace TwitterSharp.Response
         public string Lang { init; get; }
         public bool? PossiblySensitive { init; get; }
         public PublicMetrics PublicMetrics { init; get; }
-        public string Source;
+        public string Source { internal set; get; }
 
         [JsonIgnore]
         public User Author { internal set; get; }
 
         // Interface
-
-        [JsonIgnore]
-        User IHaveAuthor.Author { set => Author = value; }
-
+        void IHaveAuthor.SetAuthor(User author)
+            => Author = author;
         [JsonIgnore]
         string IHaveAuthor.AuthorId => AuthorId;
 

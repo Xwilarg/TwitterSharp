@@ -4,7 +4,7 @@ namespace TwitterSharp.Model
 {
     interface IHaveAuthor
     {
-        internal User Author { set; }
+        internal void SetAuthor(User author);
         internal string AuthorId { get; }
     }
 }
