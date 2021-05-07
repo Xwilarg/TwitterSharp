@@ -31,6 +31,7 @@ namespace TwitterSharp.Client
             _jsonOptions.Converters.Add(new ExpressionConverter());
         }
 
+        #region AdvancedParsing
         private static void IncludesParseUser(IHaveAuthor data, Includes includes)
         {
             data.Author = includes.Users.FirstOrDefault();
@@ -89,6 +90,36 @@ namespace TwitterSharp.Client
             InternalIncludesParse(answer);
             return answer;
         }
+        #endregion AdvancedParsing
+
+        #region AddOptions
+        /// <summary>
+        /// Add the user options to an url
+        /// </summary>
+        /// <param name="url">Url to modify (will thenbe returned)</param>
+        /// <param name="options">Options that need to be added</param>
+        /// <param name="needExpansion">False is we are requesting a tweet, else true</param>
+        /// <param name="isFirstLink">True if is the first URL parameter (meaning we must put a ? instead of a &)</param>
+        private static string AddUserOptions(string url, UserOption[] options, bool needExpansion, bool isFirstLink)
+        {
+            if (options == null)
+            {
+                return url;
+            }
+            if (needExpansion)
+            {
+                url += isFirstLink ? "?" : "&";
+                url += "expansions=author_id";
+                isFirstLink = false;
+            }
+            if (options.Length > 0)
+            {
+                url += isFirstLink ? "?" : "&";
+                url += "user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant()));
+            }
+            return url;
+        }
+        #endregion AddOptions
 
         #region TweetSearch
         public async Task<Tweet[]> GetTweetsByIdsAsync(params string[] ids)
@@ -96,9 +127,9 @@ namespace TwitterSharp.Client
 
         public async Task<Tweet[]> GetTweetsByIdsAsync(string[] ids, UserOption[] options)
         {
-            var str = await _httpClient.GetStringAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x)))
-                    + (options == null ? "" : "&expansions=author_id&user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant())))
-                );
+            var url = _baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x)));
+            url = AddUserOptions(url, options, true, false);
+            var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<Tweet>(str);
         }
 
@@ -107,9 +138,9 @@ namespace TwitterSharp.Client
 
         public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, UserOption[] options)
         {
-            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets"
-                    + (options == null ? "" : "?expansions=author_id&user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant())))
-                );
+            var url = _baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets";
+            url = AddUserOptions(url, options, true, true);
+            var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<Tweet>(str);
         }
         #endregion TweetSearch
@@ -126,9 +157,9 @@ namespace TwitterSharp.Client
 
         public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, UserOption[] options)
         {
-            var stream = await _httpClient.GetStreamAsync(_baseUrl + "tweets/search/stream"
-                    + (options == null ? "" : "?expansions=author_id&user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant())))
-                );
+            var url = _baseUrl + "tweets/search/stream";
+            url = AddUserOptions(url, options, true, true);
+            var stream = await _httpClient.GetStreamAsync(url);
             using StreamReader reader = new(stream);
             while (!reader.EndOfStream)
             {
@@ -160,10 +191,9 @@ namespace TwitterSharp.Client
 
         public async Task<User[]> GetUsersAsync(string[] usernames, UserOption[] options)
         {
-            var str = await _httpClient.GetStringAsync(
-                _baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.HtmlEncode(x)))
-                    + (options == null ? "" : "&user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant())))
-                );
+            var url = _baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.HtmlEncode(x)));
+            url = AddUserOptions(url, options, false, false);
+            var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<User>(str);
         }
         #endregion UserSearch
