@@ -69,6 +69,6 @@ Task.Run(async () =>
     await client.NextTweetStreamAsync((tweet) =>
     {
         Console.WriteLine($"From {tweet.Author.Name}: {tweet.Text}");
-    }, Array.Empty<UserOption>());
+    }, null, Array.Empty<UserOption>());
 });
 ```

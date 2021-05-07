@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -93,53 +94,67 @@ namespace TwitterSharp.Client
         #endregion AdvancedParsing
 
         #region AddOptions
-        /// <summary>
-        /// Add the user options to an url
-        /// </summary>
         /// <param name="url">Url to modify (will thenbe returned)</param>
         /// <param name="options">Options that need to be added</param>
-        /// <param name="needExpansion">False is we are requesting a tweet, else true</param>
         /// <param name="isFirstLink">True if is the first URL parameter (meaning we must put a ? instead of a &)</param>
-        private static string AddUserOptions(string url, UserOption[] options, bool needExpansion, bool isFirstLink)
+        private static bool AddOptions(ref string url, string[] options, bool isFirstLink, string expansionString, string requestString)
         {
-            if (options == null)
-            {
-                return url;
-            }
-            if (needExpansion)
+            if (expansionString != null)
             {
                 url += isFirstLink ? "?" : "&";
-                url += "expansions=author_id";
+                url += expansionString;
                 isFirstLink = false;
             }
             if (options.Length > 0)
             {
                 url += isFirstLink ? "?" : "&";
-                url += "user.fields=" + string.Join(",", options.Select(x => x.ToString().ToLowerInvariant()));
+                url += requestString + "=" + string.Join(",", options);
+                isFirstLink = false;
             }
-            return url;
+            return isFirstLink;
+        }
+
+        /// <param name="needExpansion">False is we are requesting a tweet, else true</param>
+        private static bool AddUserOptions(ref string url, UserOption[] options, bool needExpansion, bool isFirstLink)
+        {
+            if (options == null)
+            {
+                return isFirstLink;
+            }
+            return AddOptions(ref url, options.Select(x => x.ToString().ToLowerInvariant()).ToArray(), isFirstLink, needExpansion ? "expansions=author_id" : null, "user.fields");
+        }
+
+        private static bool AddTweetOptions(ref string url, TweetOption[] options, bool isFirstLink)
+        {
+            if (options == null)
+            {
+                return isFirstLink;
+            }
+            return AddOptions(ref url, options.Select(x => x.ToString().ToLowerInvariant()).ToArray(), isFirstLink, null, "tweet.fields");
         }
         #endregion AddOptions
 
         #region TweetSearch
         public async Task<Tweet[]> GetTweetsByIdsAsync(params string[] ids)
-            => await GetTweetsByIdsAsync(ids, null);
+            => await GetTweetsByIdsAsync(ids, null, null);
 
-        public async Task<Tweet[]> GetTweetsByIdsAsync(string[] ids, UserOption[] options)
+        public async Task<Tweet[]> GetTweetsByIdsAsync(string[] ids, TweetOption[] tweetOptions, UserOption[] userOptions)
         {
             var url = _baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x)));
-            url = AddUserOptions(url, options, true, false);
+            AddTweetOptions(ref url, tweetOptions, false);
+            AddUserOptions(ref url, userOptions, true, false);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<Tweet>(str);
         }
 
         public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId)
-            => await GetTweetsFromUserIdAsync(userId, null);
+            => await GetTweetsFromUserIdAsync(userId, null, null);
 
-        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, UserOption[] options)
+        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetOption[] tweetOptions, UserOption[] options)
         {
             var url = _baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets";
-            url = AddUserOptions(url, options, true, true);
+            var b = AddTweetOptions(ref url, tweetOptions, true);
+            AddUserOptions(ref url, options, true, b);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<Tweet>(str);
         }
@@ -153,12 +168,13 @@ namespace TwitterSharp.Client
         }
 
         public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet)
-            => await NextTweetStreamAsync(onNextTweet, null);
+            => await NextTweetStreamAsync(onNextTweet, null, null);
 
-        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, UserOption[] options)
+        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, TweetOption[] tweetOptions, UserOption[] options)
         {
             var url = _baseUrl + "tweets/search/stream";
-            url = AddUserOptions(url, options, true, true);
+            var b = AddTweetOptions(ref url, tweetOptions, true);
+            AddUserOptions(ref url, options, true, b);
             var stream = await _httpClient.GetStreamAsync(url);
             using StreamReader reader = new(stream);
             while (!reader.EndOfStream)
@@ -192,7 +208,7 @@ namespace TwitterSharp.Client
         public async Task<User[]> GetUsersAsync(string[] usernames, UserOption[] options)
         {
             var url = _baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.HtmlEncode(x)));
-            url = AddUserOptions(url, options, false, false);
+            AddUserOptions(ref url, options, false, false);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<User>(str);
         }
