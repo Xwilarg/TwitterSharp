@@ -268,7 +268,7 @@ namespace TwitterSharp.Client
 
         #region UserSearch
         public async Task<User> GetUserAsync(string username)
-            => await GetUserAsync(username);
+            => await GetUserAsync(username, null);
 
         public async Task<User> GetUserAsync(string username, UserOption[] options)
         {
