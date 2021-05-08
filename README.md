@@ -46,10 +46,14 @@ Console.WriteLine(answer[0].Id); // 1022468464513089536
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
 // You can get the id using GetUsersAsync
-var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577");
+var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577", new[] { TweetOption.Entities }, null, null);
 for (int i = 0; i < answer.Length; i++)
 {
-    Console.WriteLine($"Tweet n°{i}:\n{answer[i].Text}\n\n");
+    Console.WriteLine($"Tweet n°{i}:");
+    Console.WriteLine(answer[i].Text);
+    Console.WriteLine("URLs:");
+    Console.WriteLine(string.Join("\n", answer[i].Entities.Urls.Select(x => x.DisplayUrl)));
+    Console.WriteLine("\n");
 }
 ```
 
