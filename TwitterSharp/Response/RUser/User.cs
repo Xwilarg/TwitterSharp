@@ -1,4 +1,5 @@
 ﻿using System;
+using TwitterSharp.Response.Entity;
 
 namespace TwitterSharp.Response.RUser
 {

@@ -1,6 +1,4 @@
-﻿using TwitterSharp.Response.Entity;
-
-namespace TwitterSharp.Response
+﻿namespace TwitterSharp.Response.Entity
 {
     public class Entities
     {

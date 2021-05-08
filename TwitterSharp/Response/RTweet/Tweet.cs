@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using TwitterSharp.Model;
+using TwitterSharp.Response.Entity;
 using TwitterSharp.Response.RMedia;
 using TwitterSharp.Response.RUser;
 
