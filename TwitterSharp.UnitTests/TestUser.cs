@@ -13,6 +13,16 @@ namespace TwitterSharp.UnitTests
         public async Task GetUserAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var answer = await client.GetUserAsync("theindra5");
+            Assert.AreEqual("1022468464513089536", answer.Id);
+            Assert.AreEqual("TheIndra5", answer.Username);
+            Assert.AreEqual("TheIndra", answer.Name);
+        }
+
+        [TestMethod]
+        public async Task GetUsersAsync()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
             var answer = await client.GetUsersAsync("theindra5");
             Assert.IsTrue(answer.Length == 1);
             Assert.AreEqual("1022468464513089536", answer[0].Id);

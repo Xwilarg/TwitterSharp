@@ -203,7 +203,7 @@ namespace TwitterSharp.Client
 
         public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetOption[] tweetOptions, UserOption[] userOptions)
         {
-            var url = _baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x)));
+            var url = _baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x)));
             AddTweetOptions(ref url, tweetOptions, false);
             AddUserOptions(ref url, userOptions, true, false);
             var str = await _httpClient.GetStringAsync(url);
@@ -267,12 +267,23 @@ namespace TwitterSharp.Client
         #endregion TweetStream
 
         #region UserSearch
+        public async Task<User> GetUserAsync(string username)
+            => await GetUserAsync(username);
+
+        public async Task<User> GetUserAsync(string username, UserOption[] options)
+        {
+            var url = _baseUrl + "users/by/username/" + HttpUtility.UrlEncode(username);
+            AddUserOptions(ref url, options, false, false);
+            var str = await _httpClient.GetStringAsync(url);
+            return ParseData<User>(str).Data;
+        }
+
         public async Task<User[]> GetUsersAsync(params string[] usernames)
             => await GetUsersAsync(usernames, null);
 
         public async Task<User[]> GetUsersAsync(string[] usernames, UserOption[] options)
         {
-            var url = _baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.HtmlEncode(x)));
+            var url = _baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.UrlEncode(x)));
             AddUserOptions(ref url, options, false, false);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<User>(str);
