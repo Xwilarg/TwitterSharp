@@ -154,6 +154,15 @@ namespace TwitterSharp.Client
             return isFirstLink;
         }
 
+        private static bool AddMediaOptions(ref string url, MediaOption[] options, bool isFirstLink)
+        {
+            if (options == null)
+            {
+                return isFirstLink;
+            }
+            return AddOptions(ref url, options.Select(x => x.ToString().ToLowerInvariant()).ToArray(), isFirstLink, null, "media.fields");
+        }
+
         /// <param name="needExpansion">False is we are requesting a tweet, else true</param>
         private static bool AddUserOptions(ref string url, UserOption[] options, bool needExpansion, bool isFirstLink)
         {
@@ -187,37 +196,40 @@ namespace TwitterSharp.Client
 
         #region TweetSearch
         public async Task<Tweet> GetTweetAsync(string id)
-            => await GetTweetAsync(id, null, null);
+            => await GetTweetAsync(id, null, null, null);
 
-        public async Task<Tweet> GetTweetAsync(string id, TweetOption[] tweetOptions, UserOption[] userOptions)
+        public async Task<Tweet> GetTweetAsync(string id, TweetOption[] tweetOptions, UserOption[] userOptions, MediaOption[] mediaOptions)
         {
             var url = _baseUrl + "tweets/" + HttpUtility.UrlEncode(id);
-            AddTweetOptions(ref url, tweetOptions, false);
-            AddUserOptions(ref url, userOptions, true, false);
+            var b = AddTweetOptions(ref url, tweetOptions, true);
+            b = AddUserOptions(ref url, userOptions, true, b);
+            AddMediaOptions(ref url, mediaOptions, b);
             var str = await _httpClient.GetStringAsync(url);
             return ParseData<Tweet>(str).Data;
         }
 
         public async Task<Tweet[]> GetTweetsAsync(params string[] ids)
-            => await GetTweetsAsync(ids, null, null);
+            => await GetTweetsAsync(ids, null, null, null);
 
-        public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetOption[] tweetOptions, UserOption[] userOptions)
+        public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetOption[] tweetOptions, UserOption[] userOptions, MediaOption[] mediaOptions)
         {
             var url = _baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x)));
             AddTweetOptions(ref url, tweetOptions, false);
             AddUserOptions(ref url, userOptions, true, false);
+            AddMediaOptions(ref url, mediaOptions, false);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<Tweet>(str);
         }
 
         public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId)
-            => await GetTweetsFromUserIdAsync(userId, null, null);
+            => await GetTweetsFromUserIdAsync(userId, null, null, null);
 
-        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetOption[] tweetOptions, UserOption[] options)
+        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetOption[] tweetOptions, UserOption[] userOptions, MediaOption[] mediaOptions)
         {
             var url = _baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets";
             var b = AddTweetOptions(ref url, tweetOptions, true);
-            AddUserOptions(ref url, options, true, b);
+            b = AddUserOptions(ref url, userOptions, true, b);
+            AddMediaOptions(ref url, mediaOptions, b);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<Tweet>(str);
         }
@@ -231,13 +243,14 @@ namespace TwitterSharp.Client
         }
 
         public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet)
-            => await NextTweetStreamAsync(onNextTweet, null, null);
+            => await NextTweetStreamAsync(onNextTweet, null, null, null);
 
-        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, TweetOption[] tweetOptions, UserOption[] options)
+        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, TweetOption[] tweetOptions, UserOption[] options, MediaOption[] mediaOptions)
         {
             var url = _baseUrl + "tweets/search/stream";
             var b = AddTweetOptions(ref url, tweetOptions, true);
-            AddUserOptions(ref url, options, true, b);
+            b = AddUserOptions(ref url, options, true, b);
+            AddMediaOptions(ref url, mediaOptions, b);
             var stream = await _httpClient.GetStreamAsync(url);
             using StreamReader reader = new(stream);
             while (!reader.EndOfStream)

@@ -7,6 +7,15 @@ namespace TwitterSharp.JsonOption
 {
     public class MediaConverter : JsonConverter<Media>
     {
+        private JsonElement? TryGetProperty(JsonElement json, string key)
+        {
+            if (json.TryGetProperty(key, out JsonElement elem))
+            {
+                return elem;
+            }
+            return null;
+        }
+
         public override Media Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             try
@@ -31,7 +40,11 @@ namespace TwitterSharp.JsonOption
                         "animated_gif" => MediaType.AnimatedGif,
                         "photo" => MediaType.Photo,
                         _ => throw new InvalidOperationException("Invalid type"),
-                    }
+                    },
+                    Height = TryGetProperty(elem, "height")?.GetInt32(),
+                    Width = TryGetProperty(elem, "width")?.GetInt32(),
+                    DurationMs = TryGetProperty(elem, "duration_ms")?.GetInt32(),
+                    PreviewImageUrl = TryGetProperty(elem, "preview_image_url")?.GetString()
                 };
                 return media;
             }

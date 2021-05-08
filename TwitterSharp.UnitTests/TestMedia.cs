@@ -14,7 +14,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithoutMedia()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsAsync("1390905509167853575");
+            var answer = await client.GetTweetsAsync("1237543996861251586");
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNull(a.Attachments);
@@ -24,29 +24,48 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithMediaId()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsAsync(new[] { "1390905509167853575" }, new[] { TweetOption.AttachmentsIds }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new[] { TweetOption.AttachmentsIds }, null, null);
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNotNull(a.Attachments);
             Assert.IsNotNull(a.Attachments.Media);
             Assert.AreEqual(1, a.Attachments.Media.Length);
-            Assert.AreEqual("3_1390905504537268224", a.Attachments.Media[0].Key);
+            Assert.AreEqual("7_1237543944570847233", a.Attachments.Media[0].Key);
             Assert.IsNull(a.Attachments.Media[0].Type);
+            Assert.IsNull(a.Attachments.Media[0].PreviewImageUrl);
         }
 
         [TestMethod]
         public async Task GetTweetWithMedia()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsAsync(new[] { "1390905509167853575" }, new[] { TweetOption.Attachments }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new[] { TweetOption.Attachments }, null, null);
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNotNull(a.Attachments);
             Assert.IsNotNull(a.Attachments.Media);
             Assert.AreEqual(1, a.Attachments.Media.Length);
-            Assert.AreEqual("3_1390905504537268224", a.Attachments.Media[0].Key);
+            Assert.AreEqual("7_1237543944570847233", a.Attachments.Media[0].Key);
             Assert.IsNotNull(a.Attachments.Media[0].Type);
-            Assert.AreEqual(MediaType.Photo, a.Attachments.Media[0].Type);
+            Assert.AreEqual(MediaType.Video, a.Attachments.Media[0].Type);
+            Assert.IsNull(a.Attachments.Media[0].PreviewImageUrl);
+        }
+
+        [TestMethod]
+        public async Task GetTweetWithMediaPreview()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new[] { TweetOption.Attachments }, null, new[] { MediaOption.Preview_Image_Url });
+            Assert.IsTrue(answer.Length == 1);
+            var a = answer[0];
+            Assert.IsNotNull(a.Attachments);
+            Assert.IsNotNull(a.Attachments.Media);
+            Assert.AreEqual(1, a.Attachments.Media.Length);
+            Assert.AreEqual("7_1237543944570847233", a.Attachments.Media[0].Key);
+            Assert.IsNotNull(a.Attachments.Media[0].Type);
+            Assert.AreEqual(MediaType.Video, a.Attachments.Media[0].Type);
+            Assert.IsNotNull(a.Attachments.Media[0].PreviewImageUrl);
+            Assert.AreEqual("https://pbs.twimg.com/ext_tw_video_thumb/1237543944570847233/pu/img/kRBUlSd7M7ju_QK1.jpg", a.Attachments.Media[0].PreviewImageUrl);
         }
     }
 }
