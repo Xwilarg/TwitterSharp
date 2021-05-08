@@ -12,7 +12,6 @@ using TwitterSharp.Model;
 using TwitterSharp.Request;
 using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Internal;
-using TwitterSharp.Response;
 using TwitterSharp.Response.RStream;
 using TwitterSharp.Response.RTweet;
 using TwitterSharp.Response.RUser;
@@ -34,6 +33,7 @@ namespace TwitterSharp.Client
             _jsonOptions.Converters.Add(new ExpressionConverter());
             _jsonOptions.Converters.Add(new ReferencedTweetConverter());
             _jsonOptions.Converters.Add(new ReplySettingsConverter());
+            _jsonOptions.Converters.Add(new MediaConverter());
         }
 
         #region AdvancedParsing
@@ -50,8 +50,9 @@ namespace TwitterSharp.Client
             }
         }
 
-        private static void IncludesParse(IHaveMedias data)
-        { }
+        private static void IncludesParseMedias(IHaveMedias data, UserOption[] options, Includes includes)
+        {
+        }
 
         private static readonly Type _authorInterface = typeof(IHaveAuthor);
         private static void InternalIncludesParse<T>(Answer<T> answer)
@@ -122,25 +123,13 @@ namespace TwitterSharp.Client
         }
 
         /// <param name="needExpansion">False is we are requesting a tweet, else true</param>
-        private static bool AddUserOptions(ref string url, UserOption[] options, bool needExpansion, bool isFirstLink, out bool containsAttachments)
+        private static bool AddUserOptions(ref string url, UserOption[] options, bool needExpansion, bool isFirstLink)
         {
             if (options == null)
             {
-                containsAttachments = false;
                 return isFirstLink;
             }
-            containsAttachments = options.Contains(UserOption.Attachments);
-            return AddOptions(ref url, options.Select((x) =>
-            {
-                if (x == UserOption.AttachmentsIds)
-                {
-                    return "attachments";
-                }
-                else
-                {
-                    return x.ToString().ToLowerInvariant();
-                }
-            }).ToArray(), isFirstLink, needExpansion ? "expansions=author_id" : null, "user.fields");
+            return AddOptions(ref url, options.Select(x => x.ToString().ToLowerInvariant()).ToArray(), isFirstLink, needExpansion ? "expansions=author_id" : null, "user.fields");
         }
 
         private static bool AddTweetOptions(ref string url, TweetOption[] options, bool isFirstLink)
@@ -149,7 +138,18 @@ namespace TwitterSharp.Client
             {
                 return isFirstLink;
             }
-            return AddOptions(ref url, options.Select(x => x.ToString().ToLowerInvariant()).ToArray(), isFirstLink, null, "tweet.fields");
+            return AddOptions(ref url, options.Select((x) =>
+            {
+                if (x == TweetOption.AttachmentsIds)
+                {
+                    return "attachments";
+                }
+                else
+                {
+                    return x.ToString().ToLowerInvariant();
+                }
+            }).ToArray(), isFirstLink,
+                options.Contains(TweetOption.Attachments) ? "attachments.media_keys" : null, "tweet.fields");
         }
         #endregion AddOptions
 
@@ -161,7 +161,7 @@ namespace TwitterSharp.Client
         {
             var url = _baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x)));
             AddTweetOptions(ref url, tweetOptions, false);
-            AddUserOptions(ref url, userOptions, true, false, out bool containsAttachments);
+            AddUserOptions(ref url, userOptions, true, false);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<Tweet>(str);
         }
@@ -173,7 +173,7 @@ namespace TwitterSharp.Client
         {
             var url = _baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets";
             var b = AddTweetOptions(ref url, tweetOptions, true);
-            AddUserOptions(ref url, options, true, b, out bool containsAttachments);
+            AddUserOptions(ref url, options, true, b);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<Tweet>(str);
         }
@@ -193,7 +193,7 @@ namespace TwitterSharp.Client
         {
             var url = _baseUrl + "tweets/search/stream";
             var b = AddTweetOptions(ref url, tweetOptions, true);
-            AddUserOptions(ref url, options, true, b, out bool containsAttachments);
+            AddUserOptions(ref url, options, true, b);
             var stream = await _httpClient.GetStreamAsync(url);
             using StreamReader reader = new(stream);
             while (!reader.EndOfStream)
@@ -229,7 +229,7 @@ namespace TwitterSharp.Client
         public async Task<User[]> GetUsersAsync(string[] usernames, UserOption[] options)
         {
             var url = _baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.HtmlEncode(x)));
-            AddUserOptions(ref url, options, false, false, out bool containsAttachments);
+            AddUserOptions(ref url, options, false, false);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<User>(str);
         }

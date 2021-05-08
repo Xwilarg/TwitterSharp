@@ -1,4 +1,5 @@
-﻿using TwitterSharp.Response.RUser;
+﻿using TwitterSharp.Response.RMedia;
+using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.Client
 {
@@ -15,6 +16,7 @@ namespace TwitterSharp.Client
     internal class Includes
     {
         public User[] Users { init; get; }
+        public Media[] Medias { init; get; }
     }
 
     internal class Meta

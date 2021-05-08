@@ -60,5 +60,16 @@
         /// Name of the app this tweet was sent from
         /// </summary>
         Source
+
+        /// <summary>
+        /// Polls and medias attached to the tweet
+        /// Also get their ID
+        /// </summary>
+        Attachments,
+
+        /// <summary>
+        /// Same at "Attachments" but only get their ID
+        /// </summary>
+        AttachmentsIds
     }
 }

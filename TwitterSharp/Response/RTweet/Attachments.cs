@@ -1,12 +1,12 @@
 ﻿using System.Text.Json.Serialization;
+using TwitterSharp.Response.RMedia;
 
 namespace TwitterSharp.Response.RTweet
 {
     public class Attachments
     {
-        [JsonPropertyName("poll_ids")]
-        public AttachmentElement<object>[] Polls { init; get; }
-        [JsonPropertyName("media_keys")]
-        public AttachmentElement<object>[] Medias { init; get; }
+        //[JsonPropertyName("poll_ids")]
+        //public Media[] Polls { init; get; }
+        public Media[] Medias { set; get; }
     }
 }

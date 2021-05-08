@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using TwitterSharp.Model;
+using TwitterSharp.Response.RMedia;
 using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.Response.RTweet
 {
-    public class Tweet : IEquatable<Tweet>, IHaveAuthor
+    public class Tweet : IEquatable<Tweet>, IHaveAuthor, IHaveMedias
     {
         public string Id { init; get; }
         public string Text { init; get; }
@@ -20,6 +21,7 @@ namespace TwitterSharp.Response.RTweet
         public string Source { init; get; }
         public ReferencedTweet[] ReferencedTweets { init; get; }
         public ReplySettings? ReplySettings { init; get; }
+        public Attachments Attachments { set; get; }
 
         [JsonIgnore]
         public User Author { internal set; get; }
@@ -29,6 +31,9 @@ namespace TwitterSharp.Response.RTweet
             => Author = author;
         [JsonIgnore]
         string IHaveAuthor.AuthorId => AuthorId;
+
+        void IHaveMedias.SetMedia(Media[] medias)
+            => Attachments.Medias = medias;
 
         // Comparison
 
