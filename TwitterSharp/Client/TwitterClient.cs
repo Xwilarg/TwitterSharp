@@ -50,16 +50,16 @@ namespace TwitterSharp.Client
             }
         }
 
-        private static void IncludesParseMedias(IHaveMedias data, Includes includes)
+        private static void IncludesParseMedias(IHaveMedia data, Includes includes)
         {
-            var medias = data.GetMedias();
+            var medias = data.GetMedia();
             for (int i = 0; i < medias.Length; i++)
             {
                 medias[i] = includes.Medias.Where(x => x.Key == medias[i].Key).FirstOrDefault();
             }
         }
 
-        private static void IncludesParseMedias(IHaveMedias[] data, Includes includes)
+        private static void IncludesParseMedias(IHaveMedia[] data, Includes includes)
         {
             foreach (var m in data)
             {
@@ -68,7 +68,7 @@ namespace TwitterSharp.Client
         }
 
         private static readonly Type _authorInterface = typeof(IHaveAuthor);
-        private static readonly Type _mediaInterface = typeof(IHaveMedias);
+        private static readonly Type _mediaInterface = typeof(IHaveMedia);
         private static void InternalIncludesParse<T>(Answer<T> answer)
         {
             if (answer.Includes != null)
@@ -82,7 +82,7 @@ namespace TwitterSharp.Client
                 if (answer.Includes.Medias != null && answer.Includes.Medias.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
-                    IncludesParseMedias((IHaveMedias)data, answer.Includes);
+                    IncludesParseMedias((IHaveMedia)data, answer.Includes);
                     answer.Data = data;
                 }
             }
@@ -100,7 +100,7 @@ namespace TwitterSharp.Client
                 if (answer.Includes.Medias != null && answer.Includes.Medias.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
-                    IncludesParseMedias(data.Cast<IHaveMedias>().ToArray(), answer.Includes);
+                    IncludesParseMedias(data.Cast<IHaveMedia>().ToArray(), answer.Includes);
                     answer.Data = data;
                 }
             }
@@ -181,7 +181,7 @@ namespace TwitterSharp.Client
                     return x.ToString().ToLowerInvariant();
                 }
             }).ToArray(), isFirstLink,
-                options.Contains(TweetOption.Attachments) ? "attachments.media_keys" : null, "tweet.fields");
+                options.Contains(TweetOption.Attachments) ? "expansions=attachments.media_keys" : null, "tweet.fields");
         }
         #endregion AddOptions
 

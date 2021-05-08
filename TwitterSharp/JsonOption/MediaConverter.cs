@@ -24,6 +24,13 @@ namespace TwitterSharp.JsonOption
                 var media = JsonSerializer.Deserialize<Media>(ref reader, o);
                 var elem = JsonSerializer.Deserialize<JsonElement>(ref reader, o);
                 media.Key = elem.GetProperty("media_key").GetString();
+                media.Type = elem.GetProperty("type").GetString() switch
+                {
+                    "video" => MediaType.Video,
+                    "animated_gif" => MediaType.AnimatedGif,
+                    "photo" => MediaType.Photo,
+                    _ => throw new InvalidOperationException("Invalid type"),
+                };
                 return media;
             }
         }

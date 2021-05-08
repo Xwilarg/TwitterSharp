@@ -6,7 +6,7 @@ using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.Response.RTweet
 {
-    public class Tweet : IEquatable<Tweet>, IHaveAuthor, IHaveMedias
+    public class Tweet : IEquatable<Tweet>, IHaveAuthor, IHaveMedia
     {
         public string Id { init; get; }
         public string Text { init; get; }
@@ -32,8 +32,8 @@ namespace TwitterSharp.Response.RTweet
         [JsonIgnore]
         string IHaveAuthor.AuthorId => AuthorId;
 
-        Media[] IHaveMedias.GetMedias()
-            => Attachments.Medias;
+        Media[] IHaveMedia.GetMedia()
+            => Attachments.Media;
 
         // Comparison
 

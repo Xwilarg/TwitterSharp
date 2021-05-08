@@ -7,6 +7,7 @@ namespace TwitterSharp.Response.RTweet
     {
         //[JsonPropertyName("poll_ids")]
         //public Media[] Polls { init; get; }
-        public Media[] Medias { set; get; }
+        [JsonPropertyName("media_keys")]
+        public Media[] Media { set; get; }
     }
 }

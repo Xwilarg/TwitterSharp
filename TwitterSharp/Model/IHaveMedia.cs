@@ -2,8 +2,8 @@
 
 namespace TwitterSharp.Model
 {
-    interface IHaveMedias
+    interface IHaveMedia
     {
-        internal Media[] GetMedias();
+        internal Media[] GetMedia();
     }
 }
