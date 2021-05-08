@@ -27,6 +27,8 @@ To solve that, most function take an array of UserOption or TweetOption, make su
 
 Need more help? You can use the examples below, if you're still lost feel free to open an issue or a discussion!
 
+
+
 ## Examples
 ### Get a tweet from its ID
 ```cs
@@ -84,3 +86,8 @@ Task.Run(async () =>
     }, null, Array.Empty<UserOption>());
 });
 ```
+
+## Contributing
+
+If you want to contribute feel free to open a pull request\
+You can also see how the project is going in the [project tab](https://github.com/Xwilarg/TwitterSharp/projects/1)
