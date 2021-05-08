@@ -59,7 +59,7 @@
         /// <summary>
         /// Name of the app this tweet was sent from
         /// </summary>
-        Source
+        Source,
 
         /// <summary>
         /// Polls and medias attached to the tweet

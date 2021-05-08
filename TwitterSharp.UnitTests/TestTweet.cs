@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using TwitterSharp.Client;
 using TwitterSharp.Request.AdvancedSearch;
-using TwitterSharp.Response;
+using TwitterSharp.Response.RTweet;
 
 namespace TwitterSharp.UnitTests
 {
