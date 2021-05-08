@@ -33,7 +33,7 @@ Need more help? You can use the examples below, if you're still lost feel free t
 ### Get a tweet from its ID
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
-var answer = await client.GetTweetsByIdsAsync("1389189291582967809");
+var answer = await client.GetTweetByIdAsync("1389189291582967809");
 Console.WriteLine(answer[0].Text); // たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN
 ```
 

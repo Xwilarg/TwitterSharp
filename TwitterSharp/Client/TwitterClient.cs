@@ -186,6 +186,18 @@ namespace TwitterSharp.Client
         #endregion AddOptions
 
         #region TweetSearch
+        public async Task<Tweet> GetTweetByIdAsync(string id)
+            => await GetTweetByIdAsync(id, null, null);
+
+        public async Task<Tweet> GetTweetByIdAsync(string id, TweetOption[] tweetOptions, UserOption[] userOptions)
+        {
+            var url = _baseUrl + "tweets/" + HttpUtility.UrlEncode(id);
+            AddTweetOptions(ref url, tweetOptions, false);
+            AddUserOptions(ref url, userOptions, true, false);
+            var str = await _httpClient.GetStringAsync(url);
+            return ParseData<Tweet>(str).Data;
+        }
+
         public async Task<Tweet[]> GetTweetsByIdsAsync(params string[] ids)
             => await GetTweetsByIdsAsync(ids, null, null);
 

@@ -23,6 +23,17 @@ namespace TwitterSharp.UnitTests
         }
 
         [TestMethod]
+        public async Task GetTweetByIdAsync()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var answer = await client.GetTweetByIdAsync("1389189291582967809");
+            Assert.AreEqual("1389189291582967809", answer.Id);
+            Assert.AreEqual("たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN", answer.Text);
+            Assert.IsNull(answer.Author);
+            Assert.IsNull(answer.PossiblySensitive);
+        }
+
+        [TestMethod]
         public async Task GetTweetByIdsWithAuthorAndSensitivityAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
