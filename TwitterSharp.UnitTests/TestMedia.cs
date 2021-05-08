@@ -14,7 +14,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithoutMedia()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync("1390905509167853575");
+            var answer = await client.GetTweetsAsync("1390905509167853575");
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNull(a.Attachments);
@@ -24,7 +24,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithMediaId()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390905509167853575" }, new[] { TweetOption.AttachmentsIds }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390905509167853575" }, new[] { TweetOption.AttachmentsIds }, null);
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNotNull(a.Attachments);
@@ -38,7 +38,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithMedia()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390905509167853575" }, new[] { TweetOption.Attachments }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390905509167853575" }, new[] { TweetOption.Attachments }, null);
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNotNull(a.Attachments);

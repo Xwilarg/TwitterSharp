@@ -14,7 +14,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetByIdsAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync("1389189291582967809");
+            var answer = await client.GetTweetsAsync("1389189291582967809");
             Assert.IsTrue(answer.Length == 1);
             Assert.AreEqual("1389189291582967809", answer[0].Id);
             Assert.AreEqual("たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN", answer[0].Text);
@@ -26,7 +26,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetByIdAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetByIdAsync("1389189291582967809");
+            var answer = await client.GetTweetAsync("1389189291582967809");
             Assert.AreEqual("1389189291582967809", answer.Id);
             Assert.AreEqual("たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN", answer.Text);
             Assert.IsNull(answer.Author);
@@ -37,7 +37,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetByIdsWithAuthorAndSensitivityAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1389189291582967809" }, new[] { TweetOption.Possibly_Sensitive }, Array.Empty<UserOption>());
+            var answer = await client.GetTweetsAsync(new[] { "1389189291582967809" }, new[] { TweetOption.Possibly_Sensitive }, Array.Empty<UserOption>());
             Assert.IsTrue(answer.Length == 1);
             Assert.AreEqual("1389189291582967809", answer[0].Id);
             Assert.AreEqual("たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN", answer[0].Text);
@@ -48,10 +48,10 @@ namespace TwitterSharp.UnitTests
         }
 
         [TestMethod]
-        public async Task GetTweetsByIdsAsync()
+        public async Task GetTweetsAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync("1389330151779930113", "1389331863102128130");
+            var answer = await client.GetTweetsAsync("1389330151779930113", "1389331863102128130");
             Assert.IsTrue(answer.Length == 2);
             Assert.AreEqual("1389330151779930113", answer[0].Id);
             Assert.AreEqual("ねむくなーい！ねむくないねむくない！ドタドタドタドタ", answer[0].Text);
@@ -65,7 +65,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetsByIdsWithAuthorAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1389330151779930113", "1389331863102128130" }, null, Array.Empty<UserOption>());
+            var answer = await client.GetTweetsAsync(new[] { "1389330151779930113", "1389331863102128130" }, null, Array.Empty<UserOption>());
             Assert.IsTrue(answer.Length == 2);
             Assert.AreEqual("1389330151779930113", answer[0].Id);
             Assert.AreEqual("ねむくなーい！ねむくないねむくない！ドタドタドタドタ", answer[0].Text);
@@ -103,7 +103,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithNothing()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync("1390702559086596101");
+            var answer = await client.GetTweetsAsync("1390702559086596101");
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
@@ -123,7 +123,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithAuthorId()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390738061797953536" }, new TweetOption[] { TweetOption.Conversation_Id }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390738061797953536" }, new TweetOption[] { TweetOption.Conversation_Id }, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
@@ -144,7 +144,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithCreatedAt()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390699421726253063" }, new TweetOption[] { TweetOption.Created_At }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390699421726253063" }, new TweetOption[] { TweetOption.Created_At }, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
@@ -165,7 +165,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithEntities()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390699421726253063" }, new TweetOption[] { TweetOption.Entities }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390699421726253063" }, new TweetOption[] { TweetOption.Entities }, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
@@ -189,7 +189,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithInReplyToUserId()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390700491294724099" }, new TweetOption[] { TweetOption.In_Reply_To_User_Id }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390700491294724099" }, new TweetOption[] { TweetOption.In_Reply_To_User_Id }, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
@@ -210,7 +210,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithLang()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390766509610340354" }, new TweetOption[] { TweetOption.Lang }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390766509610340354" }, new TweetOption[] { TweetOption.Lang }, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
@@ -231,7 +231,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithPossiblySensitive()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390729374140289024" }, new TweetOption[] { TweetOption.Possibly_Sensitive }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390729374140289024" }, new TweetOption[] { TweetOption.Possibly_Sensitive }, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
@@ -252,7 +252,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithPublicMetrics()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390728256148500480" }, new TweetOption[] { TweetOption.Public_Metrics }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390728256148500480" }, new TweetOption[] { TweetOption.Public_Metrics }, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
@@ -275,7 +275,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithReferencedTweets()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1387457640414859267" }, new TweetOption[] { TweetOption.Referenced_Tweets }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1387457640414859267" }, new TweetOption[] { TweetOption.Referenced_Tweets }, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
@@ -296,7 +296,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithReplySettings()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390650205440147457" }, new TweetOption[] { TweetOption.Reply_Settings }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390650205440147457" }, new TweetOption[] { TweetOption.Reply_Settings }, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
@@ -317,7 +317,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithSource()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsByIdsAsync(new[] { "1390650205440147457" }, new TweetOption[] { TweetOption.Source }, null);
+            var answer = await client.GetTweetsAsync(new[] { "1390650205440147457" }, new TweetOption[] { TweetOption.Source }, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];

@@ -186,10 +186,10 @@ namespace TwitterSharp.Client
         #endregion AddOptions
 
         #region TweetSearch
-        public async Task<Tweet> GetTweetByIdAsync(string id)
-            => await GetTweetByIdAsync(id, null, null);
+        public async Task<Tweet> GetTweetAsync(string id)
+            => await GetTweetAsync(id, null, null);
 
-        public async Task<Tweet> GetTweetByIdAsync(string id, TweetOption[] tweetOptions, UserOption[] userOptions)
+        public async Task<Tweet> GetTweetAsync(string id, TweetOption[] tweetOptions, UserOption[] userOptions)
         {
             var url = _baseUrl + "tweets/" + HttpUtility.UrlEncode(id);
             AddTweetOptions(ref url, tweetOptions, false);
@@ -198,10 +198,10 @@ namespace TwitterSharp.Client
             return ParseData<Tweet>(str).Data;
         }
 
-        public async Task<Tweet[]> GetTweetsByIdsAsync(params string[] ids)
-            => await GetTweetsByIdsAsync(ids, null, null);
+        public async Task<Tweet[]> GetTweetsAsync(params string[] ids)
+            => await GetTweetsAsync(ids, null, null);
 
-        public async Task<Tweet[]> GetTweetsByIdsAsync(string[] ids, TweetOption[] tweetOptions, UserOption[] userOptions)
+        public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetOption[] tweetOptions, UserOption[] userOptions)
         {
             var url = _baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x)));
             AddTweetOptions(ref url, tweetOptions, false);
