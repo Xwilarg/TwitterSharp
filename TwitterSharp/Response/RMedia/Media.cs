@@ -4,7 +4,7 @@ namespace TwitterSharp.Response.RMedia
 {
     public class Media
     {
-        public string Key { init; get; }
+        public string Key { set; get; }
         public MediaType? Type { init; get; }
     }
 }

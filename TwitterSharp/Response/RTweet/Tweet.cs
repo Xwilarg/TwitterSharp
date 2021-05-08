@@ -32,8 +32,8 @@ namespace TwitterSharp.Response.RTweet
         [JsonIgnore]
         string IHaveAuthor.AuthorId => AuthorId;
 
-        void IHaveMedias.SetMedia(Media[] medias)
-            => Attachments.Medias = medias;
+        Media[] IHaveMedias.GetMedias()
+            => Attachments.Medias;
 
         // Comparison
 

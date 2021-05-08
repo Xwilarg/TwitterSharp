@@ -9,10 +9,23 @@ namespace TwitterSharp.JsonOption
     {
         public override Media Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return new Media
+            try
             {
-                Key = reader.GetString()
-            };
+                return new Media
+                {
+                    Key = reader.GetString()
+                };
+            } catch (InvalidOperationException)
+            {
+                var o = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = new SnakeCaseNamingPolicy()
+                };
+                var media = JsonSerializer.Deserialize<Media>(ref reader, o);
+                var elem = JsonSerializer.Deserialize<JsonElement>(ref reader, o);
+                media.Key = elem.GetProperty("media_key").GetString();
+                return media;
+            }
         }
 
         public override void Write(Utf8JsonWriter writer, Media value, JsonSerializerOptions options)

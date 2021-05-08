@@ -39,38 +39,70 @@ namespace TwitterSharp.Client
         #region AdvancedParsing
         private static void IncludesParseUser(IHaveAuthor data, Includes includes)
         {
-            data.SetAuthor(includes.Users.FirstOrDefault());
+            data.SetAuthor(includes.Users.Where(x => x.Id == data.AuthorId).FirstOrDefault());
         }
 
         private static void IncludesParseUser(IHaveAuthor[] data, Includes includes)
         {
-            for (int i = 0; i < data.Length; i++)
+            foreach (var d in data)
             {
-                data[i].SetAuthor(includes.Users.Where(x => x.Id == data[i].AuthorId).FirstOrDefault());
+                IncludesParseUser(d, includes);
             }
         }
 
-        private static void IncludesParseMedias(IHaveMedias data, UserOption[] options, Includes includes)
+        private static void IncludesParseMedias(IHaveMedias data, Includes includes)
         {
+            var medias = data.GetMedias();
+            for (int i = 0; i < medias.Length; i++)
+            {
+                medias[i] = includes.Medias.Where(x => x.Key == medias[i].Key).FirstOrDefault();
+            }
+        }
+
+        private static void IncludesParseMedias(IHaveMedias[] data, Includes includes)
+        {
+            foreach (var m in data)
+            {
+                IncludesParseMedias(m, includes);
+            }
         }
 
         private static readonly Type _authorInterface = typeof(IHaveAuthor);
+        private static readonly Type _mediaInterface = typeof(IHaveMedias);
         private static void InternalIncludesParse<T>(Answer<T> answer)
         {
-            if (answer.Includes != null && _authorInterface.IsAssignableFrom(typeof(T)))
+            if (answer.Includes != null)
             {
-                var data = answer.Data;
-                IncludesParseUser((IHaveAuthor)data, answer.Includes);
-                answer.Data = data;
+                if (answer.Includes.Users != null && answer.Includes.Users.Length > 0 && _authorInterface.IsAssignableFrom(typeof(T)))
+                {
+                    var data = answer.Data;
+                    IncludesParseUser((IHaveAuthor)data, answer.Includes);
+                    answer.Data = data;
+                }
+                if (answer.Includes.Medias != null && answer.Includes.Medias.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
+                {
+                    var data = answer.Data;
+                    IncludesParseMedias((IHaveMedias)data, answer.Includes);
+                    answer.Data = data;
+                }
             }
         }
         private static void InternalIncludesParse<T>(Answer<T[]> answer)
         {
-            if (answer.Includes != null && _authorInterface.IsAssignableFrom(typeof(T)))
+            if (answer.Includes != null)
             {
-                var data = answer.Data;
-                IncludesParseUser(data.Cast<IHaveAuthor>().ToArray(), answer.Includes);
-                answer.Data = data;
+                if (answer.Includes.Users != null && answer.Includes.Users.Length > 0 && answer.Includes.Users.Length > 0 && _authorInterface.IsAssignableFrom(typeof(T)))
+                {
+                    var data = answer.Data;
+                    IncludesParseUser(data.Cast<IHaveAuthor>().ToArray(), answer.Includes);
+                    answer.Data = data;
+                }
+                if (answer.Includes.Medias != null && answer.Includes.Medias.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
+                {
+                    var data = answer.Data;
+                    IncludesParseMedias(data.Cast<IHaveMedias>().ToArray(), answer.Includes);
+                    answer.Data = data;
+                }
             }
         }
 
