@@ -1,4 +1,4 @@
-﻿using TwitterSharp.Response;
+﻿using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.Client
 {

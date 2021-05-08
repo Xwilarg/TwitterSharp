@@ -13,6 +13,9 @@ using TwitterSharp.Request;
 using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Internal;
 using TwitterSharp.Response;
+using TwitterSharp.Response.RStream;
+using TwitterSharp.Response.RTweet;
+using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.Client
 {
@@ -46,6 +49,9 @@ namespace TwitterSharp.Client
                 data[i].SetAuthor(includes.Users.Where(x => x.Id == data[i].AuthorId).FirstOrDefault());
             }
         }
+
+        private static void IncludesParse(IHaveMedias data)
+        { }
 
         private static readonly Type _authorInterface = typeof(IHaveAuthor);
         private static void InternalIncludesParse<T>(Answer<T> answer)
@@ -116,13 +122,25 @@ namespace TwitterSharp.Client
         }
 
         /// <param name="needExpansion">False is we are requesting a tweet, else true</param>
-        private static bool AddUserOptions(ref string url, UserOption[] options, bool needExpansion, bool isFirstLink)
+        private static bool AddUserOptions(ref string url, UserOption[] options, bool needExpansion, bool isFirstLink, out bool containsAttachments)
         {
             if (options == null)
             {
+                containsAttachments = false;
                 return isFirstLink;
             }
-            return AddOptions(ref url, options.Select(x => x.ToString().ToLowerInvariant()).ToArray(), isFirstLink, needExpansion ? "expansions=author_id" : null, "user.fields");
+            containsAttachments = options.Contains(UserOption.Attachments);
+            return AddOptions(ref url, options.Select((x) =>
+            {
+                if (x == UserOption.AttachmentsIds)
+                {
+                    return "attachments";
+                }
+                else
+                {
+                    return x.ToString().ToLowerInvariant();
+                }
+            }).ToArray(), isFirstLink, needExpansion ? "expansions=author_id" : null, "user.fields");
         }
 
         private static bool AddTweetOptions(ref string url, TweetOption[] options, bool isFirstLink)
@@ -143,7 +161,7 @@ namespace TwitterSharp.Client
         {
             var url = _baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.HtmlEncode(x)));
             AddTweetOptions(ref url, tweetOptions, false);
-            AddUserOptions(ref url, userOptions, true, false);
+            AddUserOptions(ref url, userOptions, true, false, out bool containsAttachments);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<Tweet>(str);
         }
@@ -155,7 +173,7 @@ namespace TwitterSharp.Client
         {
             var url = _baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets";
             var b = AddTweetOptions(ref url, tweetOptions, true);
-            AddUserOptions(ref url, options, true, b);
+            AddUserOptions(ref url, options, true, b, out bool containsAttachments);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<Tweet>(str);
         }
@@ -175,7 +193,7 @@ namespace TwitterSharp.Client
         {
             var url = _baseUrl + "tweets/search/stream";
             var b = AddTweetOptions(ref url, tweetOptions, true);
-            AddUserOptions(ref url, options, true, b);
+            AddUserOptions(ref url, options, true, b, out bool containsAttachments);
             var stream = await _httpClient.GetStreamAsync(url);
             using StreamReader reader = new(stream);
             while (!reader.EndOfStream)
@@ -211,7 +229,7 @@ namespace TwitterSharp.Client
         public async Task<User[]> GetUsersAsync(string[] usernames, UserOption[] options)
         {
             var url = _baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.HtmlEncode(x)));
-            AddUserOptions(ref url, options, false, false);
+            AddUserOptions(ref url, options, false, false, out bool containsAttachments);
             var str = await _httpClient.GetStringAsync(url);
             return ParseArrayData<User>(str);
         }

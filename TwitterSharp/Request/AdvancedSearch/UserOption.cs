@@ -51,7 +51,18 @@
         /// <summary>
         /// Boolean telling if the account is marked as "verified"
         /// </summary>
-        Verified
+        Verified,
+
+        /// <summary>
+        /// Polls and medias attached to the tweet
+        /// Also get their ID
+        /// </summary>
+        Attachments,
+
+        /// <summary>
+        /// Same at "Attachments" but only get their ID
+        /// </summary>
+        AttachmentsIds
 
         // Withheld // Not implemented yet
     }

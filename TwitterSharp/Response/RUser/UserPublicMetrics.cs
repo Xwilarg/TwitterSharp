@@ -1,4 +1,4 @@
-﻿namespace TwitterSharp.Response
+﻿namespace TwitterSharp.Response.RUser
 {
     public class UserPublicMetrics
     {

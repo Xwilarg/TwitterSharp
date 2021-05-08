@@ -1,4 +1,4 @@
-﻿namespace TwitterSharp.Response
+﻿namespace TwitterSharp.Response.RTweet
 {
     public enum ReferenceType
     {

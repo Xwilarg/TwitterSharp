@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using TwitterSharp.Model;
+using TwitterSharp.Response.RUser;
 
-namespace TwitterSharp.Response
+namespace TwitterSharp.Response.RTweet
 {
     public class Tweet : IEquatable<Tweet>, IHaveAuthor
     {

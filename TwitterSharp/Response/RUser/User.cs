@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TwitterSharp.Response
+namespace TwitterSharp.Response.RUser
 {
     public class User : IEquatable<User>
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using TwitterSharp.Rule;
 
-namespace TwitterSharp.Response
+namespace TwitterSharp.Response.RStream
 {
     public class StreamInfo : IEquatable<StreamInfo>
     {
