@@ -55,7 +55,7 @@ namespace TwitterSharp.Client
             var medias = data.GetMedia();
             for (int i = 0; i < medias.Length; i++)
             {
-                medias[i] = includes.Medias.Where(x => x.Key == medias[i].Key).FirstOrDefault();
+                medias[i] = includes.Media.Where(x => x.Key == medias[i].Key).FirstOrDefault();
             }
         }
 
@@ -79,7 +79,7 @@ namespace TwitterSharp.Client
                     IncludesParseUser((IHaveAuthor)data, answer.Includes);
                     answer.Data = data;
                 }
-                if (answer.Includes.Medias != null && answer.Includes.Medias.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
+                if (answer.Includes.Media != null && answer.Includes.Media.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
                     IncludesParseMedias((IHaveMedia)data, answer.Includes);
@@ -97,7 +97,7 @@ namespace TwitterSharp.Client
                     IncludesParseUser(data.Cast<IHaveAuthor>().ToArray(), answer.Includes);
                     answer.Data = data;
                 }
-                if (answer.Includes.Medias != null && answer.Includes.Medias.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
+                if (answer.Includes.Media != null && answer.Includes.Media.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
                     IncludesParseMedias(data.Cast<IHaveMedia>().ToArray(), answer.Includes);

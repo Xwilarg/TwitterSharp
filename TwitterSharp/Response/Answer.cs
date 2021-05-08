@@ -16,7 +16,7 @@ namespace TwitterSharp.Client
     internal class Includes
     {
         public User[] Users { init; get; }
-        public Media[] Medias { init; get; }
+        public Media[] Media { init; get; }
     }
 
     internal class Meta
