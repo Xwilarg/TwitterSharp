@@ -195,10 +195,7 @@ namespace TwitterSharp.Client
         #endregion AddOptions
 
         #region TweetSearch
-        public async Task<Tweet> GetTweetAsync(string id)
-            => await GetTweetAsync(id, null, null, null);
-
-        public async Task<Tweet> GetTweetAsync(string id, TweetOption[] tweetOptions, UserOption[] userOptions, MediaOption[] mediaOptions)
+        public async Task<Tweet> GetTweetAsync(string id, TweetOption[] tweetOptions = null, UserOption[] userOptions = null, MediaOption[] mediaOptions = null)
         {
             var url = _baseUrl + "tweets/" + HttpUtility.UrlEncode(id);
             var b = AddTweetOptions(ref url, tweetOptions, true);
@@ -208,10 +205,7 @@ namespace TwitterSharp.Client
             return ParseData<Tweet>(str).Data;
         }
 
-        public async Task<Tweet[]> GetTweetsAsync(params string[] ids)
-            => await GetTweetsAsync(ids, null, null, null);
-
-        public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetOption[] tweetOptions, UserOption[] userOptions, MediaOption[] mediaOptions)
+        public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetOption[] tweetOptions = null, UserOption[] userOptions = null, MediaOption[] mediaOptions = null)
         {
             var url = _baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x)));
             AddTweetOptions(ref url, tweetOptions, false);
@@ -221,10 +215,7 @@ namespace TwitterSharp.Client
             return ParseArrayData<Tweet>(str);
         }
 
-        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId)
-            => await GetTweetsFromUserIdAsync(userId, null, null, null);
-
-        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetOption[] tweetOptions, UserOption[] userOptions, MediaOption[] mediaOptions)
+        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetOption[] tweetOptions = null, UserOption[] userOptions = null, MediaOption[] mediaOptions = null)
         {
             var url = _baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets";
             var b = AddTweetOptions(ref url, tweetOptions, true);
@@ -242,10 +233,7 @@ namespace TwitterSharp.Client
             return ParseArrayData<StreamInfo>(str);
         }
 
-        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet)
-            => await NextTweetStreamAsync(onNextTweet, null, null, null);
-
-        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, TweetOption[] tweetOptions, UserOption[] options, MediaOption[] mediaOptions)
+        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, TweetOption[] tweetOptions = null, UserOption[] options = null, MediaOption[] mediaOptions = null)
         {
             var url = _baseUrl + "tweets/search/stream";
             var b = AddTweetOptions(ref url, tweetOptions, true);
@@ -280,10 +268,7 @@ namespace TwitterSharp.Client
         #endregion TweetStream
 
         #region UserSearch
-        public async Task<User> GetUserAsync(string username)
-            => await GetUserAsync(username, null);
-
-        public async Task<User> GetUserAsync(string username, UserOption[] options)
+        public async Task<User> GetUserAsync(string username, UserOption[] options = null)
         {
             var url = _baseUrl + "users/by/username/" + HttpUtility.UrlEncode(username);
             AddUserOptions(ref url, options, false, false);
@@ -291,10 +276,7 @@ namespace TwitterSharp.Client
             return ParseData<User>(str).Data;
         }
 
-        public async Task<User[]> GetUsersAsync(params string[] usernames)
-            => await GetUsersAsync(usernames, null);
-
-        public async Task<User[]> GetUsersAsync(string[] usernames, UserOption[] options)
+        public async Task<User[]> GetUsersAsync(string[] usernames, UserOption[] options = null)
         {
             var url = _baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.UrlEncode(x)));
             AddUserOptions(ref url, options, false, false);

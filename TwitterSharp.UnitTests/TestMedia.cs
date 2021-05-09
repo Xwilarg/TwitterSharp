@@ -14,7 +14,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithoutMedia()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsAsync("1237543996861251586");
+            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" });
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNull(a.Attachments);

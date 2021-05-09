@@ -23,7 +23,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetUsersAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetUsersAsync("theindra5");
+            var answer = await client.GetUsersAsync(new[] { "theindra5" });
             Assert.IsTrue(answer.Length == 1);
             Assert.AreEqual("1022468464513089536", answer[0].Id);
             Assert.AreEqual("TheIndra5", answer[0].Username);
