@@ -271,7 +271,7 @@ namespace TwitterSharp.Client
         public async Task<User> GetUserAsync(string username, UserOption[] options = null)
         {
             var url = _baseUrl + "users/by/username/" + HttpUtility.UrlEncode(username);
-            AddUserOptions(ref url, options, false, false);
+            AddUserOptions(ref url, options, false, true);
             var str = await _httpClient.GetStringAsync(url);
             return ParseData<User>(str).Data;
         }
