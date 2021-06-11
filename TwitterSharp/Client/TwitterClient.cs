@@ -266,6 +266,23 @@ namespace TwitterSharp.Client
             var str = await _httpClient.GetStringAsync(_baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.UrlEncode(x))) + "&" + req.Build());
             return ParseArrayData<User>(str);
         }
+
+        public async Task<User> GetUserByIdAsync(string id, UserOption[] options = null)
+        {
+            var req = new RequestOptions();
+            AddUserOptions(req, options, false);
+            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.UrlEncode(id) + "?" + req.Build());
+            return ParseData<User>(str).Data;
+        }
+
+        public async Task<User[]> GetUsersByIdsAsync(string[] ids, UserOption[] options = null)
+        {
+            var req = new RequestOptions();
+            AddUserOptions(req, options, false);
+            var str = await _httpClient.GetStringAsync(_baseUrl + "users?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + req.Build());
+            return ParseArrayData<User>(str);
+        }
+
         #endregion UserSearch
 
         private const string _baseUrl = "https://api.twitter.com/2/";

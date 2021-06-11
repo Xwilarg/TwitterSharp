@@ -7,9 +7,9 @@ C# wrapper around Twitter API V2
 
 ## Download
 
-The package is available as a pre-release on [NuGet](https://www.nuget.org/packages/TwitterSharp/)
+The package is available on [NuGet](https://www.nuget.org/packages/TwitterSharp/)
 ```powershell
-Install-Package TwitterSharp -Version 0.1.0-alpha
+Install-Package TwitterSharp
 ```
 
 ## How does it works?

@@ -20,10 +20,31 @@ namespace TwitterSharp.UnitTests
         }
 
         [TestMethod]
+        public async Task GetUserById()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var answer = await client.GetUserByIdAsync("1022468464513089536");
+            Assert.AreEqual("1022468464513089536", answer.Id);
+            Assert.AreEqual("TheIndra5", answer.Username);
+            Assert.AreEqual("TheIndra", answer.Name);
+        }
+
+        [TestMethod]
         public async Task GetUsersAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
             var answer = await client.GetUsersAsync(new[] { "theindra5" });
+            Assert.IsTrue(answer.Length == 1);
+            Assert.AreEqual("1022468464513089536", answer[0].Id);
+            Assert.AreEqual("TheIndra5", answer[0].Username);
+            Assert.AreEqual("TheIndra", answer[0].Name);
+        }
+
+        [TestMethod]
+        public async Task GetUsersByIdsAsync()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var answer = await client.GetUsersByIdsAsync(new[] { "1022468464513089536" });
             Assert.IsTrue(answer.Length == 1);
             Assert.AreEqual("1022468464513089536", answer[0].Id);
             Assert.AreEqual("TheIndra5", answer[0].Username);
