@@ -53,9 +53,12 @@ namespace TwitterSharp.Client
         private static void IncludesParseMedias(IHaveMedia data, Includes includes)
         {
             var medias = data.GetMedia();
-            for (int i = 0; i < medias.Length; i++)
+            if (medias != null)
             {
-                medias[i] = includes.Media.Where(x => x.Key == medias[i].Key).FirstOrDefault();
+                for (int i = 0; i < medias.Length; i++)
+                {
+                    medias[i] = includes.Media.Where(x => x.Key == medias[i].Key).FirstOrDefault();
+                }
             }
         }
 

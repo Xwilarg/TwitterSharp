@@ -87,6 +87,15 @@ namespace TwitterSharp.UnitTests
         }
 
         [TestMethod]
+        public async Task GetTweetsFromUserIdWithArgumentsAsync() // Issue #2
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577", new[] { TweetOption.Attachments }, Array.Empty<UserOption>(), Array.Empty<MediaOption>());
+            Assert.IsTrue(answer.Length == 10);
+            Assert.IsNotNull(answer[0].Author);
+        }
+
+        [TestMethod]
         public async Task GetTweetsFromUserIdWithAuthorAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));

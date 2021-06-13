@@ -34,7 +34,7 @@ namespace TwitterSharp.Response.RTweet
         string IHaveAuthor.AuthorId => AuthorId;
 
         Media[] IHaveMedia.GetMedia()
-            => Attachments.Media;
+            => Attachments?.Media;
 
         // Comparison
 
