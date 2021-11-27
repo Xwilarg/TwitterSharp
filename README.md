@@ -32,14 +32,14 @@ Need more help? You can use the examples below, if you're still lost feel free t
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
 var answer = await client.GetTweetAsync("1389189291582967809");
-Console.WriteLine(answer[0].Text); // たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN
+Console.WriteLine(answer.Text); // たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN
 ```
 
 ### Get an user from its username
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
-var answer = await client.GetUsersAsync("theindra5");
-Console.WriteLine(answer[0].Id); // 1022468464513089536
+var answer = await client.GetUserAsync("theindra5");
+Console.WriteLine(answer.Id); // 1022468464513089536
 ```
 
 ### Get latest tweets from an user id
