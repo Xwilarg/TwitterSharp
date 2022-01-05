@@ -238,7 +238,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithPossiblySensitive()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsAsync(new[] { "1390729374140289024" }, new TweetOption[] { TweetOption.Possibly_Sensitive }, null, null);
+            var answer = await client.GetTweetsAsync(new[] { "1373191601154007040" }, new TweetOption[] { TweetOption.Possibly_Sensitive }, null, null);
 
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];

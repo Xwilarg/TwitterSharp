@@ -16,7 +16,7 @@ namespace TwitterSharp.UnitTests
             var answer = await client.GetUserAsync("theindra5");
             Assert.AreEqual("1022468464513089536", answer.Id);
             Assert.AreEqual("TheIndra5", answer.Username);
-            Assert.AreEqual("TheIndra", answer.Name);
+            Assert.AreEqual("Indra", answer.Name);
         }
 
         [TestMethod]
@@ -26,7 +26,7 @@ namespace TwitterSharp.UnitTests
             var answer = await client.GetUserByIdAsync("1022468464513089536");
             Assert.AreEqual("1022468464513089536", answer.Id);
             Assert.AreEqual("TheIndra5", answer.Username);
-            Assert.AreEqual("TheIndra", answer.Name);
+            Assert.AreEqual("Indra", answer.Name);
         }
 
         [TestMethod]
@@ -37,7 +37,7 @@ namespace TwitterSharp.UnitTests
             Assert.IsTrue(answer.Length == 1);
             Assert.AreEqual("1022468464513089536", answer[0].Id);
             Assert.AreEqual("TheIndra5", answer[0].Username);
-            Assert.AreEqual("TheIndra", answer[0].Name);
+            Assert.AreEqual("Indra", answer[0].Name);
         }
 
         [TestMethod]
@@ -48,7 +48,7 @@ namespace TwitterSharp.UnitTests
             Assert.IsTrue(answer.Length == 1);
             Assert.AreEqual("1022468464513089536", answer[0].Id);
             Assert.AreEqual("TheIndra5", answer[0].Username);
-            Assert.AreEqual("TheIndra", answer[0].Name);
+            Assert.AreEqual("Indra", answer[0].Name);
         }
 
         [TestMethod]
@@ -59,7 +59,7 @@ namespace TwitterSharp.UnitTests
             Assert.IsTrue(answer.Length == 1);
             Assert.AreEqual("1022468464513089536", answer[0].Id);
             Assert.AreEqual("TheIndra5", answer[0].Username);
-            Assert.AreEqual("TheIndra", answer[0].Name);
+            Assert.AreEqual("Indra", answer[0].Name);
             Assert.IsNotNull(answer[0].Description);
             Assert.IsNotNull(answer[0].PublicMetrics);
             Assert.IsNull(answer[0].IsVerified);
