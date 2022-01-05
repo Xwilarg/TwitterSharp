@@ -27,15 +27,15 @@ namespace TwitterSharp.UnitTests
         public async Task GetUserFollowers()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetFollowersAsync("1433657158067896325");
-            Assert.IsTrue(await ContainsFollowAsync("shirakamifubuki", answer));
+            var answer = await client.GetFollowersAsync("1022468464513089536", 1000);
+            Assert.IsTrue(await ContainsFollowAsync("CoreDesign_com", answer));
         }
 
         [TestMethod]
         public async Task GetUserFollowing()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetFollowingAsync("1433657158067896325");
+            var answer = await client.GetFollowingAsync("1433657158067896325", 1000);
             Assert.IsTrue(await ContainsFollowAsync("cover_corp", answer));
         }
     }

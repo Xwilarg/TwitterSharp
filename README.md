@@ -57,6 +57,19 @@ for (int i = 0; i < answer.Length; i++)
 }
 ```
 
+### Get the users that someone follow
+```cs
+var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+
+var answer = await client.GetFollowingAsync("1433657158067896325", 1000);
+Console.WriteLine(string.Join("\n", answer.Users.Select(u => u.Username)));
+while (answer.NextAsync != null) // We go to the next page if there is one
+{
+    answer = await answer.NextAsync();
+    Console.WriteLine(string.Join("\n", answer.Users.Select(u => u.Username)));
+}
+```
+
 ### Follow users and get all new tweets
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
