@@ -289,20 +289,43 @@ namespace TwitterSharp.Client
         #endregion UserSearch
 
         #region Follows
-        public async Task<User[]> GetFollowersAsync(string id, UserOption[] options = null)
+        private async Task<Follow> NextFollowAsync(string baseQuery, string token)
         {
-            var req = new RequestOptions();
-            AddUserOptions(req, options, false);
-            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/followers?" + req.Build());
-            return ParseArrayData<User>(str);
+            var str = await _httpClient.GetStringAsync(baseQuery + (!baseQuery.EndsWith("?") ? "&" : "") + "pagination_token=" + token);
+            var data = ParseData<User[]>(str);
+            return new()
+            {
+                Users = data.Data,
+                NextAsync = data.Meta.NextToken == null ? null : async () => await NextFollowAsync(baseQuery, data.Meta.NextToken)
+            };
         }
 
-        public async Task<User[]> GetFollowingAsync(string id, UserOption[] options = null)
+        public async Task<Follow> GetFollowersAsync(string id, UserOption[] options = null)
         {
             var req = new RequestOptions();
             AddUserOptions(req, options, false);
-            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/following?" + req.Build());
-            return ParseArrayData<User>(str);
+            var query = _baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/followers?" + req.Build();
+            var str = await _httpClient.GetStringAsync(query);
+            var data = ParseData<User[]>(str);
+            return new()
+            {
+                Users = data.Data,
+                NextAsync = data.Meta.NextToken == null ? null : async () => await NextFollowAsync(query, data.Meta.NextToken)
+            };
+        }
+
+        public async Task<Follow> GetFollowingAsync(string id, UserOption[] options = null)
+        {
+            var req = new RequestOptions();
+            AddUserOptions(req, options, false);
+            var query = _baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/following?" + req.Build();
+            var str = await _httpClient.GetStringAsync(query);
+            var data = ParseData<User[]>(str);
+            return new()
+            {
+                Users = data.Data,
+                NextAsync = data.Meta.NextToken == null ? null : async () => await NextFollowAsync(query, data.Meta.NextToken)
+            };
         }
         #endregion Follows
 

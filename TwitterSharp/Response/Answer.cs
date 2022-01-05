@@ -22,6 +22,7 @@ namespace TwitterSharp.Client
     internal class Meta
     {
         public Summary Summary { init; get; }
+        public string NextToken { init; get; }
     }
 
     internal class Summary
