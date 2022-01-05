@@ -288,6 +288,24 @@ namespace TwitterSharp.Client
 
         #endregion UserSearch
 
+        #region Follows
+        public async Task<User[]> GetFollowersAsync(string id, UserOption[] options = null)
+        {
+            var req = new RequestOptions();
+            AddUserOptions(req, options, false);
+            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/followers?" + req.Build());
+            return ParseArrayData<User>(str);
+        }
+
+        public async Task<User[]> GetFollowingAsync(string id, UserOption[] options = null)
+        {
+            var req = new RequestOptions();
+            AddUserOptions(req, options, false);
+            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/following?" + req.Build());
+            return ParseArrayData<User>(str);
+        }
+        #endregion Follows
+
         private const string _baseUrl = "https://api.twitter.com/2/";
 
         private readonly HttpClient _httpClient;
