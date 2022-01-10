@@ -70,7 +70,7 @@ while (answer.NextAsync != null) // We go to the next page if there is one
 }
 ```
 
-### Follow users and get all new tweets
+### Continuously get all the new tweets from some users
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
 
