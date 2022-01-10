@@ -3,6 +3,7 @@
     public enum ReferenceType
     {
         RepliedTo,
-        Quoted
+        Quoted,
+        Retweeted
     }
 }

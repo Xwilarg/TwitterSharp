@@ -21,8 +21,12 @@ namespace TwitterSharp.JsonOption
                     t.Type = ReferenceType.Quoted;
                     break;
 
+                case "retweeted":
+                    t.Type = ReferenceType.Retweeted;
+                    break;
+
                 default:
-                    throw new InvalidOperationException("Invalid type");
+                    throw new InvalidOperationException("Invalid type " + json.GetProperty("type").GetString());
             }
             t.Id = json.GetProperty("id").GetString();
             return t;
