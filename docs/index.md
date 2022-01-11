@@ -1,5 +1,5 @@
 # TwitterSharp
-TwitterSharp is a wrapper around the V2 of Twitter API
+TwitterSharp is a C# wrapper around the V2 of Twitter API
 
 ## Getting Started
  - Download the project:
