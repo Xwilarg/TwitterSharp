@@ -4,7 +4,7 @@ namespace TwitterSharp.Client
 {
     public class TwitterException : Exception
     {
-        public TwitterException(string message) : base(message)
+        internal TwitterException(string message) : base(message)
         { }
     }
 }

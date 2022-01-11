@@ -5,7 +5,7 @@ using TwitterSharp.Rule;
 
 namespace TwitterSharp.JsonOption
 {
-    public class ExpressionConverter : JsonConverter<Expression>
+    internal class ExpressionConverter : JsonConverter<Expression>
     {
         public override Expression Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

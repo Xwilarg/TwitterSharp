@@ -5,7 +5,7 @@ using TwitterSharp.Response.Entity;
 
 namespace TwitterSharp.JsonOption
 {
-    public class EntitiesConverter : JsonConverter<Entities>
+    internal class EntitiesConverter : JsonConverter<Entities>
     {
         public override Entities Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

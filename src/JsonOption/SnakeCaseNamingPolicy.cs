@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace TwitterSharp.JsonOption
 {
-    public class SnakeCaseNamingPolicy : JsonNamingPolicy
+    internal class SnakeCaseNamingPolicy : JsonNamingPolicy
     {
         public override string ConvertName(string name)
         {

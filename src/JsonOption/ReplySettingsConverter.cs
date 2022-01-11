@@ -5,7 +5,7 @@ using TwitterSharp.Response.RTweet;
 
 namespace TwitterSharp.JsonOption
 {
-    public class ReplySettingsConverter : JsonConverter<ReplySettings>
+    internal class ReplySettingsConverter : JsonConverter<ReplySettings>
     {
         public override ReplySettings Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

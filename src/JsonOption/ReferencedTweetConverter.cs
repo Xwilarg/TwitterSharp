@@ -5,7 +5,7 @@ using TwitterSharp.Response.RTweet;
 
 namespace TwitterSharp.JsonOption
 {
-    public class ReferencedTweetConverter : JsonConverter<ReferencedTweet>
+    internal class ReferencedTweetConverter : JsonConverter<ReferencedTweet>
     {
         public override ReferencedTweet Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

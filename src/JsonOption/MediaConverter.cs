@@ -5,7 +5,7 @@ using TwitterSharp.Response.RMedia;
 
 namespace TwitterSharp.JsonOption
 {
-    public class MediaConverter : JsonConverter<Media>
+    internal class MediaConverter : JsonConverter<Media>
     {
         private JsonElement? TryGetProperty(JsonElement json, string key)
         {

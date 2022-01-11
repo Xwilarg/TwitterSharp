@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace TwitterSharp.Client
 {
-    public class RequestOptions
+    internal class RequestOptions
     {
-        public void AddOption(string key, string value)
+        internal void AddOption(string key, string value)
         {
             if (!_options.ContainsKey(key))
             {
@@ -17,7 +17,7 @@ namespace TwitterSharp.Client
             }
         }
 
-        public void AddOptions(string key, IEnumerable<string> values)
+        internal void AddOptions(string key, IEnumerable<string> values)
         {
             if (!_options.ContainsKey(key))
             {
@@ -30,7 +30,7 @@ namespace TwitterSharp.Client
             _options[key] = _options[key].Distinct().ToList();
         }
 
-        public string Build()
+        internal string Build()
         {
             return string.Join("&", _options.Select(x => x.Key + "=" + string.Join(",", x.Value)));
         }
