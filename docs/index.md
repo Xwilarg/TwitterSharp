@@ -1,4 +1,9 @@
-# This is the **HOMEPAGE**.
-Refer to [Markdown](http://daringfireball.net/projects/markdown/) for how to write markdown files.
-## Quick Start Notes:
-1. Add images to the *images* folder if the file is referencing an image.
+# TwitterSharp
+TwitterSharp is a wrapper around the V2 of Twitter API
+
+## Getting Started
+ - Download the project:
+    - [NuGet](https://www.nuget.org/packages/TwitterSharp/)
+    - [GitHub Packages](https://github.com/Xwilarg/TwitterSharp/packages/772258)
+  - Look at [examples in the README](https://github.com/Xwilarg/TwitterSharp#examples)
+  - For more information, look at the [API reference](/api/index.html)

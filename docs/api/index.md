@@ -1,2 +1,1 @@
-# PLACEHOLDER
-TODO: Add .NET projects to the *src* folder and run `docfx` to generate **REAL** *API Documentation*!
+To start with, you can have a look at the methods available on [the client](/api/TwitterSharp.Client.TwitterClient.html)
