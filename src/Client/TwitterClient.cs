@@ -177,7 +177,7 @@ namespace TwitterSharp.Client
                 }
                 request.AddOptions("tweet.fields", options.Select(x =>
                 {
-                    if (x == TweetOption.AttachmentsIds)
+                    if (x == TweetOption.Attachments_Ids)
                     {
                         return "attachments";
                     }

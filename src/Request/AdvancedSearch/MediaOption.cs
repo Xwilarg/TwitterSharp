@@ -1,5 +1,4 @@
-﻿using System;
-namespace TwitterSharp.Request.AdvancedSearch
+﻿namespace TwitterSharp.Request.AdvancedSearch
 {
     public enum MediaOption
     {
@@ -21,6 +20,11 @@ namespace TwitterSharp.Request.AdvancedSearch
         /// <summary>
         /// URL to a preview image of the content
         /// </summary>
-        Preview_Image_Url
+        Preview_Image_Url,
+
+        /// <summary>
+        /// URL to the image of the content
+        /// </summary>
+        Url
     }
 }

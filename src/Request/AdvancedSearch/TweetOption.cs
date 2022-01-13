@@ -69,6 +69,6 @@
         /// <summary>
         /// Same at "Attachments" but only get their ID
         /// </summary>
-        AttachmentsIds
+        Attachments_Ids
     }
 }

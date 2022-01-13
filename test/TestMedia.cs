@@ -24,7 +24,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithMediaId()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new[] { TweetOption.AttachmentsIds }, null, null);
+            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new[] { TweetOption.Attachments_Ids }, null, null);
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNotNull(a.Attachments);

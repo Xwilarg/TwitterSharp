@@ -45,17 +45,21 @@ var answer = await client.GetUserAsync("theindra5");
 Console.WriteLine(answer.Id); // 1022468464513089536
 ```
 
-### Get latest tweets from an user id
+### Get latest tweets from an user id with the attached medias
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
 // You can get the id using GetUsersAsync
-var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577", new[] { TweetOption.Entities }, null, null);
+var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577", new TweetOption[] { TweetOption.Attachments }, null, new MediaOption[] { MediaOption.Url });
 for (int i = 0; i < answer.Length; i++)
 {
-    Console.WriteLine($"Tweet n°{i}:");
-    Console.WriteLine(answer[i].Text);
-    Console.WriteLine("URLs:");
-    Console.WriteLine(string.Join("\n", answer[i].Entities.Urls.Select(x => x.DisplayUrl)));
+    var tweet = answer[i];
+    Console.WriteLine($"Tweet n°{i}");
+    Console.WriteLine(tweet.Text);
+    if (tweet.Attachments?.Media?.Any() ?? false)
+    {
+        Console.WriteLine("\nImages:");
+        Console.WriteLine(string.Join("\n", tweet.Attachments.Media.Select(x => x.Url)));
+    }
     Console.WriteLine("\n");
 }
 ```

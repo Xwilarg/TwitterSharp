@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using TwitterSharp.Client;
 using TwitterSharp.Request.AdvancedSearch;
+using TwitterSharp.Response.RMedia;
 using TwitterSharp.Response.RTweet;
 
 namespace TwitterSharp.UnitTests
@@ -131,12 +132,13 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithAttachment()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var a = await client.GetTweetAsync("1481598340051914753", new TweetOption[] { TweetOption.Attachments }, null, new MediaOption[] { MediaOption.Preview_Image_Url });
+            var a = await client.GetTweetAsync("1481598340051914753", new TweetOption[] { TweetOption.Attachments }, null, new MediaOption[] { MediaOption.Url });
 
             Assert.IsNotNull(a.Attachments);
             Assert.IsNotNull(a.Attachments.Media);
             Assert.IsTrue(a.Attachments.Media.Length == 1);
-            Assert.IsTrue(a.Attachments.Media[0].PreviewImageUrl == "https://pbs.twimg.com/media/FI-xd52aUAEHCJB");
+            Assert.IsTrue(a.Attachments.Media[0].Type == MediaType.Photo);
+            Assert.IsTrue(a.Attachments.Media[0].Url == "https://pbs.twimg.com/media/FI-xd52aUAEHCJB.jpg");
             Assert.IsNull(a.ConversationId);
             Assert.IsNull(a.CreatedAt);
             Assert.IsNull(a.Entities);

@@ -44,7 +44,8 @@ namespace TwitterSharp.JsonOption
                     Height = TryGetProperty(elem, "height")?.GetInt32(),
                     Width = TryGetProperty(elem, "width")?.GetInt32(),
                     DurationMs = TryGetProperty(elem, "duration_ms")?.GetInt32(),
-                    PreviewImageUrl = TryGetProperty(elem, "preview_image_url")?.GetString()
+                    PreviewImageUrl = TryGetProperty(elem, "preview_image_url")?.GetString(),
+                    Url = TryGetProperty(elem, "url")?.GetString()
                 };
                 return media;
             }
