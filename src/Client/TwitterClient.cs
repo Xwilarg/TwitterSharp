@@ -18,8 +18,15 @@ using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.Client
 {
+    /// <summary>
+    /// Base client to do all your requests
+    /// </summary>
     public class TwitterClient
     {
+        /// <summary>
+        /// Create a new instance of the client
+        /// </summary>
+        /// <param name="bearerToken">Bearer token generated from https://developer.twitter.com/</param>
         public TwitterClient(string bearerToken)
         {
             _httpClient = new();

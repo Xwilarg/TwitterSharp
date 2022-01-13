@@ -4,7 +4,6 @@
     public enum TweetOption
     {
         // TODO:
-        // attachments
         // context_annotations
         // geo
         // non_public_metrics

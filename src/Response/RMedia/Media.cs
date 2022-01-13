@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace TwitterSharp.Response.RMedia
+﻿namespace TwitterSharp.Response.RMedia
 {
     // MUST BE PARSED IN MEDIACONVERTER
     public class Media
