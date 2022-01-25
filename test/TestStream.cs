@@ -21,7 +21,7 @@ namespace TwitterSharp.UnitTests
 
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
             
-            client.RateLimitChanged += (sender, rateLimit) =>
+            client.RateLimitChanged += (_, rateLimit) =>
             {
                 rateLimitEvents.Add(rateLimit);
             };

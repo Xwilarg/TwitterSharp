@@ -141,19 +141,26 @@ namespace TwitterSharp.Client
         private void BuildRateLimit(HttpResponseHeaders headers, string endpoint)
         {
             if (headers == null)
+            {
                 return;
+            }
 
             var rateLimit = new RateLimit(endpoint);
-
-
+            
             if (headers.TryGetValues("x-rate-limit-limit", out var limit))
+            {
                 rateLimit.Limit = Convert.ToInt32(limit.FirstOrDefault());
+            }
 
             if (headers.TryGetValues("x-rate-limit-remaining", out var remaining))
+            {
                 rateLimit.Remaining = Convert.ToInt32(remaining.FirstOrDefault());
+            }
 
             if (headers.TryGetValues("x-rate-limit-reset", out var reset))
+            {
                 rateLimit.Reset = Convert.ToInt32(reset.FirstOrDefault());
+            }
 
             RateLimitChanged?.Invoke(this, rateLimit);
         }
