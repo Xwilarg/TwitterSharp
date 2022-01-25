@@ -1,9 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using TwitterSharp.Client;
 using TwitterSharp.Request;
+using TwitterSharp.Response;
 using TwitterSharp.Rule;
 
 namespace TwitterSharp.UnitTests
@@ -14,7 +17,14 @@ namespace TwitterSharp.UnitTests
         [TestMethod]
         public async Task TestStreamProcess()
         {
+            List<RateLimit> rateLimitEvents = new();
+
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            
+            client.RateLimitChanged += (sender, rateLimit) =>
+            {
+                rateLimitEvents.Add(rateLimit);
+            };
 
             var res = await client.GetInfoTweetStreamAsync();
             var elem = res.FirstOrDefault(x => x.Tag == "TwitterSharp UnitTest");
@@ -35,6 +45,8 @@ namespace TwitterSharp.UnitTests
             Assert.IsTrue(res[0].Value.ToString() == exp.ToString());
 
             res = await client.GetInfoTweetStreamAsync();
+            
+            Assert.IsTrue(CheckGetInfoTweetStreamAsyncRateLimit(rateLimitEvents));
 
             elem = res.FirstOrDefault(x => x.Tag == "TwitterSharp UnitTest");
             Assert.IsTrue(res.Length == objectiveCount);
@@ -48,9 +60,18 @@ namespace TwitterSharp.UnitTests
 
             res = await client.GetInfoTweetStreamAsync();
 
+            Assert.IsTrue(CheckGetInfoTweetStreamAsyncRateLimit(rateLimitEvents));
+
             Assert.IsTrue(res.Length == objectiveCount);
             elem = res.FirstOrDefault(x => x.Tag == "TwitterSharp UnitTest");
             Assert.IsNull(elem);
+        }
+
+        private bool CheckGetInfoTweetStreamAsyncRateLimit(List<RateLimit> rateLimitEvents)
+        {
+            var rateLimits = rateLimitEvents.Where(x => x.Endpoint == nameof(TwitterClient.GetInfoTweetStreamAsync)).ToList();
+
+            return rateLimits[^1].Remaining == rateLimits[^2].Remaining - 1;
         }
     }
 }
