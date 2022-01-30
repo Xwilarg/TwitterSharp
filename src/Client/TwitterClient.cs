@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using TwitterSharp.JsonOption;
@@ -22,7 +23,7 @@ namespace TwitterSharp.Client
     /// <summary>
     /// Base client to do all your requests
     /// </summary>
-    public class TwitterClient
+    public class TwitterClient : IDisposable
     {
         /// <summary>
         /// Create a new instance of the client
@@ -45,6 +46,7 @@ namespace TwitterSharp.Client
         }
 
         public event EventHandler<RateLimit> RateLimitChanged;
+        private CancellationTokenSource _nextTweetStreamAsyncCancellationTokenSource;
 
         #region AdvancedParsing
         private static void IncludesParseUser(IHaveAuthor data, Includes includes)
@@ -274,13 +276,14 @@ namespace TwitterSharp.Client
         public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, TweetOption[] tweetOptions = null, UserOption[] options = null, MediaOption[] mediaOptions = null)
         {
             var req = new RequestOptions();
+            _nextTweetStreamAsyncCancellationTokenSource = new();
             AddTweetOptions(req, tweetOptions);
             AddUserOptions(req, options, true);
             AddMediaOptions(req, mediaOptions);
-            var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/stream?" + req.Build(), HttpCompletionOption.ResponseHeadersRead);
+            var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/stream?" + req.Build(), HttpCompletionOption.ResponseHeadersRead, _nextTweetStreamAsyncCancellationTokenSource.Token);
             BuildRateLimit(res.Headers, "NextTweetStreamAsync");
-            using StreamReader reader = new(await res.Content.ReadAsStreamAsync());
-            while (!reader.EndOfStream)
+            using StreamReader reader = new(await res.Content.ReadAsStreamAsync(_nextTweetStreamAsyncCancellationTokenSource.Token));
+            while (!reader.EndOfStream && !_nextTweetStreamAsyncCancellationTokenSource.IsCancellationRequested)
             {
                 var str = reader.ReadLine();
                 if (string.IsNullOrWhiteSpace(str))
@@ -289,6 +292,13 @@ namespace TwitterSharp.Client
                 }
                 onNextTweet(ParseData<Tweet>(str).Data);
             }
+
+            _nextTweetStreamAsyncCancellationTokenSource.Dispose();
+        }
+
+        public void CancelNextTweetStreamAsync()
+        {
+            _nextTweetStreamAsyncCancellationTokenSource.Cancel();
         }
 
         public async Task<StreamInfo[]> AddTweetStreamAsync(params StreamRequest[] request)
@@ -421,5 +431,11 @@ namespace TwitterSharp.Client
 
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonOptions;
+
+        public void Dispose()
+        {
+            _nextTweetStreamAsyncCancellationTokenSource?.Cancel();
+            _httpClient?.Dispose();
+        }
     }
 }
