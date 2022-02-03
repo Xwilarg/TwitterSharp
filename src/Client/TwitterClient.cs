@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -46,7 +48,7 @@ namespace TwitterSharp.Client
         }
 
         public event EventHandler<RateLimit> RateLimitChanged;
-        private CancellationTokenSource _nextTweetStreamAsyncCancellationTokenSource;
+        private CancellationTokenSource _tweetStreamCancellationTokenSource;
 
         #region AdvancedParsing
         private static void IncludesParseUser(IHaveAuthor data, Includes includes)
@@ -273,34 +275,98 @@ namespace TwitterSharp.Client
             return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync());
         }
 
+        private static StreamReader _reader;
+        private static readonly object _streamLock = new();
+        public static bool IsTweetStreaming { get; private set;}
+
+        /// <summary>
+        /// The stream is only meant to be open one time. So calling this method multiple time will result in closing and reopen the stream.
+        ///
+        /// "Filtered stream currently only allows Projects with Academic Research access to connect to up to two redundant connections. To use a redundant stream, simply connect to the same URL used for your primary connection. The data for your stream will be sent through both connections."
+        /// 
+        /// "No disconnection needed to add/remove rules using rules endpoint."
+        /// 
+        /// Keep-alive signals:
+        /// At least every 20 seconds, the stream will send a keep-alive signal, or heartbeat in the form of an \r\n carriage return through the open connection
+        /// to prevent your client from timing out. Your client application should be tolerant of the \r\n characters in the stream.
+        /// </summary>
+        /// <param name="onNextTweet">The action which is called when a tweet arrives</param>
+        /// <param name="tweetOptions"></param>
+        /// <param name="options"></param>
+        /// <param name="mediaOptions"></param>
+        /// <returns></returns>
         public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, TweetOption[] tweetOptions = null, UserOption[] options = null, MediaOption[] mediaOptions = null)
         {
+
+            lock (_streamLock)
+            { 
+                if (IsTweetStreaming)
+                {
+                    Debug.WriteLine("Stream already running. Please cancel the stream with CancelNextTweetStreamAsync");
+                    throw new TwitterException("Stream already running. Please cancel the stream with CancelNextTweetStreamAsync");
+                    //CancelNextTweetStreamAsync(true);
+                }
+                
+                IsTweetStreaming = true;
+            }
+            
             var req = new RequestOptions();
-            _nextTweetStreamAsyncCancellationTokenSource = new();
+            _tweetStreamCancellationTokenSource = new();
             AddTweetOptions(req, tweetOptions);
             AddUserOptions(req, options, true);
             AddMediaOptions(req, mediaOptions);
-            var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/stream?" + req.Build(), HttpCompletionOption.ResponseHeadersRead, _nextTweetStreamAsyncCancellationTokenSource.Token);
-            BuildRateLimit(res.Headers, "NextTweetStreamAsync");
-            using StreamReader reader = new(await res.Content.ReadAsStreamAsync(_nextTweetStreamAsyncCancellationTokenSource.Token));
-            while (!reader.EndOfStream && !_nextTweetStreamAsyncCancellationTokenSource.IsCancellationRequested)
+            var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/stream?" + req.Build(), HttpCompletionOption.ResponseHeadersRead, _tweetStreamCancellationTokenSource.Token);
+            BuildRateLimit(res.Headers, "NextTweetStreamAsync"); 
+            _reader = new(await res.Content.ReadAsStreamAsync(_tweetStreamCancellationTokenSource.Token));
+
+            try
             {
-                var str = reader.ReadLine();
-                if (string.IsNullOrWhiteSpace(str))
+                while (!_reader.EndOfStream && !_tweetStreamCancellationTokenSource.IsCancellationRequested)
                 {
-                    continue;
+                    var str = await _reader.ReadLineAsync();
+                    if (string.IsNullOrWhiteSpace(str))
+                    {
+                        Debug.WriteLine("Keep-alive signal (20 sec)");
+                        continue;
+                    }
+                    onNextTweet(ParseData<Tweet>(str).Data);
                 }
-                onNextTweet(ParseData<Tweet>(str).Data);
+            }
+            catch (IOException e)
+            {
+                if(!(e.InnerException is SocketException se && se.SocketErrorCode == SocketError.ConnectionAborted))
+                {
+                    throw;
+                }
             }
 
-            _nextTweetStreamAsyncCancellationTokenSource.Dispose();
+            CancelNextTweetStreamAsync();
         }
 
-        public void CancelNextTweetStreamAsync()
+        /// <summary>
+        /// Closes the tweet stream started by <see cref="NextTweetStreamAsync"/>. 
+        /// </summary>
+        /// <param name="force">If true, the stream will be closed immediately</param>
+        public void CancelNextTweetStreamAsync(bool force = true)
         {
-            _nextTweetStreamAsyncCancellationTokenSource.Cancel();
+            Debug.WriteLine("CancelNextTweetStreamAsync forced: " + force);
+
+            _tweetStreamCancellationTokenSource.Dispose();
+            
+            if (force)
+            {
+                _reader?.Close();
+                _reader?.Dispose();
+            }
+
+            IsTweetStreaming = false;
         }
 
+        /// <summary>
+        /// No disconnection needed to add/remove rules using rules endpoint.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public async Task<StreamInfo[]> AddTweetStreamAsync(params StreamRequest[] request)
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }, _jsonOptions), Encoding.UTF8, "application/json");
@@ -309,6 +375,11 @@ namespace TwitterSharp.Client
             return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync());
         }
 
+        /// <summary>
+        /// No disconnection needed to add/remove rules using rules endpoint.
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
         public async Task<int> DeleteTweetStreamAsync(params string[] ids)
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestDelete { Delete = new StreamRequestDeleteIds { Ids = ids } }, _jsonOptions), Encoding.UTF8, "application/json");
@@ -434,7 +505,7 @@ namespace TwitterSharp.Client
 
         public void Dispose()
         {
-            _nextTweetStreamAsyncCancellationTokenSource?.Cancel();
+            CancelNextTweetStreamAsync();
             _httpClient?.Dispose();
         }
     }
