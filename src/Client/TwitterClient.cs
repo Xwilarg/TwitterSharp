@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -82,10 +81,11 @@ namespace TwitterSharp.Client
             {
                 IncludesParseMedias(m, includes);
             }
-        }
+        }        
 
         private static readonly Type _authorInterface = typeof(IHaveAuthor);
         private static readonly Type _mediaInterface = typeof(IHaveMedia);
+        private static readonly Type _matchingRulesInterface = typeof(IHaveMatchingRules);
         private static void InternalIncludesParse<T>(Answer<T> answer)
         {
             if (answer.Includes != null)
@@ -101,6 +101,10 @@ namespace TwitterSharp.Client
                     var data = answer.Data;
                     IncludesParseMedias((IHaveMedia)data, answer.Includes);
                     answer.Data = data;
+                }
+                if (answer.MatchingRules != null && answer.MatchingRules.Length > 0 && _matchingRulesInterface.IsAssignableFrom(typeof(T)))
+                {
+                    (answer.Data as IHaveMatchingRules).MatchingRules = answer.MatchingRules;
                 }
             }
         }
@@ -358,7 +362,7 @@ namespace TwitterSharp.Client
         /// No disconnection needed to add/remove rules using rules endpoint.
         /// </summary>
         /// <param name="request">The rules to be added</param>
-        /// <returns>All existing rules</returns>
+        /// <returns>The added rule</returns>
         public async Task<StreamInfo[]> AddTweetStreamAsync(params StreamRequest[] request)
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }, _jsonOptions), Encoding.UTF8, "application/json");
