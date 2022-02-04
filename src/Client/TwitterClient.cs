@@ -275,7 +275,7 @@ namespace TwitterSharp.Client
             return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync());
         }
 
-        private static StreamReader _reader;
+        private StreamReader _reader;
         private static readonly object _streamLock = new();
         public static bool IsTweetStreaming { get; private set;}
 
