@@ -1,4 +1,4 @@
-﻿using TwitterSharp.Client;
+﻿using TwitterSharp.Response.RTweet;
 
 namespace TwitterSharp.Model
 {

@@ -88,10 +88,9 @@ var request = new TwitterSharp.Request.StreamRequest(
             Expression.Author("takanashikiara"),
             Expression.Author("ninomaeinanis"),
             Expression.Author("gawrgura"),
-            Expression.Author("Every3Minutes"),
             Expression.Author("watsonameliaEN")
         )
-, "RuleTag");
+, "Anime");
 await client.AddTweetStreamAsync(request); // Add them to the stream
 
 // We display all the subscriptions we have
@@ -105,9 +104,12 @@ Task.Run(async () =>
     // Since we want to get the basic info of the tweet author, we add an empty array of UserOption
     await client.NextTweetStreamAsync((tweet) =>
     {
-         Console.WriteLine($"From {tweet.Author.Name}: {tweet.Text} (Rules: {string.Join(',', tweet.MatchingRules.Select(x => x.Tag))})");
+        Console.WriteLine($"From {tweet.Author.Name}: {tweet.Text} (Rules: {string.Join(',', tweet.MatchingRules.Select(x => x.Tag))})");
     }, null, Array.Empty<UserOption>());
 });
+
+// Add new high frequent rule after the stream started. No disconnection needed.
+await client.AddTweetStreamAsync(new TwitterSharp.Request.StreamRequest( Expression.Author("Every3Minutes"), "Frequent"));
 ```
 
 ## Contributing

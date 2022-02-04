@@ -90,19 +90,19 @@ namespace TwitterSharp.Client
         {
             if (answer.Includes != null)
             {
-                if (answer.Includes.Users != null && answer.Includes.Users.Length > 0 && _authorInterface.IsAssignableFrom(typeof(T)))
+                if (answer.Includes.Users != null && answer.Includes.Users.Any() && _authorInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
                     IncludesParseUser((IHaveAuthor)data, answer.Includes);
                     answer.Data = data;
                 }
-                if (answer.Includes.Media != null && answer.Includes.Media.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
+                if (answer.Includes.Media != null && answer.Includes.Media.Any() && _mediaInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
                     IncludesParseMedias((IHaveMedia)data, answer.Includes);
                     answer.Data = data;
                 }
-                if (answer.MatchingRules != null && answer.MatchingRules.Length > 0 && _matchingRulesInterface.IsAssignableFrom(typeof(T)))
+                if (answer.MatchingRules != null && answer.MatchingRules.Any() && _matchingRulesInterface.IsAssignableFrom(typeof(T)))
                 {
                     (answer.Data as IHaveMatchingRules).MatchingRules = answer.MatchingRules;
                 }
@@ -112,13 +112,13 @@ namespace TwitterSharp.Client
         {
             if (answer.Includes != null)
             {
-                if (answer.Includes.Users != null && answer.Includes.Users.Length > 0 && answer.Includes.Users.Length > 0 && _authorInterface.IsAssignableFrom(typeof(T)))
+                if (answer.Includes.Users != null && answer.Includes.Users.Any() && answer.Includes.Users.Any() && _authorInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
                     IncludesParseUser(data.Cast<IHaveAuthor>().ToArray(), answer.Includes);
                     answer.Data = data;
                 }
-                if (answer.Includes.Media != null && answer.Includes.Media.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
+                if (answer.Includes.Media != null && answer.Includes.Media.Any() && _mediaInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
                     IncludesParseMedias(data.Cast<IHaveMedia>().ToArray(), answer.Includes);

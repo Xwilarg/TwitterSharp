@@ -1,4 +1,5 @@
 ﻿using TwitterSharp.Response.RMedia;
+using TwitterSharp.Response.RTweet;
 using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.Client
@@ -29,11 +30,5 @@ namespace TwitterSharp.Client
     internal class Summary
     {
         public int Deleted { init; get; }
-    }
-
-    public class MatchingRule
-    {
-        public string Id { init; get; }
-        public string Tag { init; get; }
     }
 }
