@@ -81,7 +81,7 @@ namespace TwitterSharp.Client
             {
                 IncludesParseMedias(m, includes);
             }
-        }        
+        }
 
         private static readonly Type _authorInterface = typeof(IHaveAuthor);
         private static readonly Type _mediaInterface = typeof(IHaveMedia);
