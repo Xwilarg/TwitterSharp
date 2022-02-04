@@ -67,6 +67,72 @@ namespace TwitterSharp.UnitTests
             Assert.IsNull(elem);
         }
 
+        [TestMethod]
+        public async Task TestStreamCancellation()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var requestSucceeded = false;
+            var streamFinished = false;
+            TaskStatus streamResult = TaskStatus.Created;
+            
+            client.RateLimitChanged += (_, _) =>
+            {
+                requestSucceeded = true;
+            };
+
+            _ = Task.Run(async () =>
+            {
+                await client.NextTweetStreamAsync(_ => { });
+            }).ContinueWith(t =>
+            {
+                streamResult = t.Status;
+                streamFinished = true;
+            });
+
+            // Test - IsStreaming
+            while (!requestSucceeded)
+            {
+                await Task.Delay(25);
+            }
+
+            Assert.IsTrue(TwitterClient.IsTweetStreaming);
+
+            // Test - two streams same client -> Exception
+            try
+            {
+                await client.NextTweetStreamAsync(_ => { });
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOfType(e, typeof(TwitterException));
+            }
+
+            Assert.IsTrue(TwitterClient.IsTweetStreaming);
+
+            // Test - two streams - different client -> Exception
+            var client2 = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            try
+            {
+                await client2.NextTweetStreamAsync(_ => { });
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOfType(e, typeof(TwitterException));
+            }
+
+            // Test - Cancel stream
+            client.CancelTweetStream();
+
+            Assert.IsFalse(TwitterClient.IsTweetStreaming);
+
+            while (!streamFinished)
+            {
+                await Task.Delay(25);
+            }
+
+            Assert.IsTrue(streamResult == TaskStatus.RanToCompletion);
+        }
+
         private bool CheckGetInfoTweetStreamAsyncRateLimit(List<RateLimit> rateLimitEvents)
         {
             var rateLimits = rateLimitEvents.Where(x => x.Endpoint == nameof(TwitterClient.GetInfoTweetStreamAsync)).ToList();

@@ -280,20 +280,15 @@ namespace TwitterSharp.Client
         public static bool IsTweetStreaming { get; private set;}
 
         /// <summary>
-        /// The stream is only meant to be open one time. So calling this method multiple time will result in closing and reopen the stream.
-        ///
-        /// "Filtered stream currently only allows Projects with Academic Research access to connect to up to two redundant connections. To use a redundant stream, simply connect to the same URL used for your primary connection. The data for your stream will be sent through both connections."
-        /// 
+        /// The stream is only meant to be open one time. So calling this method multiple time will result in an exception.
+        /// For changing the rules with <see cref="AddTweetStreamAsync"/> and <see cref="DeleteTweetStreamAsync"/>
         /// "No disconnection needed to add/remove rules using rules endpoint."
-        /// 
-        /// Keep-alive signals:
-        /// At least every 20 seconds, the stream will send a keep-alive signal, or heartbeat in the form of an \r\n carriage return through the open connection
-        /// to prevent your client from timing out. Your client application should be tolerant of the \r\n characters in the stream.
+        /// It has to be canceled with <see cref="CancelTweetStream"/>
         /// </summary>
         /// <param name="onNextTweet">The action which is called when a tweet arrives</param>
-        /// <param name="tweetOptions"></param>
-        /// <param name="options"></param>
-        /// <param name="mediaOptions"></param>
+        /// <param name="tweetOptions">Properties send with the tweet</param>
+        /// <param name="options">User properties send with the tweet</param>
+        /// <param name="mediaOptions">Media properties send with the tweet</param>
         /// <returns></returns>
         public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, TweetOption[] tweetOptions = null, UserOption[] options = null, MediaOption[] mediaOptions = null)
         {
@@ -302,9 +297,7 @@ namespace TwitterSharp.Client
             { 
                 if (IsTweetStreaming)
                 {
-                    Debug.WriteLine("Stream already running. Please cancel the stream with CancelNextTweetStreamAsync");
                     throw new TwitterException("Stream already running. Please cancel the stream with CancelNextTweetStreamAsync");
-                    //CancelNextTweetStreamAsync(true);
                 }
                 
                 IsTweetStreaming = true;
@@ -324,9 +317,9 @@ namespace TwitterSharp.Client
                 while (!_reader.EndOfStream && !_tweetStreamCancellationTokenSource.IsCancellationRequested)
                 {
                     var str = await _reader.ReadLineAsync();
+                    // Keep-alive signals: At least every 20 seconds, the stream will send a keep-alive signal, or heartbeat in the form of an \r\n carriage return through the open connection to prevent your client from timing out. Your client application should be tolerant of the \r\n characters in the stream.
                     if (string.IsNullOrWhiteSpace(str))
                     {
-                        Debug.WriteLine("Keep-alive signal (20 sec)");
                         continue;
                     }
                     onNextTweet(ParseData<Tweet>(str).Data);
@@ -340,18 +333,16 @@ namespace TwitterSharp.Client
                 }
             }
 
-            CancelNextTweetStreamAsync();
+            CancelTweetStream();
         }
 
         /// <summary>
         /// Closes the tweet stream started by <see cref="NextTweetStreamAsync"/>. 
         /// </summary>
-        /// <param name="force">If true, the stream will be closed immediately</param>
-        public void CancelNextTweetStreamAsync(bool force = true)
+        /// <param name="force">If true, the stream will be closed immediately. With falls the thread had to wait for the next keep-alive signal (every 20 seconds)</param>
+        public void CancelTweetStream(bool force = true)
         {
-            Debug.WriteLine("CancelNextTweetStreamAsync forced: " + force);
-
-            _tweetStreamCancellationTokenSource.Dispose();
+            _tweetStreamCancellationTokenSource?.Dispose();
             
             if (force)
             {
@@ -363,10 +354,11 @@ namespace TwitterSharp.Client
         }
 
         /// <summary>
+        /// Adds rules for the tweets/search/stream endpoint, which could be subscribed with the <see cref="NextTweetStreamAsync"/> method.
         /// No disconnection needed to add/remove rules using rules endpoint.
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <param name="request">The rules to be added</param>
+        /// <returns>All existing rules</returns>
         public async Task<StreamInfo[]> AddTweetStreamAsync(params StreamRequest[] request)
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }, _jsonOptions), Encoding.UTF8, "application/json");
@@ -376,10 +368,11 @@ namespace TwitterSharp.Client
         }
 
         /// <summary>
+        /// Removes a rule for the tweets/search/stream endpoint, which could be subscribed with the <see cref="NextTweetStreamAsync"/> method.
         /// No disconnection needed to add/remove rules using rules endpoint.
         /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
+        /// <param name="ids">Id of the rules to be removed</param>
+        /// <returns>The number of deleted rules</returns>
         public async Task<int> DeleteTweetStreamAsync(params string[] ids)
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestDelete { Delete = new StreamRequestDeleteIds { Ids = ids } }, _jsonOptions), Encoding.UTF8, "application/json");
@@ -505,7 +498,7 @@ namespace TwitterSharp.Client
 
         public void Dispose()
         {
-            CancelNextTweetStreamAsync();
+            CancelTweetStream();
             _httpClient?.Dispose();
         }
     }
