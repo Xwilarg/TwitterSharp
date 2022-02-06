@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using TwitterSharp.Client;
 using TwitterSharp.Model;
 using TwitterSharp.Response.Entity;
 using TwitterSharp.Response.RMedia;
@@ -7,7 +8,7 @@ using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.Response.RTweet
 {
-    public class Tweet : IEquatable<Tweet>, IHaveAuthor, IHaveMedia
+    public class Tweet : IEquatable<Tweet>, IHaveAuthor, IHaveMedia, IHaveMatchingRules
     {
         /// <summary>
         /// Unique identifier of the tweet
@@ -77,6 +78,9 @@ namespace TwitterSharp.Response.RTweet
 
         Media[] IHaveMedia.GetMedia()
             => Attachments?.Media;
+
+        [JsonIgnore]
+        public MatchingRule[] MatchingRules { set; get; }
 
         // Comparison
 

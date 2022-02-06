@@ -1,4 +1,5 @@
 ﻿using TwitterSharp.Response.RMedia;
+using TwitterSharp.Response.RTweet;
 using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.Client
@@ -8,6 +9,7 @@ namespace TwitterSharp.Client
         public T Data { set; get; }
         public Meta Meta { init; get; }
         public Includes Includes { init; get; }
+        public MatchingRule[] MatchingRules { init; get; }
 
         // Error Handling
         public string Detail { init; get; }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -86,21 +85,26 @@ namespace TwitterSharp.Client
 
         private static readonly Type _authorInterface = typeof(IHaveAuthor);
         private static readonly Type _mediaInterface = typeof(IHaveMedia);
+        private static readonly Type _matchingRulesInterface = typeof(IHaveMatchingRules);
         private static void InternalIncludesParse<T>(Answer<T> answer)
         {
             if (answer.Includes != null)
             {
-                if (answer.Includes.Users != null && answer.Includes.Users.Length > 0 && _authorInterface.IsAssignableFrom(typeof(T)))
+                if (answer.Includes.Users != null && answer.Includes.Users.Any() && _authorInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
                     IncludesParseUser((IHaveAuthor)data, answer.Includes);
                     answer.Data = data;
                 }
-                if (answer.Includes.Media != null && answer.Includes.Media.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
+                if (answer.Includes.Media != null && answer.Includes.Media.Any() && _mediaInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
                     IncludesParseMedias((IHaveMedia)data, answer.Includes);
                     answer.Data = data;
+                }
+                if (answer.MatchingRules != null && answer.MatchingRules.Any() && _matchingRulesInterface.IsAssignableFrom(typeof(T)))
+                {
+                    (answer.Data as IHaveMatchingRules).MatchingRules = answer.MatchingRules;
                 }
             }
         }
@@ -108,13 +112,13 @@ namespace TwitterSharp.Client
         {
             if (answer.Includes != null)
             {
-                if (answer.Includes.Users != null && answer.Includes.Users.Length > 0 && answer.Includes.Users.Length > 0 && _authorInterface.IsAssignableFrom(typeof(T)))
+                if (answer.Includes.Users != null && answer.Includes.Users.Any() && answer.Includes.Users.Any() && _authorInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
                     IncludesParseUser(data.Cast<IHaveAuthor>().ToArray(), answer.Includes);
                     answer.Data = data;
                 }
-                if (answer.Includes.Media != null && answer.Includes.Media.Length > 0 && _mediaInterface.IsAssignableFrom(typeof(T)))
+                if (answer.Includes.Media != null && answer.Includes.Media.Any() && _mediaInterface.IsAssignableFrom(typeof(T)))
                 {
                     var data = answer.Data;
                     IncludesParseMedias(data.Cast<IHaveMedia>().ToArray(), answer.Includes);
@@ -358,7 +362,7 @@ namespace TwitterSharp.Client
         /// No disconnection needed to add/remove rules using rules endpoint.
         /// </summary>
         /// <param name="request">The rules to be added</param>
-        /// <returns>All existing rules</returns>
+        /// <returns>The added rule</returns>
         public async Task<StreamInfo[]> AddTweetStreamAsync(params StreamRequest[] request)
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }, _jsonOptions), Encoding.UTF8, "application/json");
