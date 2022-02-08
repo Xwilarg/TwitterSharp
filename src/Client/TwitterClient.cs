@@ -367,7 +367,7 @@ namespace TwitterSharp.Client
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }, _jsonOptions), Encoding.UTF8, "application/json");
             var res = await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules", content);
-            BuildRateLimit(res.Headers, "AddTweetStreamAsync");
+            BuildRateLimit(res.Headers, "AddDeleteTweetStreamAsync");
             return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync());
         }
 
@@ -381,7 +381,7 @@ namespace TwitterSharp.Client
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestDelete { Delete = new StreamRequestDeleteIds { Ids = ids } }, _jsonOptions), Encoding.UTF8, "application/json");
             var res = await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules", content);
-            BuildRateLimit(res.Headers, "DeleteTweetStreamAsync");
+            BuildRateLimit(res.Headers, "AddDeleteTweetStreamAsync");
             return ParseData<object>(await res.Content.ReadAsStringAsync()).Meta.Summary.Deleted;
         }
         #endregion TweetStream
