@@ -397,7 +397,7 @@ namespace TwitterSharp.Client
             var req = new RequestOptions();
             AddUserOptions(req, options, false);
             var res = await _httpClient.GetAsync(_baseUrl + "users/by/username/" + HttpUtility.UrlEncode(username) + "?" + req.Build());
-            BuildRateLimit(res.Headers, "GetUserAsync");
+            BuildRateLimit(res.Headers, Endpoint.GetUserByName);
             return ParseData<User>(await res.Content.ReadAsStringAsync()).Data;
         }
 
@@ -410,7 +410,7 @@ namespace TwitterSharp.Client
             var req = new RequestOptions();
             AddUserOptions(req, options, false);
             var res = await _httpClient.GetAsync(_baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.UrlEncode(x))) + "&" + req.Build());
-            BuildRateLimit(res.Headers, "GetUsersAsync");
+            BuildRateLimit(res.Headers, Endpoint.GetUsersByNames);
             return ParseArrayData<User>(await res.Content.ReadAsStringAsync());
         }
 
@@ -423,7 +423,7 @@ namespace TwitterSharp.Client
             var req = new RequestOptions();
             AddUserOptions(req, options, false);
             var res = await _httpClient.GetAsync(_baseUrl + "users/" + HttpUtility.UrlEncode(id) + "?" + req.Build());
-            BuildRateLimit(res.Headers, "GetUserByIdAsync");
+            BuildRateLimit(res.Headers, Endpoint.GetUserById);
             return ParseData<User>(await res.Content.ReadAsStringAsync()).Data;
         }
 
@@ -436,7 +436,7 @@ namespace TwitterSharp.Client
             var req = new RequestOptions();
             AddUserOptions(req, options, false);
             var res = await _httpClient.GetAsync(_baseUrl + "users?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + req.Build());
-            BuildRateLimit(res.Headers, "GetUsersByIdsAsync");
+            BuildRateLimit(res.Headers, Endpoint.GetUsersByIds);
             return ParseArrayData<User>(await res.Content.ReadAsStringAsync());
         }
 
@@ -447,7 +447,7 @@ namespace TwitterSharp.Client
         {
             var res = await _httpClient.GetAsync(baseQuery + (!baseQuery.EndsWith("?") ? "&" : "") + "pagination_token=" + token);
             var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, "NextFollowAsync");
+            BuildRateLimit(res.Headers, Endpoint.FollowsLookup);
             return new()
             {
                 Users = data.Data,
@@ -467,7 +467,7 @@ namespace TwitterSharp.Client
             var query = _baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/followers?max_results=" + limit + "&" + req.Build();
             var res = await _httpClient.GetAsync(query);
             var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, "GetFollowersAsync");
+            BuildRateLimit(res.Headers, Endpoint.FollowsLookup);
             return new()
             {
                 Users = data.Data,
@@ -487,7 +487,7 @@ namespace TwitterSharp.Client
             var query = _baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/following?max_results=" + limit + "&" + req.Build();
             var res = await _httpClient.GetAsync(query);
             var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, "GetFollowingAsync");
+            BuildRateLimit(res.Headers, Endpoint.FollowsLookup);
             return new()
             {
                 Users = data.Data,

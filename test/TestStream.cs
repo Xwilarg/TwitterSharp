@@ -134,7 +134,7 @@ namespace TwitterSharp.UnitTests
 
         private bool CheckGetInfoTweetStreamAsyncRateLimit(List<RateLimit> rateLimitEvents)
         {
-            var rateLimits = rateLimitEvents.Where(x => x.Endpoint == Endpoint.ConnectingFilteresStream).ToList();
+            var rateLimits = rateLimitEvents.Where(x => x.Endpoint == Endpoint.ListingFilters).ToList();
 
             return rateLimits[^1].Remaining == rateLimits[^2].Remaining - 1;
         }
