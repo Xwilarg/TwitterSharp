@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using TwitterSharp.Client;
 using TwitterSharp.Request;
-using TwitterSharp.Response;
+using TwitterSharp.Response.RRateLimit;
 using TwitterSharp.Rule;
 
 namespace TwitterSharp.UnitTests
@@ -135,7 +134,7 @@ namespace TwitterSharp.UnitTests
 
         private bool CheckGetInfoTweetStreamAsyncRateLimit(List<RateLimit> rateLimitEvents)
         {
-            var rateLimits = rateLimitEvents.Where(x => x.Endpoint == nameof(TwitterClient.GetInfoTweetStreamAsync)).ToList();
+            var rateLimits = rateLimitEvents.Where(x => x.Endpoint == Endpoint.ConnectingFilteresStream).ToList();
 
             return rateLimits[^1].Remaining == rateLimits[^2].Remaining - 1;
         }

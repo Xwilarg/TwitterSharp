@@ -15,6 +15,7 @@ using TwitterSharp.Request;
 using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Internal;
 using TwitterSharp.Response;
+using TwitterSharp.Response.RRateLimit;
 using TwitterSharp.Response.RStream;
 using TwitterSharp.Response.RTweet;
 using TwitterSharp.Response.RUser;
@@ -153,7 +154,7 @@ namespace TwitterSharp.Client
             return answer;
         }
 
-        private void BuildRateLimit(HttpResponseHeaders headers, string endpoint)
+        private void BuildRateLimit(HttpResponseHeaders headers, Endpoint endpoint)
         {
             if (headers == null)
             {
@@ -275,7 +276,7 @@ namespace TwitterSharp.Client
         public async Task<StreamInfo[]> GetInfoTweetStreamAsync()
         {
             var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/stream/rules");
-            BuildRateLimit(res.Headers, "GetInfoTweetStreamAsync");
+            BuildRateLimit(res.Headers, Endpoint.ListingFilters);
             return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync());
         }
 
@@ -313,7 +314,7 @@ namespace TwitterSharp.Client
             AddUserOptions(req, options, true);
             AddMediaOptions(req, mediaOptions);
             var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/stream?" + req.Build(), HttpCompletionOption.ResponseHeadersRead, _tweetStreamCancellationTokenSource.Token);
-            BuildRateLimit(res.Headers, "NextTweetStreamAsync"); 
+            BuildRateLimit(res.Headers, Endpoint.ConnectingFilteresStream); 
             _reader = new(await res.Content.ReadAsStreamAsync(_tweetStreamCancellationTokenSource.Token));
 
             try
@@ -367,7 +368,7 @@ namespace TwitterSharp.Client
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }, _jsonOptions), Encoding.UTF8, "application/json");
             var res = await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules", content);
-            BuildRateLimit(res.Headers, "AddDeleteTweetStreamAsync");
+            BuildRateLimit(res.Headers, Endpoint.AddingDeletingFilters);
             return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync());
         }
 
@@ -381,7 +382,7 @@ namespace TwitterSharp.Client
         {
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestDelete { Delete = new StreamRequestDeleteIds { Ids = ids } }, _jsonOptions), Encoding.UTF8, "application/json");
             var res = await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules", content);
-            BuildRateLimit(res.Headers, "AddDeleteTweetStreamAsync");
+            BuildRateLimit(res.Headers, Endpoint.AddingDeletingFilters);
             return ParseData<object>(await res.Content.ReadAsStringAsync()).Meta.Summary.Deleted;
         }
         #endregion TweetStream
