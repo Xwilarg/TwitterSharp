@@ -3,7 +3,6 @@
     public enum Resource
     {
         Tweets,
-        HideReplies,
         Users,
         Lists,
         Spaces,
