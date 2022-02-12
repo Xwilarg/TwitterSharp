@@ -443,15 +443,15 @@ namespace TwitterSharp.Client
         #endregion UserSearch
 
         #region Follows
-        private async Task<Follow> NextFollowAsync(string baseQuery, string token)
+        private async Task<Follow> NextFollowAsync(string baseQuery, string token, Endpoint endpoint)
         {
             var res = await _httpClient.GetAsync(baseQuery + (!baseQuery.EndsWith("?") ? "&" : "") + "pagination_token=" + token);
             var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, Endpoint.FollowsLookup);
+            BuildRateLimit(res.Headers, endpoint);
             return new()
             {
                 Users = data.Data,
-                NextAsync = data.Meta.NextToken == null ? null : async () => await NextFollowAsync(baseQuery, data.Meta.NextToken)
+                NextAsync = data.Meta.NextToken == null ? null : async () => await NextFollowAsync(baseQuery, data.Meta.NextToken, endpoint)
             };
         }
 
@@ -467,11 +467,11 @@ namespace TwitterSharp.Client
             var query = _baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/followers?max_results=" + limit + "&" + req.Build();
             var res = await _httpClient.GetAsync(query);
             var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, Endpoint.FollowsLookup);
+            BuildRateLimit(res.Headers, Endpoint.GetFollowersById);
             return new()
             {
                 Users = data.Data,
-                NextAsync = data.Meta.NextToken == null ? null : async () => await NextFollowAsync(query, data.Meta.NextToken)
+                NextAsync = data.Meta.NextToken == null ? null : async () => await NextFollowAsync(query, data.Meta.NextToken, Endpoint.GetFollowersById)
             };
         }
 
@@ -487,11 +487,11 @@ namespace TwitterSharp.Client
             var query = _baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/following?max_results=" + limit + "&" + req.Build();
             var res = await _httpClient.GetAsync(query);
             var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, Endpoint.FollowsLookup);
+            BuildRateLimit(res.Headers, Endpoint.GetFollowingsById);
             return new()
             {
                 Users = data.Data,
-                NextAsync = data.Meta.NextToken == null ? null : async () => await NextFollowAsync(query, data.Meta.NextToken)
+                NextAsync = data.Meta.NextToken == null ? null : async () => await NextFollowAsync(query, data.Meta.NextToken, Endpoint.GetFollowingsById)
             };
         }
         #endregion Follows

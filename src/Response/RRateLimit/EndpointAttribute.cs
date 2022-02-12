@@ -2,10 +2,11 @@
 
 namespace TwitterSharp.Response.RRateLimit
 {
-    public class RateLimitAttribute : Attribute
+    public class EndpointAttribute : Attribute
     {
         public Resource Resource { get; set; }
-        public EndpointType EndpointType { get; set; }
+        public EndpointType EndpointType { get; set; } = EndpointType.GET;
+        public AccessLevel AccessLevel { get; set; } = AccessLevel.All;
         public string Url { get; set; }
 
         /// <summary>
