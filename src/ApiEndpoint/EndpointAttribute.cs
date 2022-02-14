@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TwitterSharp.Response.RRateLimit
+namespace TwitterSharp.ApiEndpoint
 {
     public class EndpointAttribute : Attribute
     {

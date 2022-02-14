@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using TwitterSharp.ApiEndpoint;
 using TwitterSharp.JsonOption;
 using TwitterSharp.Model;
 using TwitterSharp.Request;

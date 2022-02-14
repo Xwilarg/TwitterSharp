@@ -1,4 +1,4 @@
-﻿namespace TwitterSharp.Response.RRateLimit
+﻿namespace TwitterSharp.ApiEndpoint
 {
     public enum Resource
     {

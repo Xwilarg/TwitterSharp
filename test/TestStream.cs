@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TwitterSharp.ApiEndpoint;
 using TwitterSharp.Client;
 using TwitterSharp.Request;
 using TwitterSharp.Response.RRateLimit;

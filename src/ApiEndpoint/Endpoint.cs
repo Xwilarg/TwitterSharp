@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace TwitterSharp.Response.RRateLimit
+namespace TwitterSharp.ApiEndpoint
 {
     /// <summary>
     /// All endpoints enhanced with rate limitsall and information from <see href="https://developer.twitter.com/en/portal/products/"/>,

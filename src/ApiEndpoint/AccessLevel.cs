@@ -1,5 +1,8 @@
-﻿namespace TwitterSharp.Response.RRateLimit
+﻿using System;
+
+namespace TwitterSharp.ApiEndpoint
 {
+    [Flags]
     public enum AccessLevel
     {
         None = 0,
