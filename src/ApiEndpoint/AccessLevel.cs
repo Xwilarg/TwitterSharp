@@ -8,7 +8,8 @@ namespace TwitterSharp.ApiEndpoint
         None = 0,
         Essential = 1,
         Elevated = 2,
-        AcademicResearch = 4,
-        All = Essential | Elevated | AcademicResearch
+        ElevatedPlus = 4,
+        AcademicResearch = 8,
+        All = Essential | Elevated | ElevatedPlus | AcademicResearch
     }
 }
