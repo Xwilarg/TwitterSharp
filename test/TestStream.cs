@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TwitterSharp.ApiEndpoint;
 using TwitterSharp.Client;
 using TwitterSharp.Request;
-using TwitterSharp.Response.RRateLimit;
+using TwitterSharp.Response;
 using TwitterSharp.Rule;
 
 namespace TwitterSharp.UnitTests

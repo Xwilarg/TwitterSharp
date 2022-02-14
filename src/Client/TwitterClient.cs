@@ -16,7 +16,6 @@ using TwitterSharp.Request;
 using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Internal;
 using TwitterSharp.Response;
-using TwitterSharp.Response.RRateLimit;
 using TwitterSharp.Response.RStream;
 using TwitterSharp.Response.RTweet;
 using TwitterSharp.Response.RUser;

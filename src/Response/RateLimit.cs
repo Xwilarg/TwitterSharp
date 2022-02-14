@@ -1,6 +1,6 @@
 ﻿using TwitterSharp.ApiEndpoint;
 
-namespace TwitterSharp.Response.RRateLimit
+namespace TwitterSharp.Response
 {
     public class RateLimit
     {
