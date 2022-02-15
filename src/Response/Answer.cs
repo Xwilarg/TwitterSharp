@@ -2,7 +2,7 @@
 using TwitterSharp.Response.RTweet;
 using TwitterSharp.Response.RUser;
 
-namespace TwitterSharp.Client
+namespace TwitterSharp.Response
 {
     internal class Answer<T>
     {
