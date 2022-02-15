@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.4.0</Version>
+    <Version>1.5.0</Version>
     <Authors>Xwilarg</Authors>
     <Description>C# wrapper around Twitter API V2</Description>
     <Copyright>MIT</Copyright>
