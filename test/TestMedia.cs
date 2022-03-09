@@ -64,7 +64,7 @@ namespace TwitterSharp.UnitTests
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
             var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new TweetSearchOptions
             {
-                TweetOptions = new[] { TweetOption.Attachments_Ids },
+                TweetOptions = new[] { TweetOption.Attachments },
                 MediaOptions = new[] { MediaOption.Preview_Image_Url }
             });
             Assert.IsTrue(answer.Length == 1);
