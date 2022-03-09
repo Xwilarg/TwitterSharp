@@ -49,7 +49,11 @@ Console.WriteLine(answer.Id); // 1022468464513089536
 ```cs
 var client = new TwitterSharp.Client.TwitterClient(bearerToken);
 // You can get the id using GetUsersAsync
-var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577", new TweetOption[] { TweetOption.Attachments }, null, new MediaOption[] { MediaOption.Url });
+var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577", new TweetSearchOptions
+{
+    TweetOptions = new[] { TweetOption.Attachments },
+    MediaOptions = new[] { MediaOption.Preview_Image_Url }
+});
 for (int i = 0; i < answer.Length; i++)
 {
     var tweet = answer[i];
@@ -68,7 +72,10 @@ for (int i = 0; i < answer.Length; i++)
 ```cs
 var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
 
-var answer = await client.GetFollowingAsync("1433657158067896325", 1000);
+var answer = await client.GetFollowingAsync("1433657158067896325", new UserSearchOptions
+{
+    Limit = 1000
+});
 Console.WriteLine(string.Join("\n", answer.Users.Select(u => u.Username)));
 while (answer.NextAsync != null) // We go to the next page if there is one
 {
