@@ -13,7 +13,7 @@ namespace TwitterSharp.ApiEndpoint
     /// </summary>
     public enum Endpoint
     {
-        #region tweets
+        #region Tweets
 
         [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.GET, Url = "/2/tweets", Group = "Tweet lookup", LimitPerApp = 300, LimitPerUser = 900)]
         [Description("Retrieve multiple Tweets with a list of IDs")]

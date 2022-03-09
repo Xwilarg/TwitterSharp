@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using TwitterSharp.Client;
 using TwitterSharp.Request.AdvancedSearch;
+using TwitterSharp.Request.Option;
 using TwitterSharp.Response.RMedia;
 
 namespace TwitterSharp.UnitTests
@@ -24,7 +25,10 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithMediaId()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new[] { TweetOption.Attachments_Ids }, null, null);
+            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new TweetSearchOptions
+            {
+                TweetOptions = new[] { TweetOption.Attachments_Ids }
+            });
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNotNull(a.Attachments);
@@ -39,7 +43,10 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithMedia()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new[] { TweetOption.Attachments }, null, null);
+            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new TweetSearchOptions
+            {
+                TweetOptions = new[] { TweetOption.Attachments }
+            });
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNotNull(a.Attachments);
@@ -55,7 +62,11 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetWithMediaPreview()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new[] { TweetOption.Attachments }, null, new[] { MediaOption.Preview_Image_Url });
+            var answer = await client.GetTweetsAsync(new[] { "1237543996861251586" }, new TweetSearchOptions
+            {
+                TweetOptions = new[] { TweetOption.Attachments_Ids },
+                MediaOptions = new[] { MediaOption.Preview_Image_Url }
+            });
             Assert.IsTrue(answer.Length == 1);
             var a = answer[0];
             Assert.IsNotNull(a.Attachments);

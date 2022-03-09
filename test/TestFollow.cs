@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TwitterSharp.Client;
+using TwitterSharp.Request.Option;
 using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.UnitTests
@@ -27,7 +28,10 @@ namespace TwitterSharp.UnitTests
         public async Task GetUserFollowers()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetFollowersAsync("1022468464513089536", 1000);
+            var answer = await client.GetFollowersAsync("1022468464513089536", new FollowOptions
+            {
+                Limit = 1000
+            });
             Assert.IsTrue(await ContainsFollowAsync("CoreDesign_com", answer));
         }
 
@@ -35,7 +39,10 @@ namespace TwitterSharp.UnitTests
         public async Task GetUserFollowing()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetFollowingAsync("1433657158067896325", 1000);
+            var answer = await client.GetFollowingAsync("1433657158067896325", new FollowOptions
+            {
+                Limit = 1000
+            });
             Assert.IsTrue(await ContainsFollowAsync("cover_corp", answer));
         }
     }

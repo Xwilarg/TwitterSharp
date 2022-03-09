@@ -15,6 +15,7 @@ using TwitterSharp.Model;
 using TwitterSharp.Request;
 using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Internal;
+using TwitterSharp.Request.Option;
 using TwitterSharp.Response;
 using TwitterSharp.Response.RStream;
 using TwitterSharp.Response.RTweet;
@@ -232,12 +233,13 @@ namespace TwitterSharp.Client
         /// Get a tweet given its ID
         /// </summary>
         /// <param name="id">ID of the tweet</param>
-        public async Task<Tweet> GetTweetAsync(string id, TweetOption[] tweetOptions = null, UserOption[] userOptions = null, MediaOption[] mediaOptions = null)
+        public async Task<Tweet> GetTweetAsync(string id, TweetSearchOptions options = null)
         {
+            options ??= new();
             var req = new RequestOptions();
-            AddTweetOptions(req, tweetOptions);
-            AddUserOptions(req, userOptions, true);
-            AddMediaOptions(req, mediaOptions);
+            AddTweetOptions(req, options.TweetOptions);
+            AddUserOptions(req, options.UserOptions, true);
+            AddMediaOptions(req, options.MediaOptions);
             var str = await _httpClient.GetStringAsync(_baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + req.Build());
             return ParseData<Tweet>(str).Data;
         }
@@ -246,12 +248,13 @@ namespace TwitterSharp.Client
         /// Get a list of tweet given their IDs
         /// </summary>
         /// <param name="ids">All the IDs you want the tweets of</param>
-        public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetOption[] tweetOptions = null, UserOption[] userOptions = null, MediaOption[] mediaOptions = null)
+        public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetSearchOptions options = null)
         {
+            options ??= new();
             var req = new RequestOptions();
-            AddTweetOptions(req, tweetOptions);
-            AddUserOptions(req, userOptions, true);
-            AddMediaOptions(req, mediaOptions);
+            AddTweetOptions(req, options.TweetOptions);
+            AddUserOptions(req, options.UserOptions, true);
+            AddMediaOptions(req, options.MediaOptions);
             var str = await _httpClient.GetStringAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + req.Build());
             return ParseArrayData<Tweet>(str);
         }
@@ -260,12 +263,13 @@ namespace TwitterSharp.Client
         /// Get the latest tweets of an user
         /// </summary>
         /// <param name="userId">Username of the user you want the tweets of</param>
-        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetOption[] tweetOptions = null, UserOption[] userOptions = null, MediaOption[] mediaOptions = null)
+        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetSearchOptions options = null)
         {
+            options ??= new();
             var req = new RequestOptions();
-            AddTweetOptions(req, tweetOptions);
-            AddUserOptions(req, userOptions, true);
-            AddMediaOptions(req, mediaOptions);
+            AddTweetOptions(req, options.TweetOptions);
+            AddUserOptions(req, options.UserOptions, true);
+            AddMediaOptions(req, options.MediaOptions);
             var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + req.Build());
             return ParseArrayData<Tweet>(str);
         }
@@ -295,8 +299,9 @@ namespace TwitterSharp.Client
         /// <param name="options">User properties send with the tweet</param>
         /// <param name="mediaOptions">Media properties send with the tweet</param>
         /// <returns></returns>
-        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, TweetOption[] tweetOptions = null, UserOption[] options = null, MediaOption[] mediaOptions = null)
+        public async Task NextTweetStreamAsync(Action<Tweet> onNextTweet, TweetSearchOptions options = null)
         {
+            options ??= new();
 
             lock (_streamLock)
             { 
@@ -310,9 +315,9 @@ namespace TwitterSharp.Client
             
             var req = new RequestOptions();
             _tweetStreamCancellationTokenSource = new();
-            AddTweetOptions(req, tweetOptions);
-            AddUserOptions(req, options, true);
-            AddMediaOptions(req, mediaOptions);
+            AddTweetOptions(req, options.TweetOptions);
+            AddUserOptions(req, options.UserOptions, true);
+            AddMediaOptions(req, options.MediaOptions);
             var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/stream?" + req.Build(), HttpCompletionOption.ResponseHeadersRead, _tweetStreamCancellationTokenSource.Token);
             BuildRateLimit(res.Headers, Endpoint.ConnectingFilteresStream); 
             _reader = new(await res.Content.ReadAsStreamAsync(_tweetStreamCancellationTokenSource.Token));
@@ -392,10 +397,11 @@ namespace TwitterSharp.Client
         /// Get an user given his username
         /// </summary>
         /// <param name="username">Username of the user you want information about</param>
-        public async Task<User> GetUserAsync(string username, UserOption[] options = null)
+        public async Task<User> GetUserAsync(string username, UserSearchOptions options = null)
         {
+            options ??= new();
             var req = new RequestOptions();
-            AddUserOptions(req, options, false);
+            AddUserOptions(req, options.UserOptions, false);
             var res = await _httpClient.GetAsync(_baseUrl + "users/by/username/" + HttpUtility.UrlEncode(username) + "?" + req.Build());
             BuildRateLimit(res.Headers, Endpoint.GetUserByName);
             return ParseData<User>(await res.Content.ReadAsStringAsync()).Data;
@@ -405,10 +411,11 @@ namespace TwitterSharp.Client
         /// Get a list of users given their usernames
         /// </summary>
         /// <param name="usernames">Usernames of the users you want information about</param>
-        public async Task<User[]> GetUsersAsync(string[] usernames, UserOption[] options = null)
+        public async Task<User[]> GetUsersAsync(string[] usernames, UserSearchOptions options = null)
         {
+            options ??= new();
             var req = new RequestOptions();
-            AddUserOptions(req, options, false);
+            AddUserOptions(req, options.UserOptions, false);
             var res = await _httpClient.GetAsync(_baseUrl + "users/by?usernames=" + string.Join(",", usernames.Select(x => HttpUtility.UrlEncode(x))) + "&" + req.Build());
             BuildRateLimit(res.Headers, Endpoint.GetUsersByNames);
             return ParseArrayData<User>(await res.Content.ReadAsStringAsync());
@@ -418,10 +425,11 @@ namespace TwitterSharp.Client
         /// Get an user given his ID
         /// </summary>
         /// <param name="id">ID of the user you want information about</param>
-        public async Task<User> GetUserByIdAsync(string id, UserOption[] options = null)
+        public async Task<User> GetUserByIdAsync(string id, UserSearchOptions options = null)
         {
+            options ??= new();
             var req = new RequestOptions();
-            AddUserOptions(req, options, false);
+            AddUserOptions(req, options.UserOptions, false);
             var res = await _httpClient.GetAsync(_baseUrl + "users/" + HttpUtility.UrlEncode(id) + "?" + req.Build());
             BuildRateLimit(res.Headers, Endpoint.GetUserById);
             return ParseData<User>(await res.Content.ReadAsStringAsync()).Data;
@@ -431,10 +439,11 @@ namespace TwitterSharp.Client
         /// Get a list of user given their IDs
         /// </summary>
         /// <param name="ids">IDs of the user you want information about</param>
-        public async Task<User[]> GetUsersByIdsAsync(string[] ids, UserOption[] options = null)
+        public async Task<User[]> GetUsersByIdsAsync(string[] ids, UserSearchOptions options = null)
         {
+            options ??= new();
             var req = new RequestOptions();
-            AddUserOptions(req, options, false);
+            AddUserOptions(req, options.UserOptions, false);
             var res = await _httpClient.GetAsync(_baseUrl + "users?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + req.Build());
             BuildRateLimit(res.Headers, Endpoint.GetUsersByIds);
             return ParseArrayData<User>(await res.Content.ReadAsStringAsync());
@@ -460,11 +469,12 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="id">ID of the user</param>
         /// <param name="limit">Max number of result, max is 1000</param>
-        public async Task<Follow> GetFollowersAsync(string id, int limit = 100, UserOption[] options = null)
+        public async Task<Follow> GetFollowersAsync(string id, FollowOptions options = null)
         {
+            options ??= new();
             var req = new RequestOptions();
-            AddUserOptions(req, options, false);
-            var query = _baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/followers?max_results=" + limit + "&" + req.Build();
+            AddUserOptions(req, options.UserOptions, false);
+            var query = _baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/followers?max_results=" + options.Limit + "&" + req.Build();
             var res = await _httpClient.GetAsync(query);
             var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
             BuildRateLimit(res.Headers, Endpoint.GetFollowersById);
@@ -480,11 +490,12 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="id">ID of the user</param>
         /// <param name="limit">Max number of result, max is 1000</param>
-        public async Task<Follow> GetFollowingAsync(string id, int limit = 100, UserOption[] options = null)
+        public async Task<Follow> GetFollowingAsync(string id, FollowOptions options = null)
         {
+            options ??= new();
             var req = new RequestOptions();
-            AddUserOptions(req, options, false);
-            var query = _baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/following?max_results=" + limit + "&" + req.Build();
+            AddUserOptions(req, options.UserOptions, false);
+            var query = _baseUrl + "users/" + HttpUtility.UrlEncode(id) + "/following?max_results=" + options.Limit + "&" + req.Build();
             var res = await _httpClient.GetAsync(query);
             var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
             BuildRateLimit(res.Headers, Endpoint.GetFollowingsById);
@@ -505,6 +516,7 @@ namespace TwitterSharp.Client
         {
             CancelTweetStream();
             _httpClient?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

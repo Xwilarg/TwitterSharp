@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using TwitterSharp.Client;
 using TwitterSharp.Request.AdvancedSearch;
+using TwitterSharp.Request.Option;
 
 namespace TwitterSharp.UnitTests
 {
@@ -55,7 +56,10 @@ namespace TwitterSharp.UnitTests
         public async Task GetUserWithOptionsAsync()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetUsersAsync(new[] { "theindra5" }, new[] { UserOption.Description, UserOption.Public_Metrics });
+            var answer = await client.GetUsersAsync(new[] { "theindra5" }, new UserSearchOptions
+            {
+                UserOptions = new[] { UserOption.Description, UserOption.Public_Metrics }
+            });
             Assert.IsTrue(answer.Length == 1);
             Assert.AreEqual("1022468464513089536", answer[0].Id);
             Assert.AreEqual("TheIndra5", answer[0].Username);
