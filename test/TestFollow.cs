@@ -28,7 +28,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetUserFollowers()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetFollowersAsync("1022468464513089536", new FollowOptions
+            var answer = await client.GetFollowersAsync("1022468464513089536", new UserSearchOptions
             {
                 Limit = 1000
             });
@@ -39,7 +39,7 @@ namespace TwitterSharp.UnitTests
         public async Task GetUserFollowing()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var answer = await client.GetFollowingAsync("1433657158067896325", new FollowOptions
+            var answer = await client.GetFollowingAsync("1433657158067896325", new UserSearchOptions
             {
                 Limit = 1000
             });

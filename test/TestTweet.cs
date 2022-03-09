@@ -115,6 +115,17 @@ namespace TwitterSharp.UnitTests
                 Assert.AreEqual("inugamikorone", t.Author.Username);
             }
         }
+            
+        [TestMethod]
+        public async Task GetTweetsFromUserIdWithModifiedLimitAsync()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577", new()
+            {
+                Limit = 100
+            });
+            Assert.IsTrue(answer.Length == 100);
+        }
 
         [TestMethod]
         public async Task GetTweetWithNothing()

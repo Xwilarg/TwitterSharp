@@ -90,7 +90,7 @@ var request = new TwitterSharp.Request.StreamRequest(
             Expression.Author("gawrgura"),
             Expression.Author("watsonameliaEN")
         )
-, "Anime");
+, "Hololive");
 await client.AddTweetStreamAsync(request); // Add them to the stream
 
 // We display all the subscriptions we have
