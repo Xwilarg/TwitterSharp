@@ -13,7 +13,6 @@ using TwitterSharp.ApiEndpoint;
 using TwitterSharp.JsonOption;
 using TwitterSharp.Model;
 using TwitterSharp.Request;
-using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Internal;
 using TwitterSharp.Request.Option;
 using TwitterSharp.Response;

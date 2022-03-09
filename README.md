@@ -112,7 +112,11 @@ Task.Run(async () =>
     await client.NextTweetStreamAsync((tweet) =>
     {
         Console.WriteLine($"From {tweet.Author.Name}: {tweet.Text} (Rules: {string.Join(',', tweet.MatchingRules.Select(x => x.Tag))})");
-    }, null, Array.Empty<UserOption>());
+    },
+    new TweetSearchOptions
+    {
+        UserOptions = Array.Empty<UserOption>()
+    });
 });
 
 // Add new high frequent rule after the stream started. No disconnection needed.
