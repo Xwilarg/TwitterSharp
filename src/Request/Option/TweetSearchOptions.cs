@@ -1,4 +1,5 @@
-﻿using TwitterSharp.Request.AdvancedSearch;
+﻿using System;
+using TwitterSharp.Request.AdvancedSearch;
 
 namespace TwitterSharp.Request.Option
 {
@@ -19,11 +20,29 @@ namespace TwitterSharp.Request.Option
         /// </summary>
         public MediaOption[] MediaOptions { set; get; }
 
+        /// <summary>
+        /// Only returns tweet that were sent before the referenced id
+        /// </summary>
+        public string SinceId { set; get; }
+
+        /// <summary>
+        /// Only returns tweet that were sent after the given date
+        /// </summary>
+        public DateTime? StartTime { set; get; }
+
         protected override void PreBuild(bool needExpansion)
         {
             AddUserOptions(UserOptions, needExpansion);
             AddTweetOptions(TweetOptions);
             AddMediaOptions(MediaOptions);
+            if (SinceId != null)
+            {
+                _options.Add("since_id", new() { SinceId });
+            }
+            if (StartTime.HasValue)
+            {
+                _options.Add("start_time", new() { StartTime.Value.ToString("yyyy-MM-ddTHH:mm:ssZ") });
+            }
         }
     }
 }

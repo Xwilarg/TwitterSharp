@@ -89,6 +89,6 @@ namespace TwitterSharp.Request.Option
             _options[key] = _options[key].Distinct().ToList();
         }
 
-        private readonly Dictionary<string, List<string>> _options = new();
+        protected readonly Dictionary<string, List<string>> _options = new();
     }
 }
