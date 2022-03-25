@@ -8,11 +8,20 @@ using TwitterSharp.Response;
 
 namespace TwitterSharp.Client
 {
+
     /// <summary>
     /// Base client to do all your requests
     /// </summary>
     public partial class TwitterClient : IDisposable
     {
+        public event EventHandler<RateLimit> RateLimitChanged;
+        private CancellationTokenSource _tweetStreamCancellationTokenSource;
+
+        private const string _baseUrl = "https://api.twitter.com/2/";
+
+        private readonly HttpClient _httpClient;
+        private readonly JsonSerializerOptions _jsonOptions;
+        
         /// <summary>
         /// Create a new instance of the client
         /// </summary>
@@ -32,14 +41,6 @@ namespace TwitterSharp.Client
             _jsonOptions.Converters.Add(new ReplySettingsConverter());
             _jsonOptions.Converters.Add(new MediaConverter());
         }
-
-        public event EventHandler<RateLimit> RateLimitChanged;
-        private CancellationTokenSource _tweetStreamCancellationTokenSource;
-
-        private const string _baseUrl = "https://api.twitter.com/2/";
-
-        private readonly HttpClient _httpClient;
-        private readonly JsonSerializerOptions _jsonOptions;
 
         public void Dispose()
         {

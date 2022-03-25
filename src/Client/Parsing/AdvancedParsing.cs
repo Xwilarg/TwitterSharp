@@ -10,6 +10,11 @@ namespace TwitterSharp.Client
 {
     public partial class TwitterClient
     {
+
+        private static readonly Type _authorInterface = typeof(IHaveAuthor);
+        private static readonly Type _mediaInterface = typeof(IHaveMedia);
+        private static readonly Type _matchingRulesInterface = typeof(IHaveMatchingRules);
+        
         private static void IncludesParseUser(IHaveAuthor data, Includes includes)
         {
             data.SetAuthor(includes.Users.Where(x => x.Id == data.AuthorId).FirstOrDefault());
@@ -42,10 +47,6 @@ namespace TwitterSharp.Client
                 IncludesParseMedias(m, includes);
             }
         }
-
-        private static readonly Type _authorInterface = typeof(IHaveAuthor);
-        private static readonly Type _mediaInterface = typeof(IHaveMedia);
-        private static readonly Type _matchingRulesInterface = typeof(IHaveMatchingRules);
         private static void InternalIncludesParse<T>(Answer<T> answer)
         {
             if (answer.Includes != null)

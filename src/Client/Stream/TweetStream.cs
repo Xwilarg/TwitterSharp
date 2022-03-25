@@ -17,16 +17,16 @@ namespace TwitterSharp.Client
     public partial class TwitterClient
     {
 
+        private StreamReader _reader;
+        private static readonly object _streamLock = new();
+        public static bool IsTweetStreaming { get; private set; }
+
         public async Task<StreamInfo[]> GetInfoTweetStreamAsync()
         {
             var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/stream/rules");
             BuildRateLimit(res.Headers, Endpoint.ListingFilters);
             return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync());
         }
-
-        private StreamReader _reader;
-        private static readonly object _streamLock = new();
-        public static bool IsTweetStreaming { get; private set; }
 
         /// <summary>
         /// The stream is only meant to be open one time. So calling this method multiple time will result in an exception.
