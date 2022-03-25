@@ -250,7 +250,7 @@ namespace TwitterSharp.Client
             { 
                 if (IsTweetStreaming)
                 {
-                    throw new TwitterException("Stream already running. Please cancel the stream with CancelNextTweetStreamAsync");
+                    throw new TwitterException("Stream already running. Please cancel the stream with CancelTweetStream");
                 }
                 
                 IsTweetStreaming = true;
