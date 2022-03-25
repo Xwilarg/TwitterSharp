@@ -47,7 +47,7 @@ namespace TwitterSharp.ApiEndpoint
         FullArchiveTweetCounts,
         [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.GET, Url = "/2/tweets/search/stream", Group = "Filtered stream", LimitPerApp = 50, TweetCap = true, AdditionalInfo = "Essential + Elevated: - core operators - 512 rule length. Essential - 5 rules. Elevated: - 25 rules. Academic: - 1000 rules - enhanced operators - 1024 query length")]
         [Description("Connect to the stream")]
-        ConnectingFilteresStream,
+        ConnectingFiltersStream,
         [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.POST, Url = "/2/tweets/search/stream/rules", Group = "Filtered stream", LimitPerApp = 25, AdditionalInfo = "Essential + Elevated: - does not support backfill - 50 Tweets per second - 1 connections. Academic: - supports backfill - 2 connections - 250 Tweets per second")]
         [Description("Add or delete rules from your stream")]
         AddingDeletingFilters,
