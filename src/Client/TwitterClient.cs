@@ -14,12 +14,15 @@ namespace TwitterSharp.Client
     /// </summary>
     public partial class TwitterClient : IDisposable
     {
+    
         public event EventHandler<RateLimit> RateLimitChanged;
+        
         private CancellationTokenSource _tweetStreamCancellationTokenSource;
-
+        
         private const string _baseUrl = "https://api.twitter.com/2/";
-
+        
         private readonly HttpClient _httpClient;
+    
         private readonly JsonSerializerOptions _jsonOptions;
         
         /// <summary>
