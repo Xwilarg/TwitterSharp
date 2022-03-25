@@ -41,6 +41,7 @@ namespace TwitterSharp.Client
             _jsonOptions.Converters.Add(new MediaConverter());
         }
 
+
         public void Dispose()
         {
             CancelTweetStream();
