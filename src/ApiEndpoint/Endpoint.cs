@@ -27,6 +27,9 @@ namespace TwitterSharp.ApiEndpoint
         [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.DELETE, Url = "/2/tweets/:id", Group = "Manage Tweets", LimitPerUser = 50)]
         [Description("Delete a Tweet")]
         DeleteTweet,
+        [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.GET, Url = "/2/users/:id/timelines/reverse_chronological", Group = "Timelines", LimitPerUser = 180)]
+        [Description("Allows you to retrieve a collection of the most recent Tweets and Retweets posted by you and users you follow")]
+        ReverseChronologicalTimeline,
         [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.GET, Url = "/2/users/:id/tweets", Group = "Timelines", LimitPerApp = 1500, LimitPerUser = 900, TweetCap = true)]
         [Description("Returns most recent Tweets composed a specified user ID")]
         UserTweetTimeline,
@@ -60,6 +63,9 @@ namespace TwitterSharp.ApiEndpoint
         [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.GET, Url = "/2/tweets/:id/retweeted_by", Group = "Retweets lookup", LimitPerApp = 75, LimitPerUser = 75, TweetCap = true)]
         [Description("Users who have Retweeted a Tweet")]
         RetweetsLookup,
+        [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.GET, Url = "/2/tweets/:id/quote_tweets", Group = "Retweets lookup", LimitPerApp = 75, LimitPerUser = 75, TweetCap = true)]
+        [Description("Returns Quote Tweets for a Tweet specified by the requested Tweet ID.")]
+        QuotesLookup,
         [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.POST, Url = "/2/users/:id/retweets", Group = "Manage Retweets", LimitPerUser = 50, MaxPerUser = 300, MaxResetIntervalHours = 3, AdditionalInfo = "max shared with CreateTweet")]
         [Description("Allows a user ID to Retweet a Tweet")]
         CreateRetweet,
@@ -216,6 +222,20 @@ namespace TwitterSharp.ApiEndpoint
         [Endpoint(Resource = Resource.Lists, EndpointType = EndpointType.DELETE, Url = "/2/users/:id/pinned_lists/:list_id", Group = "Manage pinned Lists", LimitPerUser = 50)]
         [Description("Unpins a List on behalf of an authenticated user")]
         UnpinList,
+
+        #endregion
+
+        #region Bookmarks
+
+        [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.GET, Url = "/2/users/:id/bookmarks", Group = "Bookmarks lookup", LimitPerUser = 180)]
+        [Description("Allows you to get an authenticated user's 800 most recent bookmarked Tweets")]
+        BookmarksLookup,
+        [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.POST, Url = "/2/users/:id/bookmarks", Group = "Manage Bookmarks", LimitPerUser = 50)]
+        [Description("Causes the user ID of an authenticated user identified in the path parameter to Bookmark the target Tweet provided in the request body")]
+        BookmarkTweet,
+        [Endpoint(Resource = Resource.Tweets, EndpointType = EndpointType.DELETE, Url = "/2/users/:id/bookmarks/:tweet_id", Group = "Manage Bookmarks", LimitPerUser = 50)]
+        [Description("Allows a user or authenticated user ID to remove a Bookmark of a Tweet")]
+        RemoveBookmark,
 
         #endregion
 
