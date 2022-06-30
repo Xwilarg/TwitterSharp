@@ -11,9 +11,20 @@ namespace TwitterSharp.JsonOption
         {
             var json = JsonSerializer.Deserialize<JsonElement>(ref reader, options);
 
+            var error = new Error();
+
             if (!json.TryGetProperty("details", out JsonElement elem))
             {
-                elem = json;
+                // elem = json;
+                if (elem.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var el in elem.EnumerateArray())
+                    {
+                        // error.Details.el.ToString()
+                    }
+
+                }
+                // error.Details = elem.
             }
 
             return new Error();
