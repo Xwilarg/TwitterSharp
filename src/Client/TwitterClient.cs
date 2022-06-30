@@ -45,6 +45,7 @@ namespace TwitterSharp.Client
             _jsonOptions.Converters.Add(new ReferencedTweetConverter());
             _jsonOptions.Converters.Add(new ReplySettingsConverter());
             _jsonOptions.Converters.Add(new MediaConverter());
+            _jsonOptions.Converters.Add(new ErrorConverter());
         }
 
         public event EventHandler<RateLimit> RateLimitChanged;
@@ -313,7 +314,10 @@ namespace TwitterSharp.Client
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }, _jsonOptions), Encoding.UTF8, "application/json");
             var res = await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules", content);
             BuildRateLimit(res.Headers, Endpoint.AddingDeletingFilters);
-            return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync());
+
+            var cnt = await res.Content.ReadAsStringAsync();
+
+            return ParseArrayData<StreamInfo>(cnt);
         }
 
         /// <summary>

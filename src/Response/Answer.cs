@@ -10,6 +10,7 @@ namespace TwitterSharp.Response
         public Meta Meta { init; get; }
         public Includes Includes { init; get; }
         public MatchingRule[] MatchingRules { init; get; }
+        public Error[] Errors { get; set; }
 
         // Error Handling
         public string Detail { init; get; }
