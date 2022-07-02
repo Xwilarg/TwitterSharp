@@ -45,7 +45,6 @@ namespace TwitterSharp.Client
             _jsonOptions.Converters.Add(new ReferencedTweetConverter());
             _jsonOptions.Converters.Add(new ReplySettingsConverter());
             _jsonOptions.Converters.Add(new MediaConverter());
-            _jsonOptions.Converters.Add(new ErrorConverter());
         }
 
         public event EventHandler<RateLimit> RateLimitChanged;
@@ -135,6 +134,10 @@ namespace TwitterSharp.Client
             if (answer.Detail != null)
             {
                 throw new TwitterException(answer.Detail);
+            }
+            if (answer.Errors != null && answer.Errors.Any())
+            {
+                throw new TwitterException("Error", answer.Errors);
             }
             if (answer.Data == null)
             {

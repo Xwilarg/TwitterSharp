@@ -10,7 +10,7 @@ namespace TwitterSharp.Response
         public Meta Meta { init; get; }
         public Includes Includes { init; get; }
         public MatchingRule[] MatchingRules { init; get; }
-        public Error[] Errors { get; set; }
+        public Error[] Errors { init; get; }
 
         // Error Handling
         public string Detail { init; get; }
@@ -30,6 +30,10 @@ namespace TwitterSharp.Response
 
     internal class Summary
     {
+        public int Created { init; get; }
+        public int NotCreated { init; get; }
+        public int Valid { init; get; }
+        public int Invalid { init; get; }
         public int Deleted { init; get; }
     }
 }

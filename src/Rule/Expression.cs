@@ -27,11 +27,7 @@ namespace TwitterSharp.Rule
         /// Tweet match all the expressions given in parameter
         /// </summary>
         public Expression And(params Expression[] others)
-        #if DEBUG
-            => new("(" + _internal + " AND " + string.Join(" AND ", others.Select(x => x.ToString())) + ")", "");
-        #else
-            => new("(" + _internal + " " + string.Join(" ", others.Select(x => x.ToString())) + ")", "")
-        #endif
+            => new("(" + _internal + " " + string.Join(" ", others.Select(x => x.ToString())) + ")", "");
 
         /// <summary>
         /// Tweet match the negation of the current expression
