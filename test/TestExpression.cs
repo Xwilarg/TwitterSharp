@@ -11,6 +11,13 @@ namespace TwitterSharp.UnitTests
         {
             var exp = Expression.Author("achan_UGA").Or(Expression.Author("tanigox"), Expression.Author("daidoushinove"));
             Assert.AreEqual("(from:achan_UGA OR from:tanigox OR from:daidoushinove)", exp.ToString());
+        }        
+        
+        [TestMethod]
+        public void TestAnd()
+        {
+            var exp = Expression.Keyword("Test Keyword").And(Expression.IsReply().Negate(), Expression.IsRetweet().Negate());
+            Assert.AreEqual("(\"Test Keyword\" -is:reply -is:retweet)", exp.ToString());
         }
     }
 }

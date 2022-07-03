@@ -14,6 +14,8 @@ namespace TwitterSharp.Response
 
         // Error Handling
         public string Detail { init; get; }
+        public string Title { init; get; }
+        public string Type { init; get; }
     }
 
     internal class Includes
