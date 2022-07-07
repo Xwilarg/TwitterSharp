@@ -17,7 +17,7 @@ namespace TwitterSharp.JsonOption
                 case "mentionedUsers":
                     return ReplySettings.MentionnedUsers;
 
-                case "followers":
+                case "following":
                     return ReplySettings.Followers;
 
                 default:
