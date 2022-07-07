@@ -19,6 +19,7 @@ using TwitterSharp.Response;
 using TwitterSharp.Response.RStream;
 using TwitterSharp.Response.RTweet;
 using TwitterSharp.Response.RUser;
+using TwitterSharp.Rule;
 
 namespace TwitterSharp.Client
 {
@@ -216,6 +217,20 @@ namespace TwitterSharp.Client
             var str = await _httpClient.GetAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true));
             return ParseArrayData<Tweet>(await str.Content.ReadAsStringAsync());
         }
+
+        /// <summary>
+        /// Get the latest tweets for an expression
+        /// </summary>
+        /// <param name="expression">An expression to build the query <seealso cref="https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query"/></param>
+        /// <param name="options">properties send with the tweet</param>
+        public async Task<Tweet[]> GetRecentTweets(Expression expression, TweetSearchOptions options = null)
+        {
+            options ??= new();
+            var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/recent?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true));
+            BuildRateLimit(res.Headers, Endpoint.RecentSearch);
+            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
+        }
+
         #endregion TweetSearch
 
         #region TweetStream

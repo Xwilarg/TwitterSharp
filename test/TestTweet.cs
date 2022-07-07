@@ -7,6 +7,7 @@ using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Option;
 using TwitterSharp.Response.RMedia;
 using TwitterSharp.Response.RTweet;
+using TwitterSharp.Rule;
 
 namespace TwitterSharp.UnitTests
 {
@@ -439,6 +440,16 @@ namespace TwitterSharp.UnitTests
             Assert.AreEqual("Twitter for iPhone", a.Source);
         }
 
+        [TestMethod]
+        public async Task GetRecentTweets()
+        {
+            var hashtag = "Test";
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var a = await client.GetRecentTweets(Expression.Hashtag(hashtag));
+
+            Assert.IsTrue(a.All(x => x.Text.Contains("#"+hashtag, StringComparison.OrdinalIgnoreCase)));
+        }
+        
         [TestMethod]
         public async Task GetTweetByIdErrorAsync()
         {
