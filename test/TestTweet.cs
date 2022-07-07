@@ -1,17 +1,29 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TwitterSharp.Client;
 using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Option;
 using TwitterSharp.Response.RMedia;
 using TwitterSharp.Response.RTweet;
+using TwitterSharp.Rule;
 
 namespace TwitterSharp.UnitTests
 {
     [TestClass]
     public class TestTweet
     {
+        [TestMethod]
+        public async Task GetRecentTweets()
+        {
+            var hashtag = "Test";
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var a = await client.GetRecentTweets(Expression.Hashtag(hashtag));
+
+            Assert.IsTrue(a.All(x => x.Text.Contains("#"+hashtag, StringComparison.OrdinalIgnoreCase)));
+        }
+
         [TestMethod]
         public async Task GetTweetByIdsAsync()
         {
