@@ -7,7 +7,7 @@ namespace TwitterSharp.Rule
     {
         internal Expression(string prefix, string userInput)
         {
-            _internal = prefix + userInput != null ? (userInput.Contains(' ') ? "\"" + userInput + "\"" : userInput) : "";
+            _internal = prefix + (userInput != null ? (userInput.Contains(' ') ? "\"" + userInput + "\"" : userInput) : "");
         }
 
         private readonly string _internal;
