@@ -133,7 +133,7 @@ namespace TwitterSharp.Client
             var answer = JsonSerializer.Deserialize<Answer<T[]>>(json, _jsonOptions);
             if (answer.Detail != null || answer.Errors != null)
             {
-                throw new TwitterException(answer.Detail ?? "Error. See Errors property.", answer.Title, answer.Type ?? "Error", answer.Errors);
+                throw new TwitterException(answer);
             }
             if (answer.Data == null)
             {
@@ -148,7 +148,7 @@ namespace TwitterSharp.Client
             var answer = JsonSerializer.Deserialize<Answer<T>>(json, _jsonOptions);
             if (answer.Detail != null || answer.Errors != null)
             {
-                throw new TwitterException(answer.Detail ?? "Error. See Errors property.", answer.Title, answer.Type ?? "Error", answer.Errors);
+                throw new TwitterException(answer);
             }
             InternalIncludesParse(answer);
             return answer;
