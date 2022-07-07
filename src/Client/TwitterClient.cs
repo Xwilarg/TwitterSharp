@@ -191,8 +191,8 @@ namespace TwitterSharp.Client
         public async Task<Tweet> GetTweetAsync(string id, TweetSearchOptions options = null)
         {
             options ??= new();
-            var str = await _httpClient.GetAsync(_baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + options.Build(true));
-            return ParseData<Tweet>(await str.Content.ReadAsStringAsync()).Data;
+            var str = await _httpClient.GetStringAsync(_baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + options.Build(true));
+            return ParseData<Tweet>(str).Data;
         }
 
         /// <summary>
@@ -202,8 +202,8 @@ namespace TwitterSharp.Client
         public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetSearchOptions options = null)
         {
             options ??= new();
-            var str = await _httpClient.GetAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + options.Build(true));
-            return ParseArrayData<Tweet>(await str.Content.ReadAsStringAsync());
+            var str = await _httpClient.GetStringAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + options.Build(true));
+            return ParseArrayData<Tweet>(str);
         }
 
         /// <summary>
@@ -213,8 +213,8 @@ namespace TwitterSharp.Client
         public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetSearchOptions options = null)
         {
             options ??= new();
-            var str = await _httpClient.GetAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true));
-            return ParseArrayData<Tweet>(await str.Content.ReadAsStringAsync());
+            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true));
+            return ParseArrayData<Tweet>(str);
         }
         #endregion TweetSearch
 
