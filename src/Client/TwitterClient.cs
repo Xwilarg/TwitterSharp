@@ -221,14 +221,14 @@ namespace TwitterSharp.Client
         /// <summary>
         /// Get the latest tweets for an expression
         /// </summary>
-        /// <param name="userId">Username of the user you want the tweets of</param>
-        public async Task<Tweet[]> GetTweetsRecentTweets(Expression expression, TweetSearchOptions options = null)
+        /// <param name="expression">An expression to build the query <seealso cref="https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query"/></param>
+        /// <param name="options">properties send with the tweet</param>
+        public async Task<Tweet[]> GetRecentTweets(Expression expression, TweetSearchOptions options = null)
         {
             options ??= new();
-            // var str = await _httpClient.GetAsync(_baseUrl + "tweets/search/recent?query=" + "BMW" + options.Build(true));
-            // var str = await _httpClient.GetAsync(_baseUrl + "tweets/search/recent?query=" + HttpUtility.UrlEncode(expression.ToString().Substring(1,expression.ToString().Length-2)) + "&" + options.Build(true));
-            var str = await _httpClient.GetAsync(_baseUrl + "tweets/search/recent?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true));
-            return ParseArrayData<Tweet>(await str.Content.ReadAsStringAsync());
+            var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/recent?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true));
+            BuildRateLimit(res.Headers, Endpoint.RecentSearch);
+            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
         }
 
         #endregion TweetSearch
