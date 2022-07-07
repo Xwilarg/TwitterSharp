@@ -133,6 +133,42 @@ namespace TwitterSharp.UnitTests
             Assert.IsTrue(streamResult == TaskStatus.RanToCompletion);
         }
 
+        [TestMethod]
+        public async Task TestStreamErrorRule()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+
+            // Faulty expression
+            var expression = Expression.Keyword("Faulty expression").And(Expression.PlaceCountry("xx"));
+
+            try
+            {
+                await client.AddTweetStreamAsync(new StreamRequest(expression, "Test Error"));
+            }
+            catch (TwitterException e)
+            {
+                Assert.IsTrue(e.Errors != null);
+                Assert.IsTrue(e.Errors.Length == 1);
+                Assert.AreEqual("UnprocessableEntity", e.Errors.First().Title);
+                Assert.IsTrue(e.Errors.First().Details.Length == 1);
+            }
+
+            // double faulty expression
+            var expression2 = Expression.Keyword("double faulty expression").And(Expression.PlaceCountry("xx"), Expression.Sample(200));
+
+            try
+            {
+                await client.AddTweetStreamAsync(new StreamRequest(expression2, "Test Error 2"));
+            }
+            catch (TwitterException e)
+            {
+                Assert.IsTrue(e.Errors != null);
+                Assert.IsTrue(e.Errors.Length == 1);
+                Assert.AreEqual("UnprocessableEntity", e.Errors.First().Title);
+                Assert.IsTrue(e.Errors.First().Details.Length == 2);
+            }
+        }
+
         private bool CheckGetInfoTweetStreamAsyncRateLimit(List<RateLimit> rateLimitEvents)
         {
             var rateLimits = rateLimitEvents.Where(x => x.Endpoint == Endpoint.ListingFilters).ToList();

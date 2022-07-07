@@ -132,9 +132,9 @@ namespace TwitterSharp.Client
         private T[] ParseArrayData<T>(string json)
         {
             var answer = JsonSerializer.Deserialize<Answer<T[]>>(json, _jsonOptions);
-            if (answer.Detail != null)
+            if (answer.Detail != null || answer.Errors != null)
             {
-                throw new TwitterException(answer.Detail);
+                throw new TwitterException(answer.Detail ?? "Error. See Errors property.", answer.Title, answer.Type ?? "Error", answer.Errors);
             }
             if (answer.Data == null)
             {
@@ -147,9 +147,9 @@ namespace TwitterSharp.Client
         private Answer<T> ParseData<T>(string json)
         {
             var answer = JsonSerializer.Deserialize<Answer<T>>(json, _jsonOptions);
-            if (answer.Detail != null)
+            if (answer.Detail != null || answer.Errors != null)
             {
-                throw new TwitterException(answer.Detail);
+                throw new TwitterException(answer.Detail ?? "Error. See Errors property.", answer.Title, answer.Type ?? "Error", answer.Errors);
             }
             InternalIncludesParse(answer);
             return answer;
@@ -192,8 +192,8 @@ namespace TwitterSharp.Client
         public async Task<Tweet> GetTweetAsync(string id, TweetSearchOptions options = null)
         {
             options ??= new();
-            var str = await _httpClient.GetStringAsync(_baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + options.Build(true));
-            return ParseData<Tweet>(str).Data;
+            var str = await _httpClient.GetAsync(_baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + options.Build(true));
+            return ParseData<Tweet>(await str.Content.ReadAsStringAsync()).Data;
         }
 
         /// <summary>
@@ -203,8 +203,8 @@ namespace TwitterSharp.Client
         public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetSearchOptions options = null)
         {
             options ??= new();
-            var str = await _httpClient.GetStringAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + options.Build(true));
-            return ParseArrayData<Tweet>(str);
+            var str = await _httpClient.GetAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + options.Build(true));
+            return ParseArrayData<Tweet>(await str.Content.ReadAsStringAsync());
         }
 
         /// <summary>
@@ -214,8 +214,8 @@ namespace TwitterSharp.Client
         public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetSearchOptions options = null)
         {
             options ??= new();
-            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true));
-            return ParseArrayData<Tweet>(str);
+            var str = await _httpClient.GetAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true));
+            return ParseArrayData<Tweet>(await str.Content.ReadAsStringAsync());
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace TwitterSharp.Client
             { 
                 if (IsTweetStreaming)
                 {
-                    throw new TwitterException("Stream already running. Please cancel the stream with CancelTweetStream");
+                    throw new TwitterException("Stream already running. Please cancel the stream with CancelTweetStream", "TooManyConnections", "https://api.twitter.com/2/problems/streaming-connection");
                 }
                 
                 IsTweetStreaming = true;
