@@ -7,7 +7,7 @@ namespace TwitterSharp.Rule
     {
         internal Expression(string prefix, string userInput)
         {
-            _internal = prefix + (userInput.Contains(' ') ? "\"" + userInput + "\"" : userInput);
+            _internal = prefix + (userInput != null ? (userInput.Contains(' ') ? "\"" + userInput + "\"" : userInput) : "");
         }
 
         private readonly string _internal;
@@ -21,13 +21,13 @@ namespace TwitterSharp.Rule
         /// Tweet match one of the expression given in parameter
         /// </summary>
         public Expression Or(params Expression[] others)
-            => new("(" + _internal + " OR " + string.Join(" OR ", others.Select(x => x.ToString())) + ")", "");
+            => new(others.Any() ? "(" + _internal + " OR " + string.Join(" OR ", others.Select(x => x.ToString())) + ")" : _internal, "");
 
         /// <summary>
         /// Tweet match all the expressions given in parameter
         /// </summary>
         public Expression And(params Expression[] others)
-            => new("(" + _internal + " " + string.Join(" ", others.Select(x => x.ToString())) + ")", "");
+            => new(others.Any() ? "(" + _internal + " " + string.Join(" ", others.Select(x => x.ToString())) + ")" : _internal, "");
 
         /// <summary>
         /// Tweet match the negation of the current expression
