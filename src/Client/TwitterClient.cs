@@ -131,9 +131,9 @@ namespace TwitterSharp.Client
         private T[] ParseArrayData<T>(string json)
         {
             var answer = JsonSerializer.Deserialize<Answer<T[]>>(json, _jsonOptions);
-            if (answer.Detail != null)
+            if (answer.Detail != null || answer.Errors != null)
             {
-                throw new TwitterException(answer.Detail);
+                throw new TwitterException(answer);
             }
             if (answer.Data == null)
             {
@@ -146,9 +146,9 @@ namespace TwitterSharp.Client
         private Answer<T> ParseData<T>(string json)
         {
             var answer = JsonSerializer.Deserialize<Answer<T>>(json, _jsonOptions);
-            if (answer.Detail != null)
+            if (answer.Detail != null || answer.Errors != null)
             {
-                throw new TwitterException(answer.Detail);
+                throw new TwitterException(answer);
             }
             InternalIncludesParse(answer);
             return answer;
@@ -250,7 +250,7 @@ namespace TwitterSharp.Client
             { 
                 if (IsTweetStreaming)
                 {
-                    throw new TwitterException("Stream already running. Please cancel the stream with CancelTweetStream");
+                    throw new TwitterException("Stream already running. Please cancel the stream with CancelTweetStream", "TooManyConnections", "https://api.twitter.com/2/problems/streaming-connection");
                 }
                 
                 IsTweetStreaming = true;

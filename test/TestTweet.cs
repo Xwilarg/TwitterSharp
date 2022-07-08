@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TwitterSharp.Client;
 using TwitterSharp.Request.AdvancedSearch;
@@ -436,6 +437,71 @@ namespace TwitterSharp.UnitTests
             Assert.IsNull(a.ReplySettings);
             Assert.IsNotNull(a.Source);
             Assert.AreEqual("Twitter for iPhone", a.Source);
+        }
+
+        [TestMethod]
+        public async Task GetTweetByIdErrorAsync()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            try
+            {
+                await client.GetTweetAsync("FALSE_TWEET_ID");
+            }
+            catch (TwitterException e)
+            {
+                Assert.IsTrue(e.Errors != null);
+                Assert.IsTrue(e.Errors.Length == 1);
+                Assert.AreEqual("Invalid Request", e.Title);
+            }
+        }
+        
+        [TestMethod]
+        public async Task GetTweetsByIdErrorAsync()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            try
+            {
+                await client.GetTweetsAsync(new [] {"FALSE_TWEET_ID", "FALSE_TWEET_ID2"});
+            }
+            catch (TwitterException e)
+            {
+                Assert.IsTrue(e.Errors != null);
+                Assert.IsTrue(e.Errors.Length == 2);
+                Assert.AreEqual("Invalid Request", e.Title);
+            }
+        }
+        
+        [TestMethod]
+        public async Task GetTweetsFromUserIdErrorAsync()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            try
+            {
+                await client.GetTweetsFromUserIdAsync("FALSE_USER_ID");
+            }
+            catch (TwitterException e)
+            {
+                Assert.IsTrue(e.Errors != null);
+                Assert.IsTrue(e.Errors.Length == 1);
+                Assert.AreEqual("Invalid Request", e.Title);
+            }
+        }
+        
+        [TestMethod]
+        public async Task GetTweetsFromNotFoundUserIdErrorAsync()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            try
+            {
+                await client.GetTweetsFromUserIdAsync("1474083406862782466"); // Not found
+            }
+            catch (TwitterException e)
+            {
+                Assert.IsTrue(e.Errors != null);
+                Assert.IsTrue(e.Errors.Length == 1);
+                Assert.AreEqual("id", e.Errors.First().Parameter);
+                Assert.AreEqual("Not Found Error", e.Errors.First().Title);
+            }
         }
     }
 }
