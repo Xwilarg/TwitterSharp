@@ -7,6 +7,7 @@ using TwitterSharp.Request.AdvancedSearch;
 using TwitterSharp.Request.Option;
 using TwitterSharp.Response.RMedia;
 using TwitterSharp.Response.RTweet;
+using TwitterSharp.Rule;
 
 namespace TwitterSharp.UnitTests
 {
@@ -437,6 +438,18 @@ namespace TwitterSharp.UnitTests
             Assert.IsNull(a.ReplySettings);
             Assert.IsNotNull(a.Source);
             Assert.AreEqual("Twitter for iPhone", a.Source);
+        }
+
+        [TestMethod]
+        public async Task GetRecentTweets()
+        {
+            var hashtag = "Test";
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+
+            // note: retweets are truncated at 140 characters, so i had to exclude them for making the check reliable
+            var a = await client.GetRecentTweets(Expression.Hashtag(hashtag).And(Expression.IsRetweet().Negate()));
+            
+            Assert.IsTrue(a.All(x => x.Text.Contains("#"+hashtag, StringComparison.InvariantCultureIgnoreCase)));
         }
 
         [TestMethod]

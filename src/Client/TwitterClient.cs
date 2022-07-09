@@ -19,6 +19,7 @@ using TwitterSharp.Response;
 using TwitterSharp.Response.RStream;
 using TwitterSharp.Response.RTweet;
 using TwitterSharp.Response.RUser;
+using TwitterSharp.Rule;
 
 namespace TwitterSharp.Client
 {
@@ -184,6 +185,7 @@ namespace TwitterSharp.Client
         #endregion AdvancedParsing
 
         #region TweetSearch
+		
         /// <summary>
         /// Get a tweet given its ID
         /// </summary>
@@ -191,8 +193,9 @@ namespace TwitterSharp.Client
         public async Task<Tweet> GetTweetAsync(string id, TweetSearchOptions options = null)
         {
             options ??= new();
-            var str = await _httpClient.GetStringAsync(_baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + options.Build(true));
-            return ParseData<Tweet>(str).Data;
+            var res = await _httpClient.GetAsync(_baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + options.Build(true));
+            BuildRateLimit(res.Headers, Endpoint.GetTweetById);
+            return ParseData<Tweet>(await res.Content.ReadAsStringAsync()).Data;
         }
 
         /// <summary>
@@ -202,8 +205,9 @@ namespace TwitterSharp.Client
         public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetSearchOptions options = null)
         {
             options ??= new();
-            var str = await _httpClient.GetStringAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + options.Build(true));
-            return ParseArrayData<Tweet>(str);
+            var res = await _httpClient.GetAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + options.Build(true));
+            BuildRateLimit(res.Headers, Endpoint.GetTweetsByIds);
+            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
         }
 
         /// <summary>
@@ -213,9 +217,38 @@ namespace TwitterSharp.Client
         public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetSearchOptions options = null)
         {
             options ??= new();
-            var str = await _httpClient.GetStringAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true));
-            return ParseArrayData<Tweet>(str);
+            var res = await _httpClient.GetAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true));
+            BuildRateLimit(res.Headers, Endpoint.UserTweetTimeline);
+            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
         }
+
+        /// <summary>
+        /// Get the latest tweets for an expression
+        /// </summary>
+        /// <param name="expression">An expression to build the query <seealso cref="https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query"/></param>
+        /// <param name="options">properties send with the tweet</param>
+        public async Task<Tweet[]> GetRecentTweets(Expression expression, TweetSearchOptions options = null)
+        {
+            options ??= new();
+            var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/recent?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true));
+            BuildRateLimit(res.Headers, Endpoint.RecentSearch);
+            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
+        }
+        
+        /// <summary>
+        /// This endpoint is only available to those users who have been approved for <seealso cref="https://developer.twitter.com/en/docs/twitter-api/getting-started/about-twitter-api#v2-access-level">Academic Research access</seealso>.
+        /// The full-archive search endpoint returns the complete history of public Tweets matching a search query; since the first Tweet was created March 26, 2006.
+        /// </summary>
+        /// <param name="expression">An expression to build the query <seealso cref="https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query"/></param>
+        /// <param name="options">properties send with the tweet</param>
+        public async Task<Tweet[]> GetAllTweets(Expression expression, TweetSearchOptions options = null)
+        {
+            options ??= new();
+            var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/all?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true));
+            BuildRateLimit(res.Headers, Endpoint.FullArchiveSearch);
+            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
+        }
+
         #endregion TweetSearch
 
         #region TweetStream
