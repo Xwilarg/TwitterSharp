@@ -66,7 +66,7 @@ namespace TwitterSharp.UnitTests
             Assert.AreEqual("Indra", answer[0].Name);
             Assert.IsNotNull(answer[0].Description);
             Assert.IsNotNull(answer[0].PublicMetrics);
-            Assert.IsNull(answer[0].IsVerified);
+            Assert.IsNull(answer[0].Verified);
         }
     }
 }
