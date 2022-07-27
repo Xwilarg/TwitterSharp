@@ -43,7 +43,7 @@ namespace TwitterSharp.Response.RUser
         /// <summary>
         /// Are the user tweet private
         /// </summary>
-        public bool? IsProtected { init; get; }
+        public bool? Protected { init; get; }
         /// <summary>
         /// URL specified on user profile
         /// </summary>
@@ -59,7 +59,7 @@ namespace TwitterSharp.Response.RUser
         /// <summary>
         /// If the user is a verified Twitter user
         /// </summary>
-        public bool? IsVerified { init; get; }
+        public bool? Verified { init; get; }
 
         public override bool Equals(object obj)
             => obj is User t && t?.Id == Id;
