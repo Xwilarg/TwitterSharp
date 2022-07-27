@@ -58,7 +58,7 @@ namespace TwitterSharp.UnitTests
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
             var answer = await client.GetUsersAsync(new[] { "theindra5" }, new UserSearchOptions
             {
-                UserOptions = new[] { UserOption.Description, UserOption.Public_Metrics }
+                UserOptions = new[] { UserOption.Description, UserOption.Public_Metrics, UserOption.Verified, UserOption.Protected }
             });
             Assert.IsTrue(answer.Length == 1);
             Assert.AreEqual("1022468464513089536", answer[0].Id);
@@ -66,7 +66,8 @@ namespace TwitterSharp.UnitTests
             Assert.AreEqual("Indra", answer[0].Name);
             Assert.IsNotNull(answer[0].Description);
             Assert.IsNotNull(answer[0].PublicMetrics);
-            Assert.IsNull(answer[0].Verified);
+            Assert.IsFalse(answer[0].Verified != null && answer[0].Verified.Value);
+            Assert.IsFalse(answer[0].Protected != null && answer[0].Protected.Value);
         }
     }
 }
