@@ -9,7 +9,8 @@ namespace TwitterSharp.JsonOption
     {
         public override Expression Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return new(reader.GetString(), "");
+            // Nach Expression parsen
+            return new(reader.GetString(), "", ExpressionType.None);
         }
 
         public override void Write(Utf8JsonWriter writer, Expression value, JsonSerializerOptions options)
