@@ -8,28 +8,37 @@ namespace TwitterSharp.Rule
     // https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
     public class Expression
     {
-        internal Expression(string prefix, string userInput, ExpressionType type)
+        internal Expression(string prefix, string userInput, ExpressionType type, Expression orig = null, Expression[] expressions = null) : this(prefix, userInput)
         {
             Type = type;
 
-            // TODO Parse correctly
-            if (type == ExpressionType.None)
-            {
-                _ = ToExpression(prefix);
-            }
+            if(orig != null)
+                Expressions = new [] { orig };
 
+            if (expressions != null && expressions.Length > 0)
+            {
+                var exp = Expressions[0];
+                Expressions = new Expression[expressions.Length + 1];
+                Expressions[0] = exp ?? this;
+                expressions.CopyTo(Expressions, 1);
+            }
+        }
+
+        internal Expression(string prefix, string userInput)
+        {
             _internal = prefix + (userInput != null ? (userInput.Contains(' ') ? "\"" + userInput + "\"" : userInput) : "");
         }
 
         public ExpressionType Type { get; set; }
         public Expression[] Expressions { get; set; }
+        public bool IsNegate { get; set; }
 
-        private readonly string _internal;
+        private string _internal;
 
         public override string ToString()
             => _internal;
 
-        Expression ToExpression(string s)
+        public static Expression ToExpression(string s)
         {
             const char r = '~'; // replaceCharacter
             
@@ -147,7 +156,8 @@ namespace TwitterSharp.Rule
 
             void FindGroups()
             {
-                foreach (Match match in Regex.Matches(s, "\\(+.*?\\)"))
+                // https://regex101.com/r/ONVk50/2
+                foreach (Match match in Regex.Matches(s, "\\([^\\(]*?\\)"))
                 {
                     var group = match.Value.Replace("(", "").Replace(")", "");
                     AddToGroup(group);
@@ -181,10 +191,11 @@ namespace TwitterSharp.Rule
 
                 }
 
-                if (group.Value)
-                    expressions.Add(groupExpression[0].And(groupExpression.Skip(1).ToArray()));
-                else
-                    expressions.Add(groupExpression[0].Or(groupExpression.Skip(1).ToArray()));
+                if(groupExpression.Count > 1) // Simple rule (most bottom)
+                    if (group.Value)
+                        expressions.Add(groupExpression[0].And(groupExpression.Skip(1).ToArray()));
+                    else
+                        expressions.Add(groupExpression[0].Or(groupExpression.Skip(1).ToArray()));
             }
 
             return expressions.Last();
@@ -197,12 +208,7 @@ namespace TwitterSharp.Rule
         /// </summary>
         public Expression Or(params Expression[] others)
         {
-            Expressions = others;
-
-            return new(
-                others.Any()
-                    ? "(" + _internal + " OR " + string.Join(" OR ", others.Select(x => x.ToString())) + ")"
-                    : _internal, "", ExpressionType.Or);
+            return new(others.Any() ? "(" + _internal + " OR " + string.Join(" OR ", others.Select(x => x.ToString())) + ")" : _internal, "", ExpressionType.Or, this, others);
         }
 
         /// <summary>
@@ -210,19 +216,22 @@ namespace TwitterSharp.Rule
         /// </summary>
         public Expression And(params Expression[] others)
         {
-            Expressions = others;
-
-            return new(
-                others.Any()
-                    ? "(" + _internal + " " + string.Join(" ", others.Select(x => x.ToString())) + ")"
-                    : _internal, "", ExpressionType.And);
+            return new(others.Any() ? "(" + _internal + " " + string.Join(" ", others.Select(x => x.ToString())) + ")" : _internal, "", ExpressionType.And, this, others);
         }
 
         /// <summary>
         /// Tweet match the negation of the current expression
         /// </summary>
         public Expression Negate()
-            => new("-" + _internal, "", ExpressionType.Negate);
+        {
+            // TODO: prevent(?) sample and is:nullcast from beeing negated
+            // TODO: prevent(?) group from beeing negated
+            // https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule#boolean
+
+            _internal = "-" + _internal;
+            IsNegate = true;
+            return this;
+        }
 
         // OPERATORS
 
