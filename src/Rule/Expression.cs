@@ -26,7 +26,7 @@ namespace TwitterSharp.Rule
 
         internal Expression(string prefix, string userInput)
         {
-            _internal = prefix + (userInput != null ? (userInput.Contains(' ') ? "\"" + userInput + "\"" : userInput) : "");
+            _internal = prefix + (userInput != null ? (userInput.Contains(' ') && !userInput.StartsWith('\"') && !userInput.EndsWith('\"') ? "\"" + userInput + "\"" : userInput) : "");
         }
 
         public ExpressionType Type { get; set; }
@@ -53,17 +53,24 @@ namespace TwitterSharp.Rule
                 s = ReplaceFirst(s, match.Value, $"{r}q{q++}{r}");
             }
 
+            // Find coordinates and Replace (use quote array)
+            foreach (Match match in Regex.Matches(s, @"\[.*?\]"))
+            {
+                quotes.Add(match.Value);
+                s = ReplaceFirst(s, match.Value, $"{r}q{q++}{r}");
+            }
+
             List<Expression> expressions = new List<Expression>();
             var e = 0;
             foreach (var stringExpression in s.Replace($" OR ", $" ").Replace($"(", $"").Replace($")", $"").Split(' '))
             {
-                var isNegate = stringExpression.StartsWith('-');
+                var isNegate = stringExpression.StartsWith('-') && !stringExpression.Equals("-is:nullcast", StringComparison.InvariantCultureIgnoreCase);
 
                 var sr = isNegate ? stringExpression.Substring(1) : stringExpression;
 
                 // TODO: Optimize quote logic
                 if (stringExpression.Contains($"{r}q"))
-                    sr = quotes[Int32.Parse(Regex.Match(stringExpression, @"\d+").Value)].Replace("\"","");
+                    sr = Regex.Replace(sr, @"~q(\d+)~", quotes[Int32.Parse(Regex.Match(stringExpression, @"\d+").Value)]);
 
                 if (sr.StartsWith('#'))
                     AddExpression(Expression.Hashtag(sr.Substring(1)));
@@ -79,6 +86,8 @@ namespace TwitterSharp.Rule
                     AddExpression(Expression.Url(sr.Replace("url:", "")));
                 else if (sr.StartsWith("retweets_of:"))
                     AddExpression(Expression.Retweet(sr.Replace("retweets_of:", "")));
+                else if (sr.StartsWith("retweets_of_user:")) // Alias
+                    AddExpression(Expression.Retweet(sr.Replace("retweets_of:", "")));
                 else if (sr.StartsWith("context:"))
                     AddExpression(Expression.Context(sr.Replace("context:", "")));
                 else if (sr.StartsWith("entity:"))
@@ -87,12 +96,22 @@ namespace TwitterSharp.Rule
                     AddExpression(Expression.ConversationId(sr.Replace("conversation_id:", "")));
                 else if (sr.StartsWith("bio:"))
                     AddExpression(Expression.Bio(sr.Replace("bio:", "")));
+                else if (sr.StartsWith("user_bio:")) // Alias
+                    AddExpression(Expression.Bio(sr.Replace("bio:", "")));
                 else if (sr.StartsWith("bio_location:"))
+                    AddExpression(Expression.BioLocation(sr.Replace("bio_location:", "")));
+                else if (sr.StartsWith("user_bio_location:")) // Alias
                     AddExpression(Expression.BioLocation(sr.Replace("bio_location:", "")));
                 else if (sr.StartsWith("place:"))
                     AddExpression(Expression.Place(sr.Replace("place:", "")));
                 else if (sr.StartsWith("place_country:"))
                     AddExpression(Expression.PlaceCountry(sr.Replace("place_country:", "")));
+                // else if (sr.StartsWith("point_radius:"))
+                //     AddExpression(Expression.PointRadius(sr.Replace("point_radius:", "")));
+                // else if (sr.StartsWith("bounding_box:"))
+                //     AddExpression(Expression.BoundingBox(sr.Replace("bounding_box:", "")));
+                // else if (sr.StartsWith("geo_bounding_box:")) // Alias
+                //     AddExpression(Expression.BoundingBox(sr.Replace("bounding_box:", "")));
                 else if (sr.StartsWith("sample:"))
                     AddExpression(Expression.Sample(Int32.Parse(sr.Replace("sample:", ""))));
                 else if (sr.StartsWith("lang:"))
@@ -105,8 +124,7 @@ namespace TwitterSharp.Rule
                     AddExpression(Expression.IsQuote());
                 else if (sr == "is:verified")
                     AddExpression(Expression.IsVerified());
-                // TODO: FIX SPECIAL CASE
-                else if (sr == "is:nullcast")
+                else if (sr == "-is:nullcast")
                     AddExpression(Expression.IsNotNullcast());
                 else if (sr == "has:hashtags")
                     AddExpression(Expression.HasHashtags());
@@ -118,14 +136,84 @@ namespace TwitterSharp.Rule
                     AddExpression(Expression.HasMentions());
                 else if (sr == "has:media")
                     AddExpression(Expression.HasMedia());
+                else if (sr == "has:media_link") // Alias
+                    AddExpression(Expression.HasMedia());
                 else if (sr == "has:images")
                     AddExpression(Expression.HasImages());
                 else if (sr == "has:videos")
                     AddExpression(Expression.HasVideos());
+                else if (sr == "has:video_link") // Alias
+                    AddExpression(Expression.HasVideos());
                 else if (sr == "has:geo")
                     AddExpression(Expression.HasGeo());
+                else if (sr.StartsWith("followers_count:"))
+                    AddCountExpression(sr, "followers_count:");
+                else if (sr.StartsWith("tweets_count:"))
+                    AddCountExpression(sr, "tweets_count:");
+                else if (sr.StartsWith("statuses_count:")) // Alias
+                    AddCountExpression(sr, "statuses_count:");
+                else if (sr.StartsWith("following_count:"))
+                    AddCountExpression(sr, "following_count:");
+                else if (sr.StartsWith("friends_count:")) // Alias
+                    AddCountExpression(sr, "friends_count:");
+                else if (sr.StartsWith("listed_count:"))
+                    AddCountExpression(sr, "listed_count:");
+                else if (sr.StartsWith("user_in_lists_count:")) // Alias
+                    AddCountExpression(sr, "user_in_lists_count:");
+                else if (sr.StartsWith("url_title:"))
+                    AddExpression(Expression.UrlTitle(sr.Replace("url_title:", "")));
+                else if (sr.StartsWith("within_url_title:")) // Alias
+                    AddExpression(Expression.UrlTitle(sr.Replace("within_url_title:", "")));
+                else if (sr.StartsWith("url_description:"))
+                    AddExpression(Expression.UrlDescription(sr.Replace("url_description:", "")));
+                else if (sr.StartsWith("within_url_description:")) // Alias
+                    AddExpression(Expression.UrlDescription(sr.Replace("within_url_description:", "")));
+                else if (sr.StartsWith("url_contains:"))
+                    AddExpression(Expression.UrlContains(sr.Replace("url_contains:", "")));
+                else if (sr.StartsWith("source:"))
+                    AddExpression(Expression.Source(sr.Replace("source:", "")));
+                else if (sr.StartsWith("in_reply_to_tweet_id:"))
+                    AddExpression(Expression.InReplyToTweetId(long.Parse(sr.Replace("in_reply_to_tweet_id:", ""))));
+                else if (sr.StartsWith("in_reply_to_status_id:"))
+                    AddExpression(Expression.InReplyToTweetId(long.Parse(sr.Replace("in_reply_to_status_id:", ""))));
+                else if (sr.StartsWith("retweets_of_tweet_id:"))
+                    AddExpression(Expression.RetweetsOfTweetId(long.Parse(sr.Replace("retweets_of_tweet_id:", ""))));
+                else if (sr.StartsWith("retweets_of_status_id:"))
+                    AddExpression(Expression.RetweetsOfTweetId(long.Parse(sr.Replace("retweets_of_status_id:", ""))));
                 else
                     AddExpression(Expression.Keyword(sr));
+
+                void AddCountExpression(string sr, string searchString)
+                {
+                    if (sr.Contains(".."))
+                    {
+                        var matches = Regex.Matches(sr, @"\d+");
+                        switch (searchString)
+                        {
+                            case "followers_count:": AddExpression(FollowersCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
+                            case "tweets_count:": AddExpression(TweetsCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
+                            case "statuses_count:": AddExpression(TweetsCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
+                            case "following_count:": AddExpression(FollowingCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
+                            case "friends_count:": AddExpression(FollowingCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
+                            case "listed_count:": AddExpression(ListedCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
+                            case "user_in_lists_count:": AddExpression(ListedCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
+                        }
+                    }
+                    else if (sr.StartsWith(searchString))
+                    {
+                        var count = Int32.Parse(sr.Replace(searchString, ""));
+                        switch (searchString)
+                        {
+                            case "followers_count:": AddExpression(FollowersCount(count)); break;
+                            case "tweets_count:": AddExpression(TweetsCount(count)); break;
+                            case "statuses_count:": AddExpression(TweetsCount(count)); break;
+                            case "following_count:": AddExpression(FollowingCount(count)); break;
+                            case "friends_count:": AddExpression(FollowingCount(count)); break;
+                            case "listed_count:": AddExpression(ListedCount(count)); break;
+                            case "user_in_lists_count:": AddExpression(ListedCount(count)); break;
+                        }
+                    }
+                }
 
                 void AddExpression(Expression exp)
                 {
@@ -200,7 +288,7 @@ namespace TwitterSharp.Rule
 
             return expressions.Last();
         }
-        
+
         // LOGIC
 
         /// <summary>
@@ -293,7 +381,7 @@ namespace TwitterSharp.Rule
         /// Match an entity (parameter is the string declaration of entity/place)
         /// </summary>
         public static Expression Entity(string str)
-            => new("entity: ", str, ExpressionType.Entity);
+            => new("entity:", str, ExpressionType.Entity);
 
         /// <summary>
         /// Match tweet with a specific conversation ID
@@ -442,5 +530,109 @@ namespace TwitterSharp.Rule
         /// <param name="countryCode">Must be a valid BCP 47 code</param>
         public static Expression Lang(string countryCode)
             => new("lang:", countryCode, ExpressionType.Lang);
+
+        /// <summary>
+        /// Matches Tweets when the author has a followers count within the given range.
+        /// Example: followers_count:500
+        /// </summary>
+        /// <param name="count">Any number equal to or higher will match</param>
+        public static Expression FollowersCount(int count)
+            => new("followers_count:", count.ToString(), ExpressionType.FollowersCount);
+
+        /// <summary>
+        /// Matches Tweets when the author has a followers count within the given range.
+        /// Example: followers_count:1000..10000
+        /// </summary>
+        public static Expression FollowersCount(int from, int to)
+            => new("followers_count:", from + ".." + to, ExpressionType.FollowersCount);
+
+        /// <summary>
+        /// Matches Tweets when the author has posted a number of Tweets that falls within the given range.
+        /// Example: tweets_count:500
+        /// </summary>
+        /// <param name="count">Any number equal to or higher will match</param>
+        public static Expression TweetsCount(int count)
+            => new("tweets_count:", count.ToString(), ExpressionType.TweetsCount);
+
+        /// <summary>
+        /// Matches Tweets when the author has posted a number of Tweets that falls within the given range.
+        /// Example: tweets_count:1000..10000
+        /// </summary>
+        public static Expression TweetsCount(int from, int to)
+            => new("tweets_count:", from + ".." + to, ExpressionType.TweetsCount);
+
+        /// <summary>
+        /// Matches Tweets when the author has a friends count (the number of users they follow) that falls within the given range.
+        /// Example: following_count:500
+        /// </summary>
+        /// <param name="count">Any number equal to or higher will match</param>
+        public static Expression FollowingCount(int count)
+            => new("following_count:", count.ToString(), ExpressionType.FollowingCount);
+
+        /// <summary>
+        /// Matches Tweets when the author has a friends count (the number of users they follow) that falls within the given range.
+        /// Example: following_count:1000..10000
+        /// </summary>
+        public static Expression FollowingCount(int from, int to)
+            => new("following_count:", from + ".." + to, ExpressionType.FollowingCount);
+
+        /// <summary>
+        /// Matches Tweets when the author is included in the specified number of Lists. 
+        /// Example: listed_count:500
+        /// </summary>
+        /// <param name="count">Any number equal to or higher will match</param>
+        public static Expression ListedCount(int count)
+            => new("listed_count:", count.ToString(), ExpressionType.ListedCount);
+        
+        /// <summary>
+        /// Matches Tweets when the author is included in the specified number of Lists. 
+        /// Example: listed_count:1000..10000
+        /// </summary>
+        public static Expression ListedCount(int from, int to)
+            => new("listed_count:", from + ".." + to, ExpressionType.ListedCount);
+
+        /// <summary>
+        /// Performs a keyword/phrase match on the expanded URL HTML title metadata.
+        /// Example: url_title:snow
+        /// </summary>
+        public static Expression UrlTitle(string title)
+            => new("url_title:", title, ExpressionType.UrlTitle);
+
+        /// <summary>
+        /// Performs a keyword/phrase match on the expanded page description metadata.
+        /// Example: url_description:weather
+        /// </summary>
+        public static Expression UrlDescription(string description)
+            => new("url_description:", description, ExpressionType.UrlDescription);
+
+        /// <summary>
+        /// Matches Tweets with URLs that literally contain the given phrase or keyword. To search for patterns with punctuation in them (i.e. google.com) enclose the search term in quotes.
+        /// NOTE: This will match against the expanded URL as well.
+        /// Example: url_contains:photos
+        /// </summary>
+        public static Expression UrlContains(string contains)
+            => new("url_contains:", contains, ExpressionType.UrlContains);
+
+        /// <summary>
+        /// Matches any Tweet generated by the given source application. The value must be either the name of the application or the application’s URL. Cannot be used alone.
+        /// Example: source:"Twitter for iPhone"
+        /// Note: As a Twitter app developer, Tweets created programmatically by your application will have the source of your application Name and Website URL set in your app settings. 
+        /// </summary>
+        public static Expression Source(string source)
+            => new("source:", source, ExpressionType.Source);
+
+        /// <summary>
+        /// Deliver only explicit Replies to the specified Tweet.
+        /// Example: in_reply_to_tweet_id:1539382664746020864
+        /// </summary>
+        public static Expression InReplyToTweetId(long tweetId)
+            => new("in_reply_to_tweet_id:", tweetId.ToString(), ExpressionType.InReplyToTweetId);
+
+        /// <summary>
+        /// Deliver only explicit (or native) Retweets of the specified Tweet. Note that the status ID used should be the ID of an original Tweet and not a Retweet.
+        /// Example: retweets_of_tweet_id:1539382664746020864
+        /// </summary>
+        public static Expression RetweetsOfTweetId(long tweetId)
+            => new("retweets_of_tweet_id:", tweetId.ToString(), ExpressionType.RetweetsOfTweetId);
     }
 }
