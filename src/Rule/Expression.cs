@@ -106,12 +106,22 @@ namespace TwitterSharp.Rule
                     AddExpression(Expression.Place(sr.Replace("place:", "")));
                 else if (sr.StartsWith("place_country:"))
                     AddExpression(Expression.PlaceCountry(sr.Replace("place_country:", "")));
-                // else if (sr.StartsWith("point_radius:"))
-                //     AddExpression(Expression.PointRadius(sr.Replace("point_radius:", "")));
-                // else if (sr.StartsWith("bounding_box:"))
-                //     AddExpression(Expression.BoundingBox(sr.Replace("bounding_box:", "")));
-                // else if (sr.StartsWith("geo_bounding_box:")) // Alias
-                //     AddExpression(Expression.BoundingBox(sr.Replace("bounding_box:", "")));
+                else if (sr.StartsWith("point_radius:"))
+                {
+                    var coordinates = sr.Replace("point_radius:", "").Replace("[", "").Replace("]", "").Split(' ');
+                    var unit = coordinates[2].EndsWith("km") ? RadiusUnit.Kilometer : RadiusUnit.Mile;
+                    AddExpression(Expression.PointRadius(coordinates[0], coordinates[1], coordinates[2].Substring(0, coordinates[2].Length-2), unit));
+                }
+                else if (sr.StartsWith("bounding_box:"))
+                {
+                    var coordinates = sr.Replace("bounding_box:", "").Replace("[", "").Replace("]", "").Split(' ');
+                    AddExpression(Expression.BoundingBox(coordinates[0],coordinates[1],coordinates[2],coordinates[3]));
+                }
+                else if (sr.StartsWith("geo_bounding_box:")) // Alias
+                {
+                    var coordinates = sr.Replace("geo_bounding_box:", "").Replace("[", "").Replace("]", "").Split(' ');
+                    AddExpression(Expression.BoundingBox(coordinates[0],coordinates[1],coordinates[2],coordinates[3]));
+                }
                 else if (sr.StartsWith("sample:"))
                     AddExpression(Expression.Sample(Int32.Parse(sr.Replace("sample:", ""))));
                 else if (sr.StartsWith("lang:"))
@@ -251,15 +261,27 @@ namespace TwitterSharp.Rule
                     AddToGroup(group);
                     s = ReplaceFirst(s, $"({group})", $"{r}g{e++}{r}");
                 }
-                
+
                 if(s.Contains('(')) 
                     FindGroups();
+                else if(s.Contains(" OR ") && s.Contains($"{r} {r}")) // Mixed groups
+                {
+                    var ors = s.Split(" OR ");
+
+                    for (int i = 0; i <= ors.Length-1; i++)
+                    {
+                        if(ors[i].Contains(' '))
+                            ors[i] = $"({ors[i]})";
+                    }
+
+                    s = String.Join(" OR ", ors);
+                    FindGroups();
+                }
                 else
                     AddToGroup(s); // most top group should be left
 
                 void AddToGroup(string ga)
                 {
-                    // TODO: Mixed groups!?
                     if(ga.Contains(" OR "))
                         groups.Add(ga.Split(" OR "), false);
                     else
