@@ -8,30 +8,47 @@ namespace TwitterSharp.Rule
     // https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
     public class Expression
     {
-        internal Expression(string prefix, string userInput, ExpressionType type, Expression orig = null, Expression[] expressions = null) : this(prefix, userInput)
-        {
-            Type = type;
-
-            if(orig != null)
-                Expressions = new [] { orig };
-
-            if (expressions != null && expressions.Length > 0)
-            {
-                var exp = Expressions[0];
-                Expressions = new Expression[expressions.Length + 1];
-                Expressions[0] = exp ?? this;
-                expressions.CopyTo(Expressions, 1);
-            }
-        }
-
         internal Expression(string prefix, string userInput)
         {
             _internal = prefix + (userInput != null ? (userInput.Contains(' ') && !userInput.StartsWith('\"') && !userInput.EndsWith('\"') ? "\"" + userInput + "\"" : userInput) : "");
         }
 
-        public ExpressionType Type { get; set; }
-        public Expression[] Expressions { get; set; }
-        public bool IsNegate { get; set; }
+        /// <summary>
+        /// Constructor for building single expressions
+        /// </summary>
+        /// <param name="prefix">Prefix like #, @, from: or is:retweet</param>
+        /// <param name="userInput">Value of the expression</param>
+        /// <param name="type">Type of the expression</param>
+        private Expression(string prefix, string userInput, ExpressionType type) : this(prefix, userInput)
+        {
+            Type = type;
+        }        
+        
+        /// <summary>
+        /// Constructor for building expression tree
+        /// </summary>
+        /// <param name="prefix">Prefix like #, @, from: or is:retweet</param>
+        /// <param name="userInput">Value of the expression</param>
+        /// <param name="type">Type of the expression</param>
+        /// <param name="firstExpression">first expression from And/Or logic</param>
+        /// <param name="expressions">grouped expressions</param>
+        private Expression(string prefix, string userInput, ExpressionType type, Expression firstExpression, Expression[] expressions) : this(prefix, userInput, type)
+        {
+            if(firstExpression != null && expressions is { Length: > 0 })
+            {
+                Expressions = new Expression[expressions.Length + 1];
+                Expressions[0] = firstExpression;
+                expressions.CopyTo(Expressions, 1);
+            }
+            else if(firstExpression != null)
+            {
+                Expressions = new [] { firstExpression };
+            }
+        }
+
+        public ExpressionType Type { get; }
+        public Expression[] Expressions { get; }
+        public bool IsNegate { get; private set; }
 
         private string _internal;
 
@@ -44,33 +61,33 @@ namespace TwitterSharp.Rule
             
             // Find Quote and Replace
             // https://regex101.com/r/9P1hCA/1
-            var quotes = new List<string>();
-            var q = 0;
+            var replacements = new List<string>();
+            var replacementCount = 0;
 
             foreach (Match match in Regex.Matches(s, "(\\\").*?(\")"))
             {
-                quotes.Add(match.Value);
-                s = ReplaceFirst(s, match.Value, $"{r}q{q++}{r}");
+                replacements.Add(match.Value);
+                s = ReplaceFirst(s, match.Value, $"{r}q{replacementCount++}{r}");
             }
 
-            // Find coordinates and Replace (use quote array)
+            // Find coordinates and Replace
             foreach (Match match in Regex.Matches(s, @"\[.*?\]"))
             {
-                quotes.Add(match.Value);
-                s = ReplaceFirst(s, match.Value, $"{r}q{q++}{r}");
+                replacements.Add(match.Value);
+                s = ReplaceFirst(s, match.Value, $"{r}q{replacementCount++}{r}");
             }
 
             List<Expression> expressions = new List<Expression>();
-            var e = 0;
-            foreach (var stringExpression in s.Replace($" OR ", $" ").Replace($"(", $"").Replace($")", $"").Split(' '))
+            var expressionCount = 0;
+
+            // Finding most bottom (single) expressions
+            foreach (var stringExpression in s.Replace($" OR ", $" ").Replace($"-(", $"").Replace($"(", $"").Replace($")", $"").Split(' '))
             {
                 var isNegate = stringExpression.StartsWith('-') && !stringExpression.Equals("-is:nullcast", StringComparison.InvariantCultureIgnoreCase);
-
                 var sr = isNegate ? stringExpression.Substring(1) : stringExpression;
 
-                // TODO: Optimize quote logic
                 if (stringExpression.Contains($"{r}q"))
-                    sr = Regex.Replace(sr, @"~q(\d+)~", quotes[Int32.Parse(Regex.Match(stringExpression, @"\d+").Value)]);
+                    sr = Regex.Replace(sr, @$"{r}q(\d+){r}", replacements[Int32.Parse(Regex.Match(stringExpression, @"\d+").Value)]);
 
                 if (sr.StartsWith('#'))
                     AddExpression(Expression.Hashtag(sr.Substring(1)));
@@ -233,7 +250,7 @@ namespace TwitterSharp.Rule
                         expressions.Add(exp);
                 }
 
-                s = ReplaceFirst(s, stringExpression, $"{r}e{e++}{r}");
+                s = ReplaceFirst(s, stringExpression, $"{r}e{expressionCount++}{r}");
             }
 
             string ReplaceFirst(string text, string search, string replace)
@@ -249,7 +266,7 @@ namespace TwitterSharp.Rule
             // Find groups recursive
             // https://regex101.com/r/xJaODO/2
             var groups = new Dictionary<string[],bool>();
-            // var g = 0;
+
             FindGroups();
 
             void FindGroups()
@@ -259,11 +276,13 @@ namespace TwitterSharp.Rule
                 {
                     var group = match.Value.Replace("(", "").Replace(")", "");
                     AddToGroup(group);
-                    s = ReplaceFirst(s, $"({group})", $"{r}g{e++}{r}");
+                    s = ReplaceFirst(s, $"({group})", $"{r}g{expressionCount++}{r}");
                 }
 
-                if(s.Contains('(')) 
+                if(s.Contains('('))
+                {
                     FindGroups();
+                }
                 else if(s.Contains(" OR ") && s.Contains($"{r} {r}")) // Mixed groups
                 {
                     var ors = s.Split(" OR ");
@@ -278,7 +297,9 @@ namespace TwitterSharp.Rule
                     FindGroups();
                 }
                 else
+                {
                     AddToGroup(s); // most top group should be left
+                }
 
                 void AddToGroup(string ga)
                 {
@@ -298,14 +319,18 @@ namespace TwitterSharp.Rule
                 {
                     var index = Regex.Match(k, @"\d+").Value;
                     groupExpression.Add(expressions[Int32.Parse(index)]);
-
+                    
+                    if (k.StartsWith('-'))
+                        expressions[Int32.Parse(index)].Negate();
                 }
 
-                if(groupExpression.Count > 1) // Simple rule (most bottom)
-                    if (group.Value)
+                if(groupExpression.Count > 1)
+                {
+                    if(group.Value) // true is And / false is Or
                         expressions.Add(groupExpression[0].And(groupExpression.Skip(1).ToArray()));
                     else
                         expressions.Add(groupExpression[0].Or(groupExpression.Skip(1).ToArray()));
+                }
             }
 
             return expressions.Last();
@@ -334,11 +359,9 @@ namespace TwitterSharp.Rule
         /// </summary>
         public Expression Negate()
         {
-            // TODO: prevent(?) sample and is:nullcast from beeing negated
-            // TODO: prevent(?) group from beeing negated
-            // https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule#boolean
+            if(!_internal.StartsWith('-')) // prevent double negation
+                _internal = "-" + _internal;
 
-            _internal = "-" + _internal;
             IsNegate = true;
             return this;
         }
