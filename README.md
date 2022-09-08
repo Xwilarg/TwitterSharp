@@ -123,55 +123,29 @@ Task.Run(async () =>
 await client.AddTweetStreamAsync(new TwitterSharp.Request.StreamRequest( Expression.Author("Every3Minutes"), "Frequent"));
 ```
 
-### Get all rules and search the expression tree
+### Search the expression tree
 ```cs
-var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+var expressionString = "(@twitterdev OR @twitterapi) -@twitter";
+// Parse the string into an expression with a typed expression tree
+var parsedExpression = Expression.Parse(expressionString);
 
-// Subscribe to 5 Twitter accounts
-var request = new TwitterSharp.Request.StreamRequest(
-    Expression.Author("moricalliope") // using TwitterSharp.Rule;
-        .Or(
-            Expression.Author("takanashikiara"),
-            Expression.Author("ninomaeinanis"),
-            Expression.Author("gawrgura"),
-            Expression.Author("watsonameliaEN")
-        )
-    , "Hololive");
-await client.AddTweetStreamAsync(request); // Add them to the stream
+var mentionsCount = CountExpressionsOfType(parsedExpression, ExpressionType.Mention);
+var groupsCount = CountExpressionsOfType(parsedExpression, ExpressionType.And) + CountExpressionsOfType(parsedExpression, ExpressionType.Or);;
 
-// get all the rules for FilteresStream
-var rules = await client.GetInfoTweetStreamAsync();
+Console.WriteLine($"Found {mentionsCount} mentions and {groupsCount} groups in the expression"); // Found 3 mentions and 2 groups in the expression
 
-// helper function to count recursive
+// Helper function to count recursive
 int CountExpressionsOfType(Expression expression, ExpressionType type)
 {
-    var i = 0;
-
-    if (expression.Type == type)
-    {
-        i++;
-    }
+    var i = expression.Type == type ? 1 : 0;
 
     if (expression.Expressions != null)
     {
-        foreach (var exp in expression.Expressions)
-        {
-            i += CountExpressionsOfType(exp, type);
-        }
+        i += expression.Expressions.Sum(exp => CountExpressionsOfType(exp, type));
     }
 
     return i;
 }
-
-var authorCount = 0;
-
-foreach (var rule in rules)
-{
-    var expression = Expression.Parse(rule.Value.ToString());
-    authorCount += CountExpressionsOfType(expression, ExpressionType.Author);
-}
-
-Console.WriteLine($"Found {authorCount} authors in {rules.Length}");
 ```
 
 ## Contributing

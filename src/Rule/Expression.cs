@@ -34,13 +34,13 @@ namespace TwitterSharp.Rule
         /// <param name="expressions">grouped expressions</param>
         private Expression(string prefix, string userInput, ExpressionType type, Expression firstExpression, Expression[] expressions) : this(prefix, userInput, type)
         {
-            if(firstExpression != null && expressions is { Length: > 0 })
+            if (firstExpression != null && expressions is { Length: > 0 })
             {
                 Expressions = new Expression[expressions.Length + 1];
                 Expressions[0] = firstExpression;
                 expressions.CopyTo(Expressions, 1);
             }
-            else if(firstExpression != null)
+            else if (firstExpression != null)
             {
                 Expressions = new [] { firstExpression };
             }
@@ -137,12 +137,12 @@ namespace TwitterSharp.Rule
                 else if (sr.StartsWith("bounding_box:"))
                 {
                     var coordinates = sr.Replace("bounding_box:", "").Replace("[", "").Replace("]", "").Split(' ');
-                    AddExpression(BoundingBox(coordinates[0],coordinates[1],coordinates[2],coordinates[3]));
+                    AddExpression(BoundingBox(coordinates[0], coordinates[1], coordinates[2], coordinates[3]));
                 }
                 else if (sr.StartsWith("geo_bounding_box:")) // Alias
                 {
                     var coordinates = sr.Replace("geo_bounding_box:", "").Replace("[", "").Replace("]", "").Split(' ');
-                    AddExpression(BoundingBox(coordinates[0],coordinates[1],coordinates[2],coordinates[3]));
+                    AddExpression(BoundingBox(coordinates[0], coordinates[1], coordinates[2], coordinates[3]));
                 }
                 else if (sr.StartsWith("sample:"))
                     AddExpression(Sample(int.Parse(sr.Replace("sample:", ""))));
@@ -272,7 +272,7 @@ namespace TwitterSharp.Rule
 
             // Find groups recursive
             // https://regex101.com/r/xJaODO/2
-            var groups = new Dictionary<string[],bool>();
+            var groups = new Dictionary<string[], bool>();
 
             FindGroups();
 
@@ -286,17 +286,17 @@ namespace TwitterSharp.Rule
                     s = ReplaceFirst(s, $"({group})", $"{r}g{expressionCount++}{r}");
                 }
 
-                if(s.Contains('('))
+                if (s.Contains('('))
                 {
                     FindGroups();
                 }
-                else if(s.Contains(" OR ") && s.Contains($"{r} {r}")) // Mixed groups
+                else if (s.Contains(" OR ") && s.Contains($"{r} {r}")) // Mixed groups
                 {
                     var ors = s.Split(" OR ");
 
                     for (int i = 0; i <= ors.Length-1; i++)
                     {
-                        if(ors[i].Contains(' '))
+                        if (ors[i].Contains(' '))
                             ors[i] = $"({ors[i]})";
                     }
 
@@ -310,7 +310,7 @@ namespace TwitterSharp.Rule
 
                 void AddToGroup(string ga)
                 {
-                    if(ga.Contains(" OR "))
+                    if (ga.Contains(" OR "))
                         groups.Add(ga.Split(" OR "), false);
                     else
                         groups.Add(ga.Split(" "), true);
@@ -331,9 +331,9 @@ namespace TwitterSharp.Rule
                         expressions[int.Parse(index)].Negate();
                 }
 
-                if(groupExpression.Count > 1)
+                if (groupExpression.Count > 1)
                 {
-                    if(group.Value) // true is And / false is Or
+                    if (group.Value) // true is And / false is Or
                         expressions.Add(groupExpression[0].And(groupExpression.Skip(1).ToArray()));
                     else
                         expressions.Add(groupExpression[0].Or(groupExpression.Skip(1).ToArray()));
@@ -366,7 +366,7 @@ namespace TwitterSharp.Rule
         /// </summary>
         public Expression Negate()
         {
-            if(!_internal.StartsWith('-')) // prevent double negation
+            if (!_internal.StartsWith('-')) // prevent double negation
                 _internal = "-" + _internal;
 
             IsNegate = true;
