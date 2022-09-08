@@ -35,6 +35,13 @@ namespace TwitterSharp.Rule
         public Expression Negate()
             => new("-" + _internal, "");
 
+        /// <summary>
+        /// Match a tweet that is a retweet of the provided tweet.
+        /// </summary>
+        /// <param name="id">The tweet to get the retweets of.</param>
+        public static Expression RetweetOf(string id)
+            => new("retweets_of_tweet_id:", id);
+
         // OPERATORS
 
         /// <summary>
