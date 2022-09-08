@@ -123,6 +123,57 @@ Task.Run(async () =>
 await client.AddTweetStreamAsync(new TwitterSharp.Request.StreamRequest( Expression.Author("Every3Minutes"), "Frequent"));
 ```
 
+### Get all rules and search the expression tree
+```cs
+var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+
+// Subscribe to 5 Twitter accounts
+var request = new TwitterSharp.Request.StreamRequest(
+    Expression.Author("moricalliope") // using TwitterSharp.Rule;
+        .Or(
+            Expression.Author("takanashikiara"),
+            Expression.Author("ninomaeinanis"),
+            Expression.Author("gawrgura"),
+            Expression.Author("watsonameliaEN")
+        )
+    , "Hololive");
+await client.AddTweetStreamAsync(request); // Add them to the stream
+
+// get all the rules for FilteresStream
+var rules = await client.GetInfoTweetStreamAsync();
+
+// helper function to count recursive
+int CountExpressionsOfType(Expression expression, ExpressionType type)
+{
+    var i = 0;
+
+    if (expression.Type == type)
+    {
+        i++;
+    }
+
+    if (expression.Expressions != null)
+    {
+        foreach (var exp in expression.Expressions)
+        {
+            i += CountExpressionsOfType(exp, type);
+        }
+    }
+
+    return i;
+}
+
+var authorCount = 0;
+
+foreach (var rule in rules)
+{
+    var expression = Expression.Parse(rule.Value.ToString());
+    authorCount += CountExpressionsOfType(expression, ExpressionType.Author);
+}
+
+Console.WriteLine($"Found {authorCount} authors in {rules.Length}");
+```
+
 ## Contributing
 
 If you want to contribute feel free to open a pull request\

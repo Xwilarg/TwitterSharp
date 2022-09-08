@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TwitterSharp.Rule;
 
 namespace TwitterSharp.UnitTests
@@ -37,29 +38,29 @@ namespace TwitterSharp.UnitTests
         [TestMethod]
         public void EmptyGroup()
         { 
-            var exp = Expression.Keyword("foo").Or(System.Array.Empty<Expression>());
+            var exp = Expression.Keyword("foo").Or(Array.Empty<Expression>());
             Assert.AreEqual("foo", exp.ToString());
-        }        
+        } 
         
         [TestMethod]
         public void FindExpressionsByType()
         {
-            var exp_1 = Expression.Keyword("Twitter API");
-            var exp_2 = Expression.Hashtag("v2");
-            var exp_a = exp_1.Or(exp_2);
-            var exp_3 = Expression.Keyword("recent search");
-            var exp_3b = exp_3.Negate();
-            var exp_b = exp_a.And(exp_3b);
-            var exp_4 = Expression.Keyword("grumpy");
-            var exp_5 = Expression.Keyword("cat");
-            var exp_c = exp_4.And(exp_5);
-            var exp_6 = Expression.Hashtag("meme");
-            var exp_7 = Expression.HasImages();
-            var exp_8 = Expression.IsRetweet();
-            var exp_8b = exp_8.Negate();
-            var exp_d = exp_6.And(exp_7, exp_8b);
-            var exp_e = exp_c.Or(exp_d);
-            var exp_f = exp_b.Or(exp_e);
+            var exp1 = Expression.Keyword("Twitter API");
+            var exp2 = Expression.Hashtag("v2");
+            var expA = exp1.Or(exp2);
+            var exp3 = Expression.Keyword("recent search");
+            var exp3B = exp3.Negate();
+            var expB = expA.And(exp3B);
+            var exp4 = Expression.Keyword("grumpy");
+            var exp5 = Expression.Keyword("cat");
+            var expC = exp4.And(exp5);
+            var exp6 = Expression.Hashtag("meme");
+            var exp7 = Expression.HasImages();
+            var exp8 = Expression.IsRetweet();
+            var exp8B = exp8.Negate();
+            var expD = exp6.And(exp7, exp8B);
+            var expE = expC.Or(expD);
+            var expF = expB.Or(expE);
 
             int CountExpressionsOfType(Expression expression, ExpressionType type)
             {
@@ -81,11 +82,25 @@ namespace TwitterSharp.UnitTests
                 return i;
             }
 
-            Assert.AreEqual(CountExpressionsOfType(exp_f, ExpressionType.Hashtag), 2);
-            Assert.AreEqual(CountExpressionsOfType(exp_f, ExpressionType.Keyword), 4);
-            Assert.AreEqual(CountExpressionsOfType(exp_f, ExpressionType.And), 3);
-            Assert.AreEqual(CountExpressionsOfType(exp_f, ExpressionType.HasImages), 1);
-            Assert.AreEqual(CountExpressionsOfType(exp_f, ExpressionType.IsRetweet), 1);
+            Assert.AreEqual(CountExpressionsOfType(expF, ExpressionType.Hashtag), 2);
+            Assert.AreEqual(CountExpressionsOfType(expF, ExpressionType.Keyword), 4);
+            Assert.AreEqual(CountExpressionsOfType(expF, ExpressionType.And), 3);
+            Assert.AreEqual(CountExpressionsOfType(expF, ExpressionType.HasImages), 1);
+            Assert.AreEqual(CountExpressionsOfType(expF, ExpressionType.IsRetweet), 1);
+        }
+
+        [TestMethod]
+        public void FailParseExpression()
+        {
+            try
+            {
+                Expression.Parse("expression to fail: following_count:aaa..bbbb");
+                Assert.Fail("Test MUST fail! Not failed");
+            }
+            catch (Exception e)
+            {
+                Assert.AreEqual(e.GetType(), typeof(ArgumentOutOfRangeException));
+            }
         }
 
         [TestMethod]
@@ -172,7 +187,7 @@ namespace TwitterSharp.UnitTests
 
             foreach (var rule in rules)
             {
-                var expression = Expression.ToExpression(rule.ExpressionString);
+                var expression = Expression.Parse(rule.ExpressionString);
                 // strip extra brackets
                 var expressionString = (expression.Type == ExpressionType.And || expression.Type == ExpressionType.Or) && !expression.IsNegate ? expression.ToString().Substring(1, expression.ToString().Length - 2) : expression.ToString();
                 Assert.AreEqual(rule.ExpectedString, expressionString);

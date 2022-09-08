@@ -55,7 +55,12 @@ namespace TwitterSharp.Rule
         public override string ToString()
             => _internal;
 
-        public static Expression ToExpression(string s)
+        /// <summary>
+        /// Parses the given string into an expression with type and expression tree
+        /// </summary>
+        /// <param name="s">Expression string following the rules from <see cref="!:https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule">Building rules for filtered stream</see></param>
+        /// <returns>Expression with type and expression tree</returns>
+        public static Expression Parse(string s)
         {
             const char r = '~'; // replaceCharacter
             
@@ -77,102 +82,102 @@ namespace TwitterSharp.Rule
                 s = ReplaceFirst(s, match.Value, $"{r}q{replacementCount++}{r}");
             }
 
-            List<Expression> expressions = new List<Expression>();
+            var expressions = new List<Expression>();
             var expressionCount = 0;
 
             // Finding most bottom (single) expressions
-            foreach (var stringExpression in s.Replace($" OR ", $" ").Replace($"-(", $"").Replace($"(", $"").Replace($")", $"").Split(' '))
+            foreach (var stringExpression in s.Replace($" OR ", " ").Replace("-(", "").Replace("(", "").Replace(")", "").Split(' '))
             {
                 var isNegate = stringExpression.StartsWith('-') && !stringExpression.Equals("-is:nullcast", StringComparison.InvariantCultureIgnoreCase);
-                var sr = isNegate ? stringExpression.Substring(1) : stringExpression;
+                var sr = isNegate ? stringExpression[1..] : stringExpression;
 
                 if (stringExpression.Contains($"{r}q"))
-                    sr = Regex.Replace(sr, @$"{r}q(\d+){r}", replacements[Int32.Parse(Regex.Match(stringExpression, @"\d+").Value)]);
+                    sr = Regex.Replace(sr, @$"{r}q(\d+){r}", replacements[int.Parse(Regex.Match(stringExpression, @"\d+").Value)]);
 
                 if (sr.StartsWith('#'))
-                    AddExpression(Expression.Hashtag(sr.Substring(1)));
+                    AddExpression(Hashtag(sr[1..]));
                 else if (sr.StartsWith('$'))
-                    AddExpression(Expression.Cashtag(sr.Substring(1)));
+                    AddExpression(Cashtag(sr[1..]));
                 else if (sr.StartsWith('@'))
-                    AddExpression(Expression.Mention(sr.Substring(1)));
+                    AddExpression(Mention(sr[1..]));
                 else if (sr.StartsWith("from:"))
-                    AddExpression(Expression.Author(sr.Replace("from:", "")));
+                    AddExpression(Author(sr.Replace("from:", "")));
                 else if (sr.StartsWith("to:"))
-                    AddExpression(Expression.Recipient(sr.Replace("to:", "")));
+                    AddExpression(Recipient(sr.Replace("to:", "")));
                 else if (sr.StartsWith("url:"))
-                    AddExpression(Expression.Url(sr.Replace("url:", "")));
+                    AddExpression(Url(sr.Replace("url:", "")));
                 else if (sr.StartsWith("retweets_of:"))
-                    AddExpression(Expression.Retweet(sr.Replace("retweets_of:", "")));
+                    AddExpression(Retweet(sr.Replace("retweets_of:", "")));
                 else if (sr.StartsWith("retweets_of_user:")) // Alias
-                    AddExpression(Expression.Retweet(sr.Replace("retweets_of:", "")));
+                    AddExpression(Retweet(sr.Replace("retweets_of:", "")));
                 else if (sr.StartsWith("context:"))
-                    AddExpression(Expression.Context(sr.Replace("context:", "")));
+                    AddExpression(Context(sr.Replace("context:", "")));
                 else if (sr.StartsWith("entity:"))
-                    AddExpression(Expression.Entity(sr.Replace("entity:", "")));
+                    AddExpression(Entity(sr.Replace("entity:", "")));
                 else if (sr.StartsWith("conversation_id:"))
-                    AddExpression(Expression.ConversationId(sr.Replace("conversation_id:", "")));
+                    AddExpression(ConversationId(sr.Replace("conversation_id:", "")));
                 else if (sr.StartsWith("bio:"))
-                    AddExpression(Expression.Bio(sr.Replace("bio:", "")));
+                    AddExpression(Bio(sr.Replace("bio:", "")));
                 else if (sr.StartsWith("user_bio:")) // Alias
-                    AddExpression(Expression.Bio(sr.Replace("bio:", "")));
+                    AddExpression(Bio(sr.Replace("bio:", "")));
                 else if (sr.StartsWith("bio_location:"))
-                    AddExpression(Expression.BioLocation(sr.Replace("bio_location:", "")));
+                    AddExpression(BioLocation(sr.Replace("bio_location:", "")));
                 else if (sr.StartsWith("user_bio_location:")) // Alias
-                    AddExpression(Expression.BioLocation(sr.Replace("bio_location:", "")));
+                    AddExpression(BioLocation(sr.Replace("bio_location:", "")));
                 else if (sr.StartsWith("place:"))
-                    AddExpression(Expression.Place(sr.Replace("place:", "")));
+                    AddExpression(Place(sr.Replace("place:", "")));
                 else if (sr.StartsWith("place_country:"))
-                    AddExpression(Expression.PlaceCountry(sr.Replace("place_country:", "")));
+                    AddExpression(PlaceCountry(sr.Replace("place_country:", "")));
                 else if (sr.StartsWith("point_radius:"))
                 {
                     var coordinates = sr.Replace("point_radius:", "").Replace("[", "").Replace("]", "").Split(' ');
                     var unit = coordinates[2].EndsWith("km") ? RadiusUnit.Kilometer : RadiusUnit.Mile;
-                    AddExpression(Expression.PointRadius(coordinates[0], coordinates[1], coordinates[2].Substring(0, coordinates[2].Length-2), unit));
+                    AddExpression(PointRadius(coordinates[0], coordinates[1], coordinates[2][..^2], unit));
                 }
                 else if (sr.StartsWith("bounding_box:"))
                 {
                     var coordinates = sr.Replace("bounding_box:", "").Replace("[", "").Replace("]", "").Split(' ');
-                    AddExpression(Expression.BoundingBox(coordinates[0],coordinates[1],coordinates[2],coordinates[3]));
+                    AddExpression(BoundingBox(coordinates[0],coordinates[1],coordinates[2],coordinates[3]));
                 }
                 else if (sr.StartsWith("geo_bounding_box:")) // Alias
                 {
                     var coordinates = sr.Replace("geo_bounding_box:", "").Replace("[", "").Replace("]", "").Split(' ');
-                    AddExpression(Expression.BoundingBox(coordinates[0],coordinates[1],coordinates[2],coordinates[3]));
+                    AddExpression(BoundingBox(coordinates[0],coordinates[1],coordinates[2],coordinates[3]));
                 }
                 else if (sr.StartsWith("sample:"))
-                    AddExpression(Expression.Sample(Int32.Parse(sr.Replace("sample:", ""))));
+                    AddExpression(Sample(int.Parse(sr.Replace("sample:", ""))));
                 else if (sr.StartsWith("lang:"))
-                    AddExpression(Expression.Lang(sr.Replace("lang:", "")));
+                    AddExpression(Lang(sr.Replace("lang:", "")));
                 else if (sr == "is:retweet")
-                    AddExpression(Expression.IsRetweet());
+                    AddExpression(IsRetweet());
                 else if (sr == "is:reply")
-                    AddExpression(Expression.IsReply());
+                    AddExpression(IsReply());
                 else if (sr == "is:quote")
-                    AddExpression(Expression.IsQuote());
+                    AddExpression(IsQuote());
                 else if (sr == "is:verified")
-                    AddExpression(Expression.IsVerified());
+                    AddExpression(IsVerified());
                 else if (sr == "-is:nullcast")
-                    AddExpression(Expression.IsNotNullcast());
+                    AddExpression(IsNotNullcast());
                 else if (sr == "has:hashtags")
-                    AddExpression(Expression.HasHashtags());
+                    AddExpression(HasHashtags());
                 else if (sr == "has:cashtags")
-                    AddExpression(Expression.HasCashtags());
+                    AddExpression(HasCashtags());
                 else if (sr == "has:links")
-                    AddExpression(Expression.HasLinks());
+                    AddExpression(HasLinks());
                 else if (sr == "has:mentions")
-                    AddExpression(Expression.HasMentions());
+                    AddExpression(HasMentions());
                 else if (sr == "has:media")
-                    AddExpression(Expression.HasMedia());
+                    AddExpression(HasMedia());
                 else if (sr == "has:media_link") // Alias
-                    AddExpression(Expression.HasMedia());
+                    AddExpression(HasMedia());
                 else if (sr == "has:images")
-                    AddExpression(Expression.HasImages());
+                    AddExpression(HasImages());
                 else if (sr == "has:videos")
-                    AddExpression(Expression.HasVideos());
+                    AddExpression(HasVideos());
                 else if (sr == "has:video_link") // Alias
-                    AddExpression(Expression.HasVideos());
+                    AddExpression(HasVideos());
                 else if (sr == "has:geo")
-                    AddExpression(Expression.HasGeo());
+                    AddExpression(HasGeo());
                 else if (sr.StartsWith("followers_count:"))
                     AddCountExpression(sr, "followers_count:");
                 else if (sr.StartsWith("tweets_count:"))
@@ -188,47 +193,49 @@ namespace TwitterSharp.Rule
                 else if (sr.StartsWith("user_in_lists_count:")) // Alias
                     AddCountExpression(sr, "user_in_lists_count:");
                 else if (sr.StartsWith("url_title:"))
-                    AddExpression(Expression.UrlTitle(sr.Replace("url_title:", "")));
+                    AddExpression(UrlTitle(sr.Replace("url_title:", "")));
                 else if (sr.StartsWith("within_url_title:")) // Alias
-                    AddExpression(Expression.UrlTitle(sr.Replace("within_url_title:", "")));
+                    AddExpression(UrlTitle(sr.Replace("within_url_title:", "")));
                 else if (sr.StartsWith("url_description:"))
-                    AddExpression(Expression.UrlDescription(sr.Replace("url_description:", "")));
+                    AddExpression(UrlDescription(sr.Replace("url_description:", "")));
                 else if (sr.StartsWith("within_url_description:")) // Alias
-                    AddExpression(Expression.UrlDescription(sr.Replace("within_url_description:", "")));
+                    AddExpression(UrlDescription(sr.Replace("within_url_description:", "")));
                 else if (sr.StartsWith("url_contains:"))
-                    AddExpression(Expression.UrlContains(sr.Replace("url_contains:", "")));
+                    AddExpression(UrlContains(sr.Replace("url_contains:", "")));
                 else if (sr.StartsWith("source:"))
-                    AddExpression(Expression.Source(sr.Replace("source:", "")));
+                    AddExpression(Source(sr.Replace("source:", "")));
                 else if (sr.StartsWith("in_reply_to_tweet_id:"))
-                    AddExpression(Expression.InReplyToTweetId(long.Parse(sr.Replace("in_reply_to_tweet_id:", ""))));
+                    AddExpression(InReplyToTweetId(long.Parse(sr.Replace("in_reply_to_tweet_id:", ""))));
                 else if (sr.StartsWith("in_reply_to_status_id:"))
-                    AddExpression(Expression.InReplyToTweetId(long.Parse(sr.Replace("in_reply_to_status_id:", ""))));
+                    AddExpression(InReplyToTweetId(long.Parse(sr.Replace("in_reply_to_status_id:", ""))));
                 else if (sr.StartsWith("retweets_of_tweet_id:"))
-                    AddExpression(Expression.RetweetsOfTweetId(long.Parse(sr.Replace("retweets_of_tweet_id:", ""))));
+                    AddExpression(RetweetsOfTweetId(long.Parse(sr.Replace("retweets_of_tweet_id:", ""))));
                 else if (sr.StartsWith("retweets_of_status_id:"))
-                    AddExpression(Expression.RetweetsOfTweetId(long.Parse(sr.Replace("retweets_of_status_id:", ""))));
+                    AddExpression(RetweetsOfTweetId(long.Parse(sr.Replace("retweets_of_status_id:", ""))));
                 else
-                    AddExpression(Expression.Keyword(sr));
+                    AddExpression(Keyword(sr));
 
-                void AddCountExpression(string sr, string searchString)
+                void AddCountExpression(string countExpressionString, string searchString)
                 {
-                    if (sr.Contains(".."))
+                    if (countExpressionString.Contains(".."))
                     {
-                        var matches = Regex.Matches(sr, @"\d+");
+                        var matches = Regex.Matches(countExpressionString, @"\d+");
+
                         switch (searchString)
                         {
-                            case "followers_count:": AddExpression(FollowersCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
-                            case "tweets_count:": AddExpression(TweetsCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
-                            case "statuses_count:": AddExpression(TweetsCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
-                            case "following_count:": AddExpression(FollowingCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
-                            case "friends_count:": AddExpression(FollowingCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
-                            case "listed_count:": AddExpression(ListedCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
-                            case "user_in_lists_count:": AddExpression(ListedCount(Int32.Parse(matches[0].Value), Int32.Parse(matches[1].Value))); break;
+                            case "followers_count:": AddExpression(FollowersCount(int.Parse(matches[0].Value), int.Parse(matches[1].Value))); break;
+                            case "tweets_count:": AddExpression(TweetsCount(int.Parse(matches[0].Value), int.Parse(matches[1].Value))); break;
+                            case "statuses_count:": AddExpression(TweetsCount(int.Parse(matches[0].Value), int.Parse(matches[1].Value))); break;
+                            case "following_count:": AddExpression(FollowingCount(int.Parse(matches[0].Value), int.Parse(matches[1].Value))); break;
+                            case "friends_count:": AddExpression(FollowingCount(int.Parse(matches[0].Value), int.Parse(matches[1].Value))); break;
+                            case "listed_count:": AddExpression(ListedCount(int.Parse(matches[0].Value), int.Parse(matches[1].Value))); break;
+                            case "user_in_lists_count:": AddExpression(ListedCount(int.Parse(matches[0].Value), int.Parse(matches[1].Value))); break;
                         }
                     }
-                    else if (sr.StartsWith(searchString))
+                    else if (countExpressionString.StartsWith(searchString))
                     {
-                        var count = Int32.Parse(sr.Replace(searchString, ""));
+                        var count = int.Parse(countExpressionString.Replace(searchString, ""));
+
                         switch (searchString)
                         {
                             case "followers_count:": AddExpression(FollowersCount(count)); break;
@@ -255,12 +262,12 @@ namespace TwitterSharp.Rule
 
             string ReplaceFirst(string text, string search, string replace)
             {
-                int pos = text.IndexOf(search);
+                int pos = text.IndexOf(search, StringComparison.Ordinal);
                 if (pos < 0)
                 {
                     return text;
                 }
-                return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+                return text[..pos] + replace + text[(pos + search.Length)..];
             }
 
             // Find groups recursive
@@ -293,7 +300,7 @@ namespace TwitterSharp.Rule
                             ors[i] = $"({ors[i]})";
                     }
 
-                    s = String.Join(" OR ", ors);
+                    s = string.Join(" OR ", ors);
                     FindGroups();
                 }
                 else
@@ -318,10 +325,10 @@ namespace TwitterSharp.Rule
                 foreach (var k in group.Key)
                 {
                     var index = Regex.Match(k, @"\d+").Value;
-                    groupExpression.Add(expressions[Int32.Parse(index)]);
+                    groupExpression.Add(expressions[int.Parse(index)]);
                     
                     if (k.StartsWith('-'))
-                        expressions[Int32.Parse(index)].Negate();
+                        expressions[int.Parse(index)].Negate();
                 }
 
                 if(groupExpression.Count > 1)
@@ -468,6 +475,7 @@ namespace TwitterSharp.Rule
         /// <param name="latitude">Must be in decimal degree, is in range of ±180</param>
         /// <param name="longitude">Must be in decimal degree, is in range of ±90</param>
         /// <param name="radius">Must be less than 25 miles</param>
+        /// <param name="radiusUnit">km or mi</param>
         public static Expression PointRadius(string longitude, string latitude, string radius, RadiusUnit radiusUnit)
             => new($"point_radius:[{longitude} {latitude} {radius}{(radiusUnit == RadiusUnit.Kilometer ? "km" : "mi")}]", "", ExpressionType.PointRadius);
 
