@@ -251,10 +251,7 @@ namespace TwitterSharp.Rule
 
                 void AddExpression(Expression exp)
                 {
-                    if (isNegate)
-                        expressions.Add(exp.Negate());
-                    else
-                        expressions.Add(exp);
+                    expressions.Add(isNegate ? exp.Negate() : exp);
                 }
 
                 s = ReplaceFirst(s, stringExpression, $"{r}e{expressionCount++}{r}");
@@ -262,7 +259,7 @@ namespace TwitterSharp.Rule
 
             string ReplaceFirst(string text, string search, string replace)
             {
-                int pos = text.IndexOf(search, StringComparison.Ordinal);
+                var pos = text.IndexOf(search, StringComparison.Ordinal);
                 if (pos < 0)
                 {
                     return text;
@@ -297,7 +294,9 @@ namespace TwitterSharp.Rule
                     for (int i = 0; i <= ors.Length-1; i++)
                     {
                         if (ors[i].Contains(' '))
+                        {
                             ors[i] = $"({ors[i]})";
+                        }
                     }
 
                     s = string.Join(" OR ", ors);
@@ -311,9 +310,13 @@ namespace TwitterSharp.Rule
                 void AddToGroup(string ga)
                 {
                     if (ga.Contains(" OR "))
+                    {
                         groups.Add(ga.Split(" OR "), false);
+                    }
                     else
+                    {
                         groups.Add(ga.Split(" "), true);
+                    }
                 }
             }
 
@@ -328,15 +331,16 @@ namespace TwitterSharp.Rule
                     groupExpression.Add(expressions[int.Parse(index)]);
                     
                     if (k.StartsWith('-'))
+                    {
                         expressions[int.Parse(index)].Negate();
+                    }
                 }
 
                 if (groupExpression.Count > 1)
                 {
-                    if (group.Value) // true is And / false is Or
-                        expressions.Add(groupExpression[0].And(groupExpression.Skip(1).ToArray()));
-                    else
-                        expressions.Add(groupExpression[0].Or(groupExpression.Skip(1).ToArray()));
+                    expressions.Add(group.Value // true is And / false is Or
+                        ? groupExpression[0].And(groupExpression.Skip(1).ToArray())
+                        : groupExpression[0].Or(groupExpression.Skip(1).ToArray()));
                 }
             }
 
