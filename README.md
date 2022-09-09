@@ -123,6 +123,31 @@ Task.Run(async () =>
 await client.AddTweetStreamAsync(new TwitterSharp.Request.StreamRequest( Expression.Author("Every3Minutes"), "Frequent"));
 ```
 
+### Search the expression tree
+```cs
+var expressionString = "(@twitterdev OR @twitterapi) -@twitter";
+// Parse the string into an expression with a typed expression tree
+var parsedExpression = Expression.Parse(expressionString);
+
+var mentionsCount = CountExpressionsOfType(parsedExpression, ExpressionType.Mention);
+var groupsCount = CountExpressionsOfType(parsedExpression, ExpressionType.And) + CountExpressionsOfType(parsedExpression, ExpressionType.Or);;
+
+Console.WriteLine($"Found {mentionsCount} mentions and {groupsCount} groups in the expression"); // Found 3 mentions and 2 groups in the expression
+
+// Helper function to count recursive
+int CountExpressionsOfType(Expression expression, ExpressionType type)
+{
+    var i = expression.Type == type ? 1 : 0;
+
+    if (expression.Expressions != null)
+    {
+        i += expression.Expressions.Sum(exp => CountExpressionsOfType(exp, type));
+    }
+
+    return i;
+}
+```
+
 ## Contributing
 
 If you want to contribute feel free to open a pull request\
