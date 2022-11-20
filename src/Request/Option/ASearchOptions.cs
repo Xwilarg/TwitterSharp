@@ -59,6 +59,10 @@ namespace TwitterSharp.Request.Option
                     {
                         return "attachments";
                     }
+                    if (x == TweetOption.Author_Id)
+                    {
+                        return "author_id";
+                    }
                     return x.ToString().ToLowerInvariant();
                 }));
             }

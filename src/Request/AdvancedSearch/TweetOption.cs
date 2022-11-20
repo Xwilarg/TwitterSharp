@@ -11,6 +11,11 @@
         // promoted_metrics
 
         /// <summary>
+        /// The ID of the author of the tweet
+        /// </summary>
+        Author_Id,
+
+        /// <summary>
         /// The ID of the tweet this one is replying to
         /// </summary>
         Conversation_Id,
