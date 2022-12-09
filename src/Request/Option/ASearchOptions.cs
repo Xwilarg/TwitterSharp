@@ -7,7 +7,7 @@ namespace TwitterSharp.Request.Option
     public abstract class ASearchOptions
     {
         /// <summary>
-        /// Max number of results returned by the API
+        /// Max number of results returned by the API or the maximum number of results to be returned per page
         /// </summary>
         public int? Limit { set; get; }
 
