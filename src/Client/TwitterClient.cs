@@ -214,12 +214,35 @@ namespace TwitterSharp.Client
         /// Get the latest tweets of an user
         /// </summary>
         /// <param name="userId">Username of the user you want the tweets of</param>
-        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetSearchOptions options = null)
+        public async Task<RTweets> GetTweetsFromUserIdAsync(string userId, TweetSearchOptions options = null)
         {
-            options ??= new();
-            var res = await _httpClient.GetAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true));
+            options ??= new(); 
+            var query = _baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true);
+
+            var res = await _httpClient.GetAsync(query);
             BuildRateLimit(res.Headers, Endpoint.UserTweetTimeline);
-            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
+            var data = ParseData<Tweet[]>(await res.Content.ReadAsStringAsync());
+            return new()
+            {
+                Tweets = data.Data,
+                NextAsync = data.Meta.NextToken == null ? null : async () => await NextTweetsAsync(query, data.Meta.NextToken, Endpoint.UserTweetTimeline)
+            };
+        }
+
+        /// <summary>
+        /// General method for getting the next page of tweets
+        /// </summary>
+        /// <returns></returns>
+        private async Task<RTweets> NextTweetsAsync(string baseQuery, string token, Endpoint endpoint)
+        {
+            var res = await _httpClient.GetAsync(baseQuery + (!baseQuery.EndsWith("?") ? "&" : "") + "pagination_token=" + token);
+            var data = ParseData<Tweet[]>(await res.Content.ReadAsStringAsync());
+            BuildRateLimit(res.Headers, endpoint);
+            return new()
+            {
+                Tweets = data.Data,
+                NextAsync = data.Meta.NextToken == null ? null : async () => await NextTweetsAsync(baseQuery, data.Meta.NextToken, endpoint)
+            };
         }
 
         /// <summary>
