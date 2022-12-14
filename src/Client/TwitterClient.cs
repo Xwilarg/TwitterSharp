@@ -237,7 +237,7 @@ namespace TwitterSharp.Client
         private async Task<RTweets> NextTweetsAsync(string baseQuery, string token, Endpoint endpoint)
         {
             var res = await _httpClient.GetAsync(baseQuery + (!baseQuery.EndsWith("?") ? "&" : "") + "pagination_token=" + token);
-            var data = ParseData<Tweet[]>(await res.Content.ReadAsStringAsync());
+            var data = ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
             BuildRateLimit(res.Headers, endpoint);
             return new()
             {
