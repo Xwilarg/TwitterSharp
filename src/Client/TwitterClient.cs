@@ -194,7 +194,7 @@ namespace TwitterSharp.Client
         public async Task<Tweet> GetTweetAsync(string id, TweetSearchOptions options = null)
         {
             options ??= new();
-            var res = await _httpClient.GetAsync(_baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + options.Build(true));
+            var query = _baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + options.Build(true);
 
             var res = await _httpClient.GetAsync(query);
             BuildRateLimit(res.Headers, Endpoint.GetTweetById);
