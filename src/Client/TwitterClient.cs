@@ -205,20 +205,14 @@ namespace TwitterSharp.Client
         /// Get a list of tweet given their IDs
         /// </summary>
         /// <param name="ids">All the IDs you want the tweets of</param>
-        public async Task<RList<Tweet>> GetTweetsAsync(string[] ids, TweetSearchOptions options = null)
+        public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetSearchOptions options = null)
         {
             options ??= new();
-            var query = _baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + options.Build(true);
 
-            var res = await _httpClient.GetAsync(query);
+            var res = await _httpClient.GetAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + options.Build(true));
             BuildRateLimit(res.Headers, Endpoint.GetTweetsByIds);
-            var data = ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
-            var meta = data.Meta;
-            return new()
-            {
-                Data = data.Data,
-                NextAsync = data.Meta == null ? null : (data.Meta.NextToken == null ? null : async () => await NextAsync<Tweet>(query, data.Meta.NextToken, Endpoint.UserTweetTimeline))
-            };
+            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync()).Data;
+            
         }
 
         /// <summary>
@@ -257,7 +251,7 @@ namespace TwitterSharp.Client
             return new()
             {
                 Data = data.Data,
-                NextAsync = data.Meta == null ? null : (data.Meta.NextToken == null ? null : async () => await NextAsync<Tweet>(query, data.Meta.NextToken, Endpoint.UserTweetTimeline))
+                NextAsync = data.Meta == null ? null : (data.Meta.NextToken == null ? null : async () => await NextAsync<Tweet>(query, data.Meta.NextToken, Endpoint.RecentSearch))
             };
         }
         
@@ -278,7 +272,7 @@ namespace TwitterSharp.Client
             return new()
             {
                 Data = data.Data,
-                NextAsync = data.Meta.NextToken == null ? null : async () => await NextAsync<Tweet>(query, data.Meta.NextToken, Endpoint.UserTweetTimeline)
+                NextAsync = data.Meta.NextToken == null ? null : async () => await NextAsync<Tweet>(query, data.Meta.NextToken, Endpoint.FullArchiveSearch)
             };
         }
 
@@ -532,6 +526,22 @@ namespace TwitterSharp.Client
 
         #region General
 
+
+        /// <summary>
+        /// General method for getting the next page with meta token
+        /// </summary>
+        /// <returns></returns>
+        private async Task<RList<T>> RequestList<T>(string baseQuery, string token, Endpoint endpoint)
+        {
+            var res = await _httpClient.GetAsync(baseQuery + (!baseQuery.EndsWith("?") ? "&" : "") + "pagination_token=" + token);
+            var data = ParseArrayData<T>(await res.Content.ReadAsStringAsync());
+            BuildRateLimit(res.Headers, endpoint);
+            return new()
+            {
+                Data = data.Data,
+                NextAsync = data.Meta.NextToken == null ? null : async () => await NextAsync<T>(baseQuery, data.Meta.NextToken, endpoint)
+            };
+        }
 
         /// <summary>
         /// General method for getting the next page with meta token

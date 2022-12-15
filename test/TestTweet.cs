@@ -19,11 +19,11 @@ namespace TwitterSharp.UnitTests
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
             var answer = await client.GetTweetsAsync(new[] { "1389189291582967809" });
-            Assert.IsTrue(answer.Data.Length == 1);
-            Assert.AreEqual("1389189291582967809", answer.Data[0].Id);
-            Assert.AreEqual("たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN", answer.Data[0].Text);
-            Assert.IsNull(answer.Data[0].Author);
-            Assert.IsNull(answer.Data[0].PossiblySensitive);
+            Assert.IsTrue(answer.Length == 1);
+            Assert.AreEqual("1389189291582967809", answer[0].Id);
+            Assert.AreEqual("たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN", answer[0].Text);
+            Assert.IsNull(answer[0].Author);
+            Assert.IsNull(answer[0].PossiblySensitive);
         }
 
         [TestMethod]
@@ -46,13 +46,13 @@ namespace TwitterSharp.UnitTests
                 TweetOptions = new[] { TweetOption.Possibly_Sensitive },
                 UserOptions = Array.Empty<UserOption>()
             });
-            Assert.IsTrue(answer.Data.Length == 1);
-            Assert.AreEqual("1389189291582967809", answer.Data[0].Id);
-            Assert.AreEqual("たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN", answer.Data[0].Text);
-            Assert.IsNotNull(answer.Data[0].Author);
-            Assert.IsNotNull(answer.Data[0].PossiblySensitive);
-            Assert.AreEqual("kiryucoco", answer.Data[0].Author.Username);
-            Assert.IsFalse(answer.Data[0].PossiblySensitive.Value);
+            Assert.IsTrue(answer.Length == 1);
+            Assert.AreEqual("1389189291582967809", answer[0].Id);
+            Assert.AreEqual("たのしみ！！\uD83D\uDC93 https://t.co/DgBYVYr9lN", answer[0].Text);
+            Assert.IsNotNull(answer[0].Author);
+            Assert.IsNotNull(answer[0].PossiblySensitive);
+            Assert.AreEqual("kiryucoco", answer[0].Author.Username);
+            Assert.IsFalse(answer[0].PossiblySensitive.Value);
         }
 
         [TestMethod]
@@ -60,13 +60,13 @@ namespace TwitterSharp.UnitTests
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
             var answer = await client.GetTweetsAsync(new[] { "1389330151779930113", "1389331863102128130" });
-            Assert.IsTrue(answer.Data.Length == 2);
-            Assert.AreEqual("1389330151779930113", answer.Data[0].Id);
-            Assert.AreEqual("ねむくなーい！ねむくないねむくない！ドタドタドタドタ", answer.Data[0].Text);
-            Assert.IsNull(answer.Data[0].Author);
-            Assert.AreEqual("1389331863102128130", answer.Data[1].Id);
-            Assert.AreEqual("( - ω・ )", answer.Data[1].Text);
-            Assert.IsNull(answer.Data[1].Author);
+            Assert.IsTrue(answer.Length == 2);
+            Assert.AreEqual("1389330151779930113", answer[0].Id);
+            Assert.AreEqual("ねむくなーい！ねむくないねむくない！ドタドタドタドタ", answer[0].Text);
+            Assert.IsNull(answer[0].Author);
+            Assert.AreEqual("1389331863102128130", answer[1].Id);
+            Assert.AreEqual("( - ω・ )", answer[1].Text);
+            Assert.IsNull(answer[1].Author);
         }
 
         [TestMethod]
@@ -77,15 +77,15 @@ namespace TwitterSharp.UnitTests
             {
                 UserOptions = Array.Empty<UserOption>()
             });
-            Assert.IsTrue(answer.Data.Length == 2);
-            Assert.AreEqual("1389330151779930113", answer.Data[0].Id);
-            Assert.AreEqual("ねむくなーい！ねむくないねむくない！ドタドタドタドタ", answer.Data[0].Text);
-            Assert.IsNotNull(answer.Data[0].Author);
-            Assert.AreEqual("tsunomakiwatame", answer.Data[0].Author.Username);
-            Assert.AreEqual("1389331863102128130", answer.Data[1].Id);
-            Assert.AreEqual("( - ω・ )", answer.Data[1].Text);
-            Assert.IsNotNull(answer.Data[1].Author);
-            Assert.AreEqual("tsunomakiwatame", answer.Data[1].Author.Username);
+            Assert.IsTrue(answer.Length == 2);
+            Assert.AreEqual("1389330151779930113", answer[0].Id);
+            Assert.AreEqual("ねむくなーい！ねむくないねむくない！ドタドタドタドタ", answer[0].Text);
+            Assert.IsNotNull(answer[0].Author);
+            Assert.AreEqual("tsunomakiwatame", answer[0].Author.Username);
+            Assert.AreEqual("1389331863102128130", answer[1].Id);
+            Assert.AreEqual("( - ω・ )", answer[1].Text);
+            Assert.IsNotNull(answer[1].Author);
+            Assert.AreEqual("tsunomakiwatame", answer[1].Author.Username);
         }
 
         [TestMethod]
