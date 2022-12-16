@@ -160,7 +160,7 @@ namespace TwitterSharp.UnitTests
         }
 
         [TestMethod]
-        public async Task GetTweetsFromUserIdWithNextToken()
+        public async Task GetTweetsFromUserIdWithNextTokenAndPreviousToken()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
             var answer = await client.GetTweetsFromUserIdAsync("1109748792721432577");
@@ -171,6 +171,10 @@ namespace TwitterSharp.UnitTests
 
             Assert.IsTrue(nextAnswer.Data.Length == 10);
 
+            var previousAnswer = await nextAnswer.PreviousAsync();  
+
+            Assert.IsTrue(previousAnswer.Data.Length == 10);
+            Assert.IsTrue(previousAnswer.Data[0].Id.Equals(answer.Data[0].Id));
         }
 
         [TestMethod]

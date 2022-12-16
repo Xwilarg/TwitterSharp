@@ -488,7 +488,8 @@ namespace TwitterSharp.Client
             return new()
             {
                 Data = data.Data,
-                NextAsync = data.Meta.NextToken == null ? null : async () => await RequestList<T>(baseQuery, endpoint, data.Meta.NextToken)
+                NextAsync = data.Meta.NextToken == null ? null : async () => await RequestList<T>(baseQuery, endpoint, data.Meta.NextToken),
+                PreviousAsync = data.Meta.PreviousToken == null ? null : async () => await RequestList<T>(baseQuery, endpoint, data.Meta.PreviousToken)
             };
         }
 

@@ -32,6 +32,7 @@ namespace TwitterSharp.Response
     {
         public Summary Summary { init; get; }
         public string NextToken { init; get; }
+        public string PreviousToken { init; get; }
     }
 
     internal class Summary
