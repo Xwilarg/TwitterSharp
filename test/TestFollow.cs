@@ -12,7 +12,7 @@ namespace TwitterSharp.UnitTests
     [TestClass]
     public class TestFollow
     {
-        private async Task<bool> ContainsFollowAsync(string username, RList<User> rUsers)
+        private async Task<bool> ContainsFollowAsync(string username, RArray<User> rUsers)
         {
             if (rUsers.Data.Any(x => x.Username == username))
             {

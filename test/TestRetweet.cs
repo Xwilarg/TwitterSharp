@@ -12,7 +12,7 @@ namespace TwitterSharp.UnitTests
     [TestClass]
     public class TestRetweet
     {
-        private async Task<bool> ContainsUserAsync(string username, RList<User> rUsers)
+        private async Task<bool> ContainsUserAsync(string username, RArray<User> rUsers)
         {
             if (rUsers.Data.Any(x => x.Username == username))
             {

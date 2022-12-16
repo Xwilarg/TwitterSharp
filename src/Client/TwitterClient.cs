@@ -220,7 +220,7 @@ namespace TwitterSharp.Client
         /// Get the latest tweets of an user
         /// </summary>
         /// <param name="userId">Username of the user you want the tweets of</param>
-        public async Task<RList<Tweet>> GetTweetsFromUserIdAsync(string userId, TweetSearchOptions options = null)
+        public async Task<RArray<Tweet>> GetTweetsFromUserIdAsync(string userId, TweetSearchOptions options = null)
         {
             options ??= new(); 
             var query = _baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true);
@@ -233,7 +233,7 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="expression">An expression to build the query <seealso cref="https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query"/></param>
         /// <param name="options">properties send with the tweet</param>
-        public async Task<RList<Tweet>> GetRecentTweets(Expression expression, TweetSearchOptions options = null)
+        public async Task<RArray<Tweet>> GetRecentTweets(Expression expression, TweetSearchOptions options = null)
         {
             options ??= new();
             var query = _baseUrl + "tweets/search/recent?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true);
@@ -246,7 +246,7 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="expression">An expression to build the query <seealso cref="https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query"/></param>
         /// <param name="options">properties send with the tweet</param>
-        public async Task<RList<Tweet>> GetAllTweets(Expression expression, TweetSearchOptions options = null)
+        public async Task<RArray<Tweet>> GetAllTweets(Expression expression, TweetSearchOptions options = null)
         {
             options ??= new();
             var query = _baseUrl + "tweets/search/all?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true);
@@ -427,7 +427,7 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="id">ID of the user</param>
         /// <param name="limit">Max number of result, max is 1000</param>
-        public async Task<RList<User>> GetFollowersAsync(string id, UserSearchOptions options = null)
+        public async Task<RArray<User>> GetFollowersAsync(string id, UserSearchOptions options = null)
         {
             options ??= new();
             var query = _baseUrl + $"users/{HttpUtility.UrlEncode(id)}/followers?{options.Build(false)}";
@@ -439,7 +439,7 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="id">ID of the user</param>
         /// <param name="limit">Max number of result, max is 1000</param>
-        public async Task<RList<User>> GetFollowingAsync(string id, UserSearchOptions options = null)
+        public async Task<RArray<User>> GetFollowingAsync(string id, UserSearchOptions options = null)
         {
             options ??= new();
             var query = _baseUrl + $"users/{HttpUtility.UrlEncode(id)}/following?{options.Build(false)}";
@@ -451,7 +451,7 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="id">ID of the tweet</param>
         /// <param name="options">This parameter enables you to select which specific user fields will deliver with each returned users objects. You can also set a Limit per page. Max is 100</param>
-        public async Task<RList<User>> GetLikesAsync(string id, UserSearchOptions options = null)
+        public async Task<RArray<User>> GetLikesAsync(string id, UserSearchOptions options = null)
         {
             options ??= new();
             var query = _baseUrl + $"tweets/{HttpUtility.UrlEncode(id)}/liking_users?{options.Build(false)}";
@@ -463,7 +463,7 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="id">ID of the tweet</param>
         /// <param name="options">This parameter enables you to select which specific user fields will deliver with each returned users objects. You can also set a Limit per page. Max is 100</param>
-        public async Task<RList<User>> GetRetweetsAsync(string id, UserSearchOptions options = null)
+        public async Task<RArray<User>> GetRetweetsAsync(string id, UserSearchOptions options = null)
         {
             options ??= new();
             var query = _baseUrl + $"tweets/{HttpUtility.UrlEncode(id)}/retweeted_by?{options.Build(false)}";
@@ -480,7 +480,7 @@ namespace TwitterSharp.Client
         /// General method for getting the next page with meta token
         /// </summary>
         /// <returns></returns>
-        private async Task<RList<T>> RequestList<T>(string baseQuery, Endpoint endpoint, string token = null)
+        private async Task<RArray<T>> RequestList<T>(string baseQuery, Endpoint endpoint, string token = null)
         {
             var res = await _httpClient.GetAsync(baseQuery + (string.IsNullOrEmpty(token) ? "" : (!baseQuery.EndsWith("?") ? "&" : "") +  "pagination_token=" + token));
             var data = ParseArrayData<T>(await res.Content.ReadAsStringAsync());
