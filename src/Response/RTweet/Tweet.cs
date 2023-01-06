@@ -51,10 +51,6 @@ namespace TwitterSharp.Response.RTweet
         /// </summary>
         public TweetPublicMetrics PublicMetrics { init; get; }
         /// <summary>
-        /// Name of the device that was used to make the tweet
-        /// </summary>
-        public string Source { init; get; }
-        /// <summary>
         /// Tweet that were referenced by this one
         /// </summary>
         public ReferencedTweet[] ReferencedTweets { init; get; }

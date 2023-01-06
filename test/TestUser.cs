@@ -68,6 +68,22 @@ namespace TwitterSharp.UnitTests
             Assert.IsNotNull(answer[0].PublicMetrics);
             Assert.IsFalse(answer[0].Verified != null && answer[0].Verified.Value);
             Assert.IsFalse(answer[0].Protected != null && answer[0].Protected.Value);
+            Assert.IsNull(answer[0].VerifiedType);
+        }
+
+        [TestMethod]
+        public async Task GetUserWithVerifiedTypeAsync()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var answer = await client.GetUsersAsync(new[] { "theindra5", "TwitterDev", "NorwayMFA", "elonmusk" }, new UserSearchOptions
+            {
+                UserOptions = new[] { UserOption.Verified_Type }
+            });
+            Assert.IsTrue(answer.Length == 4);
+            Assert.IsTrue(answer[0].VerifiedType != null && answer[0].VerifiedType == "none");
+            Assert.IsTrue(answer[1].VerifiedType != null && answer[1].VerifiedType == "business");
+            Assert.IsTrue(answer[2].VerifiedType != null && answer[2].VerifiedType == "government");
+            Assert.IsTrue(answer[3].VerifiedType != null && answer[3].VerifiedType == "blue");
         }
     }
 }

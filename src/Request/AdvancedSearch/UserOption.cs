@@ -51,7 +51,12 @@
         /// <summary>
         /// Boolean telling if the account is marked as "verified"
         /// </summary>
-        Verified,
+        Verified,        
+        
+        /// <summary>
+        /// indicates the type of verification a user account has: blue, business, government or none
+        /// </summary>
+        Verified_Type,
 
         // Withheld // Not implemented yet
     }
