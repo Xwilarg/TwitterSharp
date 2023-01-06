@@ -61,6 +61,11 @@ namespace TwitterSharp.Response.RUser
         /// </summary>
         public bool? Verified { init; get; }
 
+        /// <summary>
+        /// indicates the type of verification a user account has: blue, business, government or none
+        /// </summary>
+        public string VerifiedType { init; get; }
+
         public override bool Equals(object obj)
             => obj is User t && t?.Id == Id;
 
