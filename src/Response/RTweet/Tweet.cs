@@ -47,6 +47,10 @@ namespace TwitterSharp.Response.RTweet
         /// </summary>
         public bool? PossiblySensitive { init; get; }
         /// <summary>
+        /// An array of Tweet IDs corresponding to each version of a Tweet, beginning with the initial Tweet and ending with the most recent version of the Tweet.
+        /// </summary>
+        public string[] EditHistoryTweetIds { init; get; }
+        /// <summary>
         /// Public metrics of the tweet
         /// </summary>
         public TweetPublicMetrics PublicMetrics { init; get; }

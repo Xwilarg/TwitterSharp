@@ -483,5 +483,23 @@ namespace TwitterSharp.UnitTests
                 Assert.AreEqual("Not Found Error", e.Errors.First().Title);
             }
         }
+        
+        [TestMethod]
+        public async Task GetTweetsEditFromTweet()
+        {
+            var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
+            var a = await client.GetTweetAsync("1575590534529556480");
+
+            Assert.IsNull(a.Attachments);
+            Assert.IsNull(a.ConversationId);
+            Assert.IsNull(a.CreatedAt);
+            Assert.IsNull(a.Entities);
+            Assert.IsNull(a.InReplyToUserId);
+            Assert.IsNull(a.Lang);
+            Assert.IsNull(a.PossiblySensitive);
+            Assert.IsNull(a.PublicMetrics);
+            Assert.IsNull(a.ReferencedTweets);
+            Assert.IsTrue(a.EditHistoryTweetIds.Length > 1);
+        }
     }
 }
