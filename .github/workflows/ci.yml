@@ -10,17 +10,16 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-      matrix:
-        dotnet-version: ['5.x', '6.x', '7.x' ]
 
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET ${{ matrix.dotnet-version }}
+    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+        dotnet-version: |
+          5.x
+          6.x
+          7.x
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
     - name: Restore dependencies
@@ -30,7 +29,7 @@ jobs:
     - name: Test
       env:
         TWITTER_TOKEN: ${{ secrets.TWITTER_TOKEN }}
-      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage"
+      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" -p:ParallelizeTestCollections=false
     - name: Copy coverage
       run: sh copy_coverage.sh
     - name: Upload coverage to Codacy
