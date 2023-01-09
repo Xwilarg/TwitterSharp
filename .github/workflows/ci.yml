@@ -16,7 +16,10 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: |
+          5.x
+          6.x
+          7.x
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
     - name: Restore dependencies
