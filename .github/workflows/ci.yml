@@ -10,16 +10,16 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['5.x', '6.x', '7.x' ]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET
+    - name: Setup .NET ${{ matrix.dotnet-version }}
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: |
-          5.x
-          6.x
-          7.x
+          dotnet-version: ${{ matrix.dotnet-version }}
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
     - name: Restore dependencies
