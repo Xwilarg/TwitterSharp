@@ -14,12 +14,11 @@ namespace TwitterSharp.Response.RTweet
         /// </summary>
         public bool IsEditEligible { get; init; }
         /// <summary>
-        /// how much time,
-        /// if any, is remaining for a Tweet to be edited
+        /// How much time, if any, is remaining for a Tweet to be edited
         /// </summary>
         public DateTime EditableUntil { get; init; }
         /// <summary>
-        /// how many edits remain
+        /// How many edits remain
         /// </summary>
         public int EditsRemaining { get; init; }
     }
