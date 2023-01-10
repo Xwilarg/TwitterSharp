@@ -9,8 +9,18 @@ namespace TwitterSharp.Response.RTweet
     /// </summary>
     public class EditControls
     {
+        /// <summary>
+        /// Tweet was editable at the time it was created
+        /// </summary>
         public bool IsEditEligible { get; init; }
+        /// <summary>
+        /// how much time,
+        /// if any, is remaining for a Tweet to be edited
+        /// </summary>
         public DateTime EditableUntil { get; init; }
+        /// <summary>
+        /// how many edits remain
+        /// </summary>
         public int EditsRemaining { get; init; }
     }
 }
