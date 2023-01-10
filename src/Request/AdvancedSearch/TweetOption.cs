@@ -64,6 +64,13 @@
         /// <summary>
         /// Same at "Attachments" but only get their ID
         /// </summary>
-        Attachments_Ids
+        Attachments_Ids,
+
+        /// <summary>
+        /// You can get information such as whether a Tweet was editable at the time it was created, how much time,
+        /// if any, is remaining for a Tweet to be edited, and how many edits remain by specifying edit_controls
+        /// in your tweet.fields parameter.
+        /// </summary>
+        Edit_Controls
     }
 }

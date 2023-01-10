@@ -488,7 +488,10 @@ namespace TwitterSharp.UnitTests
         public async Task GetTweetsEditFromTweet()
         {
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
-            var a = await client.GetTweetAsync("1575590534529556480");
+            var a = await client.GetTweetAsync("1575590534529556480", new TweetSearchOptions
+            {
+                TweetOptions = new[] { TweetOption.Edit_Controls }
+            });
 
             Assert.IsNull(a.Attachments);
             Assert.IsNull(a.ConversationId);
@@ -500,6 +503,10 @@ namespace TwitterSharp.UnitTests
             Assert.IsNull(a.PublicMetrics);
             Assert.IsNull(a.ReferencedTweets);
             Assert.IsTrue(a.EditHistoryTweetIds.Length > 1);
+            Assert.IsNotNull(a.EditControls);
+            Assert.IsTrue(a.EditControls.IsEditEligible);
+            Assert.IsTrue(a.EditControls.EditsRemaining > 0);
+            Assert.IsTrue(a.EditControls.EditableUntil.Ticks == 638000835290000000);
         }
     }
 }
