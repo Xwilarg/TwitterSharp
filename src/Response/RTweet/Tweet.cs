@@ -47,6 +47,16 @@ namespace TwitterSharp.Response.RTweet
         /// </summary>
         public bool? PossiblySensitive { init; get; }
         /// <summary>
+        /// An array of Tweet IDs corresponding to each version of a Tweet, beginning with the initial Tweet and ending with the most recent version of the Tweet.
+        /// </summary>
+        public string[] EditHistoryTweetIds { init; get; }
+        /// <summary>
+        /// You can get information such as whether a Tweet was editable at the time it was created, how much time,
+        /// if any, is remaining for a Tweet to be edited, and how many edits remain by specifying edit_controls
+        /// in your tweet.fields parameter.
+        /// </summary>
+        public EditControls EditControls { get; set; }
+        /// <summary>
         /// Public metrics of the tweet
         /// </summary>
         public TweetPublicMetrics PublicMetrics { init; get; }
