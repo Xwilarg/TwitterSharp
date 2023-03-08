@@ -92,7 +92,7 @@ namespace TwitterSharp.ApiEndpoint
 
         #region Users
 
-        [Endpoint(Resource = Resource.Users, EndpointType = EndpointType.GET, Url = "/2/users/me", Group = "Authenticated user", LimitPerUser = 75)]
+        [Endpoint(Resource = Resource.Users, EndpointType = EndpointType.GET, Url = "/2/users/me", Group = "User lookup", LimitPerUser = 75)]
         [Description("Retrieve the currently authenticated user")]
         GetMe,
         [Endpoint(Resource = Resource.Users, EndpointType = EndpointType.GET, Url = "/2/users/by/username/:username", Group = "User lookup", LimitPerApp = 300, LimitPerUser = 900)]
