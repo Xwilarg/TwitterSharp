@@ -249,6 +249,19 @@ namespace TwitterSharp.Client
             return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
         }
 
+        /// <summary>
+        /// Get the tweets liked by a user
+        /// </summary>
+        /// <param name="userId">User ID of the user you want the linked tweets of</param>
+        /// <param name="options">properties send with the tweet</param>
+        public async Task<Tweet[]> GetLikedTweets(string userId, TweetSearchOptions options = null)
+        {
+            options ??= new();
+            var res = await _httpClient.GetAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/liked_tweets?" + options.Build(true));
+            BuildRateLimit(res.Headers, Endpoint.TweetsLiked);
+            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
+        }
+
         #endregion TweetSearch
 
         #region TweetStream
