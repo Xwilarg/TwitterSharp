@@ -45,10 +45,27 @@ namespace TwitterSharp.JsonOption
                     Width = TryGetProperty(elem, "width")?.GetInt32(),
                     DurationMs = TryGetProperty(elem, "duration_ms")?.GetInt32(),
                     PreviewImageUrl = TryGetProperty(elem, "preview_image_url")?.GetString(),
-                    Url = TryGetProperty(elem, "url")?.GetString()
+                    Url = TryGetProperty(elem, "url")?.GetString(),
+                    Variants = GetMediaVariants(elem)
                 };
+
                 return media;
             }
+        }
+
+        private MediaVariant[] GetMediaVariants(JsonElement mediaElement)
+        {
+            var mediaVariants = Array.Empty<MediaVariant>();
+
+            if(mediaElement.TryGetProperty("variants", out var variants))
+            {
+                mediaVariants = JsonSerializer.Deserialize<MediaVariant[]>(variants.GetRawText(), new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = new SnakeCaseNamingPolicy()
+                });
+            }
+
+            return mediaVariants;
         }
 
         public override void Write(Utf8JsonWriter writer, Media value, JsonSerializerOptions options)

@@ -25,6 +25,12 @@
         /// <summary>
         /// URL to the image of the content
         /// </summary>
-        Url
+        Url,
+
+        /// <summary>
+        /// Each media object may have multiple display or playback variants, with different resolutions or formats.
+        /// For videos, each variant will also contain URLs to the video in each format.
+        /// </summary>
+        Variants
     }
 }

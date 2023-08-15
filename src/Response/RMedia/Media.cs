@@ -10,5 +10,6 @@
         public int? DurationMs { init; get; }
         public string PreviewImageUrl { init; get; }
         public string Url { init; get; }
+        public MediaVariant[] Variants { init; get; }
     }
 }
