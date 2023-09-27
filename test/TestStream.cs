@@ -130,7 +130,7 @@ namespace TwitterSharp.UnitTests
                 await Task.Delay(25);
             }
 
-            Assert.IsTrue(streamResult == TaskStatus.RanToCompletion);
+            Assert.IsTrue(streamResult == TaskStatus.RanToCompletion, streamResult.ToString());
         }
 
         [TestMethod]
@@ -139,7 +139,7 @@ namespace TwitterSharp.UnitTests
             var client = new TwitterClient(Environment.GetEnvironmentVariable("TWITTER_TOKEN"));
 
             // Faulty expression
-            var expression = Expression.Keyword("Faulty expression").And(Expression.PlaceCountry("xxxx"));
+            var expression = Expression.Keyword("Faulty expression").And(Expression.Sample(200));
 
             try
             {
@@ -154,7 +154,7 @@ namespace TwitterSharp.UnitTests
             }
 
             // double faulty expression
-            var expression2 = Expression.Keyword("double faulty expression").And(Expression.PlaceCountry("xxxx"), Expression.Sample(200));
+            var expression2 = Expression.Keyword("double faulty expression").And(Expression.FollowersCount(-100), Expression.Sample(200));
 
             try
             {
