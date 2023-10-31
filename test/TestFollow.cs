@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TwitterSharp.Client;
 using TwitterSharp.Request.Option;
+using TwitterSharp.Response;
 using TwitterSharp.Response.RUser;
 
 namespace TwitterSharp.UnitTests
@@ -11,9 +12,9 @@ namespace TwitterSharp.UnitTests
     [TestClass]
     public class TestFollow
     {
-        private async Task<bool> ContainsFollowAsync(string username, RUsers rUsers)
+        private async Task<bool> ContainsFollowAsync(string username, RArray<User> rUsers)
         {
-            if (rUsers.Users.Any(x => x.Username == username))
+            if (rUsers.Data.Any(x => x.Username == username))
             {
                 return true;
             }

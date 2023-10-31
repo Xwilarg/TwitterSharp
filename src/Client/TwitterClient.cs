@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -129,7 +130,7 @@ namespace TwitterSharp.Client
             }
         }
 
-        private T[] ParseArrayData<T>(string json)
+        private Answer<T[]> ParseArrayData<T>(string json)
         {
             var answer = JsonSerializer.Deserialize<Answer<T[]>>(json, _jsonOptions);
             if (answer.Detail != null || answer.Errors != null)
@@ -138,10 +139,11 @@ namespace TwitterSharp.Client
             }
             if (answer.Data == null)
             {
-                return Array.Empty<T>();
+                answer.Data = Array.Empty<T>();
+                return answer;
             }
             InternalIncludesParse(answer);
-            return answer.Data;
+            return answer;
         }
 
         private Answer<T> ParseData<T>(string json)
@@ -193,7 +195,9 @@ namespace TwitterSharp.Client
         public async Task<Tweet> GetTweetAsync(string id, TweetSearchOptions options = null)
         {
             options ??= new();
-            var res = await _httpClient.GetAsync(_baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + options.Build(true));
+            var query = _baseUrl + "tweets/" + HttpUtility.UrlEncode(id) + "?" + options.Build(true);
+
+            var res = await _httpClient.GetAsync(query);
             BuildRateLimit(res.Headers, Endpoint.GetTweetById);
             return ParseData<Tweet>(await res.Content.ReadAsStringAsync()).Data;
         }
@@ -205,34 +209,35 @@ namespace TwitterSharp.Client
         public async Task<Tweet[]> GetTweetsAsync(string[] ids, TweetSearchOptions options = null)
         {
             options ??= new();
+
             var res = await _httpClient.GetAsync(_baseUrl + "tweets?ids=" + string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x))) + "&" + options.Build(true));
             BuildRateLimit(res.Headers, Endpoint.GetTweetsByIds);
-            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
+            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync()).Data;
+            
         }
 
         /// <summary>
         /// Get the latest tweets of an user
         /// </summary>
         /// <param name="userId">Username of the user you want the tweets of</param>
-        public async Task<Tweet[]> GetTweetsFromUserIdAsync(string userId, TweetSearchOptions options = null)
+        public async Task<RArray<Tweet>> GetTweetsFromUserIdAsync(string userId, TweetSearchOptions options = null)
         {
-            options ??= new();
-            var res = await _httpClient.GetAsync(_baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true));
-            BuildRateLimit(res.Headers, Endpoint.UserTweetTimeline);
-            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
+            options ??= new(); 
+            var query = _baseUrl + "users/" + HttpUtility.HtmlEncode(userId) + "/tweets?" + options.Build(true);
+            return await RequestList<Tweet>(query, Endpoint.UserTweetTimeline);
         }
+
 
         /// <summary>
         /// Get the latest tweets for an expression
         /// </summary>
         /// <param name="expression">An expression to build the query <seealso cref="https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query"/></param>
         /// <param name="options">properties send with the tweet</param>
-        public async Task<Tweet[]> GetRecentTweets(Expression expression, TweetSearchOptions options = null)
+        public async Task<RArray<Tweet>> GetRecentTweets(Expression expression, TweetSearchOptions options = null)
         {
             options ??= new();
-            var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/recent?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true));
-            BuildRateLimit(res.Headers, Endpoint.RecentSearch);
-            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
+            var query = _baseUrl + "tweets/search/recent?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true);
+            return await RequestList<Tweet>(query, Endpoint.RecentSearch);
         }
         
         /// <summary>
@@ -241,12 +246,11 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="expression">An expression to build the query <seealso cref="https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query"/></param>
         /// <param name="options">properties send with the tweet</param>
-        public async Task<Tweet[]> GetAllTweets(Expression expression, TweetSearchOptions options = null)
+        public async Task<RArray<Tweet>> GetAllTweets(Expression expression, TweetSearchOptions options = null)
         {
             options ??= new();
-            var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/all?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true));
-            BuildRateLimit(res.Headers, Endpoint.FullArchiveSearch);
-            return ParseArrayData<Tweet>(await res.Content.ReadAsStringAsync());
+            var query = _baseUrl + "tweets/search/all?query=" + HttpUtility.UrlEncode(expression.ToString()) + "&" + options.Build(true);
+            return await RequestList<Tweet>(query, Endpoint.FullArchiveSearch);
         }
 
         #endregion TweetSearch
@@ -257,7 +261,7 @@ namespace TwitterSharp.Client
         {
             var res = await _httpClient.GetAsync(_baseUrl + "tweets/search/stream/rules");
             BuildRateLimit(res.Headers, Endpoint.ListingFilters);
-            return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync());
+            return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync()).Data;
         }
 
         private StreamReader _reader;
@@ -346,7 +350,7 @@ namespace TwitterSharp.Client
             var content = new StringContent(JsonSerializer.Serialize(new StreamRequestAdd { Add = request }, _jsonOptions), Encoding.UTF8, "application/json");
             var res = await _httpClient.PostAsync(_baseUrl + "tweets/search/stream/rules", content);
             BuildRateLimit(res.Headers, Endpoint.AddingDeletingFilters);
-            return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync());
+            return ParseArrayData<StreamInfo>(await res.Content.ReadAsStringAsync()).Data;
         }
 
         /// <summary>
@@ -397,7 +401,7 @@ namespace TwitterSharp.Client
             options ??= new();
             var res = await _httpClient.GetAsync(_baseUrl + $"users/by?usernames={string.Join(",", usernames.Select(x => HttpUtility.UrlEncode(x)))}&{options.Build(false)}");
             BuildRateLimit(res.Headers, Endpoint.GetUsersByNames);
-            return ParseArrayData<User>(await res.Content.ReadAsStringAsync());
+            return ParseArrayData<User>(await res.Content.ReadAsStringAsync()).Data;
         }
 
         /// <summary>
@@ -421,46 +425,24 @@ namespace TwitterSharp.Client
             options ??= new();
             var res = await _httpClient.GetAsync(_baseUrl + $"users?ids={string.Join(",", ids.Select(x => HttpUtility.UrlEncode(x)))}&{options.Build(false)}");
             BuildRateLimit(res.Headers, Endpoint.GetUsersByIds);
-            return ParseArrayData<User>(await res.Content.ReadAsStringAsync());
+            return ParseArrayData<User>(await res.Content.ReadAsStringAsync()).Data;
         }
 
         #endregion UserSearch
 
         #region GetUsers
 
-        /// <summary>
-        /// General method for getting the next page of users
-        /// </summary>
-        /// <returns></returns>
-        private async Task<RUsers> NextUsersAsync(string baseQuery, string token, Endpoint endpoint)
-        {
-            var res = await _httpClient.GetAsync(baseQuery + (!baseQuery.EndsWith("?") ? "&" : "") + "pagination_token=" + token);
-            var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, endpoint);
-            return new()
-            {
-                Users = data.Data,
-                NextAsync = data.Meta.NextToken == null ? null : async () => await NextUsersAsync(baseQuery, data.Meta.NextToken, endpoint)
-            };
-        }
 
         /// <summary>
         /// Get the follower of an user
         /// </summary>
         /// <param name="id">ID of the user</param>
         /// <param name="limit">Max number of result, max is 1000</param>
-        public async Task<RUsers> GetFollowersAsync(string id, UserSearchOptions options = null)
+        public async Task<RArray<User>> GetFollowersAsync(string id, UserSearchOptions options = null)
         {
             options ??= new();
             var query = _baseUrl + $"users/{HttpUtility.UrlEncode(id)}/followers?{options.Build(false)}";
-            var res = await _httpClient.GetAsync(query);
-            var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, Endpoint.GetFollowersById);
-            return new()
-            {
-                Users = data.Data,
-                NextAsync = data.Meta.NextToken == null ? null : async () => await NextUsersAsync(query, data.Meta.NextToken, Endpoint.GetFollowersById)
-            };
+            return await RequestList<User>(query, Endpoint.GetFollowersById);
         }
 
         /// <summary>
@@ -468,37 +450,23 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="id">ID of the user</param>
         /// <param name="limit">Max number of result, max is 1000</param>
-        public async Task<RUsers> GetFollowingAsync(string id, UserSearchOptions options = null)
+        public async Task<RArray<User>> GetFollowingAsync(string id, UserSearchOptions options = null)
         {
             options ??= new();
             var query = _baseUrl + $"users/{HttpUtility.UrlEncode(id)}/following?{options.Build(false)}";
-            var res = await _httpClient.GetAsync(query);
-            var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, Endpoint.GetFollowingsById);
-            return new()
-            {
-                Users = data.Data,
-                NextAsync = data.Meta.NextToken == null ? null : async () => await NextUsersAsync(query, data.Meta.NextToken, Endpoint.GetFollowingsById)
-            };
+            return await RequestList<User>(query, Endpoint.GetFollowersById);
         }
-        
+
         /// <summary>
         /// Get the likes of a tweet
         /// </summary>
         /// <param name="id">ID of the tweet</param>
         /// <param name="options">This parameter enables you to select which specific user fields will deliver with each returned users objects. You can also set a Limit per page. Max is 100</param>
-        public async Task<RUsers> GetLikesAsync(string id, UserSearchOptions options = null)
+        public async Task<RArray<User>> GetLikesAsync(string id, UserSearchOptions options = null)
         {
             options ??= new();
             var query = _baseUrl + $"tweets/{HttpUtility.UrlEncode(id)}/liking_users?{options.Build(false)}";
-            var res = await _httpClient.GetAsync(query);
-            var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, Endpoint.UsersLiked);
-            return new()
-            {
-                Users = data.Data,
-                NextAsync = data.Meta.NextToken == null ? null : async () => await NextUsersAsync(query, data.Meta.NextToken, Endpoint.UsersLiked)
-            };
+            return await RequestList<User>(query, Endpoint.UsersLiked);
         }
 
         /// <summary>
@@ -506,21 +474,37 @@ namespace TwitterSharp.Client
         /// </summary>
         /// <param name="id">ID of the tweet</param>
         /// <param name="options">This parameter enables you to select which specific user fields will deliver with each returned users objects. You can also set a Limit per page. Max is 100</param>
-        public async Task<RUsers> GetRetweetsAsync(string id, UserSearchOptions options = null)
+        public async Task<RArray<User>> GetRetweetsAsync(string id, UserSearchOptions options = null)
         {
             options ??= new();
             var query = _baseUrl + $"tweets/{HttpUtility.UrlEncode(id)}/retweeted_by?{options.Build(false)}";
-            var res = await _httpClient.GetAsync(query);
-            var data = ParseData<User[]>(await res.Content.ReadAsStringAsync());
-            BuildRateLimit(res.Headers, Endpoint.RetweetsLookup);
-            return new()
-            {
-                Users = data.Data,
-                NextAsync = data.Meta.NextToken == null ? null : async () => await NextUsersAsync(query, data.Meta.NextToken, Endpoint.RetweetsLookup)
-            };
+            return await RequestList<User>(query, Endpoint.RetweetsLookup);
         }
 
         #endregion Users
+
+
+        #region General
+
+
+        /// <summary>
+        /// General method for getting the next page with meta token
+        /// </summary>
+        /// <returns></returns>
+        private async Task<RArray<T>> RequestList<T>(string baseQuery, Endpoint endpoint, string token = null)
+        {
+            var res = await _httpClient.GetAsync(baseQuery + (string.IsNullOrEmpty(token) ? "" : (!baseQuery.EndsWith("?") ? "&" : "") +  "pagination_token=" + token));
+            var data = ParseArrayData<T>(await res.Content.ReadAsStringAsync());
+            BuildRateLimit(res.Headers, endpoint);
+            return new()
+            {
+                Data = data.Data,
+                NextAsync = data.Meta.NextToken == null ? null : async () => await RequestList<T>(baseQuery, endpoint, data.Meta.NextToken),
+                PreviousAsync = data.Meta.PreviousToken == null ? null : async () => await RequestList<T>(baseQuery, endpoint, data.Meta.PreviousToken)
+            };
+        }
+
+        #endregion
 
         private const string _baseUrl = "https://api.twitter.com/2/";
 
